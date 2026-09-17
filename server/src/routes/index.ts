@@ -1,5 +1,6 @@
 import { Router } from "express";
 import healthRouter from "./health.routes.js";
+import authRouter from "./auth.routes.js";
 import tripRouter from "./trip.routes.js";
 import destinationRouter from "./destination.routes.js";
 import experienceRouter from "./experience.routes.js";
@@ -10,6 +11,7 @@ import reviewRouter from "./review.routes.js";
 const router = Router();
 
 router.use("/health", healthRouter);
+router.use("/auth", authRouter);
 router.use("/trips", tripRouter);
 router.use("/destinations", destinationRouter);
 router.use("/experiences", experienceRouter);

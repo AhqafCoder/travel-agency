@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────
-// GetSet Junction — Shared TypeScript Types
+// editmytrips — Shared TypeScript Types
 // All interfaces mirror the MongoDB models.
 // ─────────────────────────────────────────────
 
@@ -261,7 +261,7 @@ export interface BookingTraveller {
 
 export interface Booking {
   _id: string;
-  bookingNumber: string; // GSJ10023
+  bookingNumber: string; // EMT10023
   userId: string;
   user?: User;
   tripId: string;

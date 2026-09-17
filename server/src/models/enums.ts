@@ -1,4 +1,4 @@
-// Shared enums for the GetSet Junction domain.
+// Shared enums for the editmytrips domain.
 // Keep in sync with client/src/types/index.ts.
 
 export enum UserRole {

@@ -58,7 +58,7 @@
 }
 
 :root {
-  /* GetSet Junction brand — orange + teal travel palette */
+  /* editmytrips brand — orange + teal travel palette */
   --brand: oklch(0.65 0.2 38);          /* #FF6B35 orange */
   --brand-foreground: oklch(1 0 0);
   --brand-muted: oklch(0.95 0.04 38);   /* light orange tint */

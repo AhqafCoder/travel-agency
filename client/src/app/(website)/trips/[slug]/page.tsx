@@ -29,8 +29,9 @@ import { getTripBySlug, getTripReviews, formatPrice } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 import { DIFFICULTY_COLORS } from "@/lib/constants";
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const trip = getTripBySlug(params.slug);
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const trip = getTripBySlug(slug);
   if (!trip) return { title: "Trip Not Found" };
 
   return {
@@ -44,8 +45,9 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-export default function TripDetailPage({ params }: { params: { slug: string } }) {
-  const trip = getTripBySlug(params.slug);
+export default async function TripDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const trip = getTripBySlug(slug);
 
   if (!trip) return notFound();
 

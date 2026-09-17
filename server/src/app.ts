@@ -24,7 +24,7 @@ export function createApp(): Express {
   app.get("/", (_req, res) => {
     res.json({
       success: true,
-      data: { name: "GetSet Junction API", version: "0.1.0" },
+      data: { name: "editmytrips API", version: "0.1.0" },
     });
   });
 

@@ -1,5 +1,6 @@
 import { connectDB, disconnectDB } from "../db/mongoose.js";
 import { env } from "../config/env.js";
+import bcrypt from "bcryptjs";
 import { User } from "../models/User.js";
 import { Destination, type DestinationDoc } from "../models/Destination.js";
 import { Trip } from "../models/Trip.js";
@@ -12,12 +13,15 @@ import { Review } from "../models/Review.js";
 import { Payment } from "../models/Payment.js";
 import { Captain } from "../models/Captain.js";
 
+// All seeded accounts share this dev password so you can log in as any of them.
+const DEFAULT_PASSWORD = "editmytrips123";
+
 const users = [
-  { name: "Arjun Mehta", email: "arjun@getsetjunction.com", phone: "+919876543210", role: "SUPER_ADMIN" },
-  { name: "Priya Nair", email: "priya@getsetjunction.com", phone: "+919876543211", role: "OPERATIONS" },
-  { name: "Ravi Sharma", email: "ravi@getsetjunction.com", phone: "+919876543212", role: "CAPTAIN" },
-  { name: "Sonia Das", email: "sonia@getsetjunction.com", phone: "+919876543213", role: "CAPTAIN" },
-  { name: "Kabir Patel", email: "kabir@getsetjunction.com", phone: "+919876543214", role: "CUSTOMER" },
+  { name: "Arjun Mehta", email: "arjun@editmytrips.com", phone: "+919876543210", role: "SUPER_ADMIN" },
+  { name: "Priya Nair", email: "priya@editmytrips.com", phone: "+919876543211", role: "OPERATIONS" },
+  { name: "Ravi Sharma", email: "ravi@editmytrips.com", phone: "+919876543212", role: "CAPTAIN" },
+  { name: "Sonia Das", email: "sonia@editmytrips.com", phone: "+919876543213", role: "CAPTAIN" },
+  { name: "Kabir Patel", email: "kabir@editmytrips.com", phone: "+919876543214", role: "CUSTOMER" },
 ];
 
 const destinations = [
@@ -176,8 +180,10 @@ async function seed() {
   const destDocs = await Destination.insertMany(destinations);
   console.log(`✅ Seeded ${destDocs.length} destinations`);
 
-  // Seed users
-  const userDocs = await User.insertMany(users);
+  // Seed users (with hashed password so /login works against the seeded DB).
+  const passwordHash = await bcrypt.hash(DEFAULT_PASSWORD, 10);
+  const usersWithHash = users.map((u) => ({ ...u, passwordHash }));
+  const userDocs = await User.insertMany(usersWithHash);
   console.log(`✅ Seeded ${userDocs.length} users`);
 
   // Seed captains (link to CAPTAIN users by order)

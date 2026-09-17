@@ -1,6 +1,6 @@
-# GetSet Junction — Implementation Plan
+# editmytrips — Implementation Plan
 
-> **Stack:** Next.js 16 · TypeScript · Tailwind CSS v4 · shadcn/ui (base-nova) · MongoDB + Mongoose · Auth.js v5 · Razorpay · Resend · Cloudinary · TanStack Query
+> **Stack:** Next.js 16 · TypeScript · Tailwind CSS v4 · shadcn/ui (base-nova) · MongoDB + Mongoose · JWT auth (jsonwebtoken + bcryptjs) · Razorpay · Resend · Cloudinary · TanStack Query
 
 ---
 
@@ -15,7 +15,7 @@ server/                       ← Express + Mongoose REST API (monorepo root)
     ├── db/mongoose.ts        ← MongoDB singleton connection
     ├── middleware/
     │   ├── error.ts          ← notFound + error handler
-    │   └── auth.ts           ← JWT auth guard (Phase 10)
+    │   └── auth.ts           ← requireAuth / requireRole JWT guards (done)
     ├── models/               ← Mongoose models (same shape as client types)
     │   ├── User.ts, Trip.ts, Destination.ts, Experience.ts,
     │   ├── Booking.ts, Payment.ts, Review.ts, Story.ts, Captain.ts,
@@ -46,7 +46,12 @@ client/
     │   │   ├── booking/
     │   │   │   └── [tripId]/page.tsx
     │   │   └── profile/
-    │   │       └── page.tsx
+    │   │       └── page.tsx        ← Auth-aware ProfileShell
+    │   │
+    │   ├── (auth)/                 ← Account auth (centered layout)
+    │   │   ├── layout.tsx
+    │   │   ├── login/page.tsx
+    │   │   └── register/page.tsx
     │   │
     │   ├── admin/                  ← Admin dashboard
     │   │   ├── layout.tsx
@@ -72,6 +77,9 @@ client/
     │
     ├── components/
     │   ├── ui/                     ← shadcn (already generated)
+    │   ├── auth/
+    │   │   ├── AuthContext.tsx     ← AuthProvider + useAuth (JWT session)
+    │   │   └── AuthForm.tsx        ← login/register card form
     │   ├── navigation/
     │   │   ├── Navbar.tsx
     │   │   ├── MobileNav.tsx
@@ -100,6 +108,7 @@ client/
     ├── lib/
     │   ├── utils.ts                ← cn() (exists)
     │   ├── constants.ts            ← site config, nav links
+    │   ├── api.ts                  ← typed fetch wrapper + JWT session helpers
     │   ├── fonts.ts                ← Geist config
     │   └── mock-data.ts            ← Realistic mock data (swapped for Express API later)
     │
@@ -175,7 +184,7 @@ client/
   - Experiences section
   - Stories / Blog preview
   - Community / Traveller photos
-  - Why GetSet Junction (trust signals)
+  - Why editmytrips (trust signals)
   - CTA banner
 - [x] **4.2** `(website)/explore/page.tsx` — **Explore**
   - Search input with URL params
@@ -193,10 +202,10 @@ client/
   - Captain card
 - [ ] **4.5** `(website)/destinations/page.tsx` — Destinations grid
 - [ ] **4.6** `(website)/destinations/[slug]/page.tsx` — Destination detail (hero, about, best time, trips from here)
-- [ ] **4.7** `(website)/experiences/page.tsx` — Experiences grid with filter
-- [ ] **4.8** `(website)/stories/page.tsx` — Blog listing (featured + grid)
-- [ ] **4.9** `(website)/stories/[slug]/page.tsx` — Story/blog detail with rich content
-- [ ] **4.10** `(website)/community/page.tsx` — Traveller photos, trip reviews, social feed style
+- [x] **4.7** `(website)/experiences/page.tsx` — Experiences grid with filter
+- [x] **4.8** `(website)/stories/page.tsx` — Blog listing (featured + grid)
+- [x] **4.9** `(website)/stories/[slug]/page.tsx` — Story/blog detail with rich content
+- [x] **4.10** `(website)/community/page.tsx` — Traveller photos, trip reviews, social feed style
 
 ---
 
@@ -207,7 +216,7 @@ client/
 - [x] **5.3** `components/booking/TravellerSelector.tsx` — Adults/children counter with max cap
 - [x] **5.4** `components/booking/PriceBreakdown.tsx` — Subtotal, tax, coupon discount, total
 - [x] **5.5** `components/booking/BookingSummary.tsx` — Final confirmation summary card
-- [ ] **5.6** `(website)/booking/[tripId]/page.tsx` — **Multi-step booking flow**
+- [x] **5.6** `(website)/booking/[tripId]/page.tsx` — **Multi-step booking flow**
   - Step 1: Select departure + traveller count
   - Step 2: Traveller details form (name, age, gender, phone, emergency contact)
   - Step 3: Add-ons + coupon code
@@ -219,7 +228,7 @@ client/
 
 ### Phase 6 — User Account
 
-- [ ] **6.1** `(website)/profile/page.tsx` — Upcoming bookings, past trips, edit profile
+- [x] **6.1** `(website)/profile/page.tsx` — Upcoming bookings, past trips, edit profile
 
 ---
 
@@ -297,10 +306,15 @@ client/
 
 ### Phase 10 — Auth
 
-- [ ] **10.1** `src/lib/auth/auth.ts` — Auth.js v5 with Google + Email OTP, MongoDB adapter
-- [ ] **10.2** `src/lib/permissions.ts` — Role-permission matrix (SUPER_ADMIN → CUSTOMER)
-- [ ] **10.3** `src/app/middleware.ts` — Route protection (admin routes, booking routes)
-- [ ] **10.4** `src/app/(auth)/` — Sign in / Sign up pages
+- [x] **10.1** `server/src/lib/jwt.ts` — JWT sign/verify (jsonwebtoken, 7-day expiry, `sub/role/email` payload)
+- [x] **10.2** `server/src/middleware/auth.ts` — `requireAuth` (Bearer parsing) + `requireRole` role guard
+- [x] **10.3** `server/src/controllers/auth.controller.ts` + `server/src/routes/auth.routes.ts` — `POST /api/auth/register`, `POST /api/auth/login`, `GET /api/auth/me` (bcrypt password hashing, 409 duplicate email, envelope `{ success, data }`)
+- [x] **10.4** `server/src/seed/seed.ts` — seeded users with bcrypt-hashed password (`editmytrips123`)
+- [x] **10.5** `client/src/components/auth/` — `AuthProvider` (loading/authenticated/unauthenticated + localStorage session + 401 clear), login/register forms
+- [x] **10.6** `client/src/app/(auth)/` — centered `layout.tsx`, `login/page.tsx`, `register/page.tsx`
+- [x] **10.7** Auth-aware UI — Navbar (user dropdown / log in / sign up) + `ProfileShell` (real session, mock bookings, sign-out)
+
+> Note: original plan called for Auth.js v5 (Google + Email OTP, session-based). Implemented as **JWT (Bearer token) + bcrypt** instead — a self-contained Express auth API that the mock-first client already calls; swap to Auth.js/OAuth later if social login is needed. MongoDB must be running (`npm run seed` + `npm run dev`) for live auth.
 
 ---
 

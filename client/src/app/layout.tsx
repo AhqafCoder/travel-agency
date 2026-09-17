@@ -15,22 +15,22 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "GetSet Junction — Go Beyond the Ordinary",
-    template: "%s | GetSet Junction",
+    default: "editmytrips — Go Beyond the Ordinary",
+    template: "%s | editmytrips",
   },
   description:
     "India's most adventurous travel community. Handcrafted trips, trusted captains, and memories that last a lifetime.",
-  metadataBase: new URL("https://getsetjunction.com"),
+  metadataBase: new URL("https://editmytrips.com"),
   openGraph: {
     type: "website",
     locale: "en_IN",
-    url: "https://getsetjunction.com",
-    siteName: "GetSet Junction",
+    url: "https://editmytrips.com",
+    siteName: "editmytrips",
     images: [{ url: "/og-image.jpg", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    site: "@getsetjunction",
+    site: "@editmytrips",
   },
 };
 

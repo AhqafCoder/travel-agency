@@ -80,7 +80,7 @@ export const MOCK_DESTINATIONS: Destination[] = [
     description:
       "The yoga capital of the world and India's adventure sports hub. White water rafting, bungee jumping, camping on the Ganges banks — Rishikesh has it all.",
     heroImage:
-      "https://images.unsplash.com/photo-1583309219338-a582f1db9bde?w=1200&q=80",
+      "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1200&q=80",
     gallery: [],
     bestTime: "September to May",
     latitude: 30.0869,
@@ -118,7 +118,7 @@ export const MOCK_DESTINATIONS: Destination[] = [
     description:
       "The abode of clouds. Living root bridges, crystal clear rivers, and the wettest place on earth — Meghalaya is unlike anywhere else in India.",
     heroImage:
-      "https://images.unsplash.com/photo-1581918719906-c2b6b92ae47c?w=1200&q=80",
+      "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80",
     gallery: [],
     bestTime: "October to May",
     latitude: 25.467,
@@ -352,7 +352,7 @@ export const MOCK_TRIPS: Trip[] = [
     captain: MOCK_CAPTAINS[0],
     rating: 4.8,
     reviewCount: 124,
-    metaTitle: "Manali Backpacking Adventure — 5 Days | GetSet Junction",
+    metaTitle: "Manali Backpacking Adventure — 5 Days | editmytrips",
     metaDescription:
       "5 days of raw Himalayan exploration in Manali. Snow peaks, pine forests, bonfire nights. Starting ₹8,499.",
     createdAt: d(-60),
@@ -563,7 +563,7 @@ export const MOCK_TRIPS: Trip[] = [
     featured: false,
     trending: false,
     coverImage:
-      "https://images.unsplash.com/photo-1581918719906-c2b6b92ae47c?w=1200&q=80",
+      "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80",
     gallery: [],
     inclusions: [
       "Guwahati/Shillong airport pickup",
@@ -722,7 +722,7 @@ export const MOCK_REVIEWS: Review[] = [
     rating: 5,
     title: "Rishikesh hit different",
     content:
-      "I went solo and came back with 15 new friends. The rafting was exhilarating, the yoga sessions were peaceful, and the campfire conversations went till 2 AM every night. GetSet Junction nails the group dynamics.",
+      "I went solo and came back with 15 new friends. The rafting was exhilarating, the yoga sessions were peaceful, and the campfire conversations went till 2 AM every night. editmytrips nails the group dynamics.",
     status: "APPROVED",
     verifiedBooking: true,
     createdAt: d(-15),
@@ -885,7 +885,7 @@ export const MOCK_STORIES: Story[] = [
     author: {
       _id: "usr_admin_001",
       name: "Ahqaf Ali",
-      email: "ahqaf@getsetjunction.com",
+      email: "ahqaf@editmytrips.com",
       role: "EDITOR",
       createdAt: d(-300),
       updatedAt: d(-1),
@@ -913,7 +913,7 @@ export const MOCK_STORIES: Story[] = [
     author: {
       _id: "usr_admin_002",
       name: "Meera Kapoor",
-      email: "meera@getsetjunction.com",
+      email: "meera@editmytrips.com",
       role: "EDITOR",
       createdAt: d(-280),
       updatedAt: d(-1),
@@ -936,7 +936,7 @@ export const MOCK_STORIES: Story[] = [
       "Yes, it's possible. Here's exactly how I planned it, what I spent, and what I'd do differently.",
     content: "<p>Full rich text content goes here...</p>",
     coverImage:
-      "https://images.unsplash.com/photo-1583309219338-a582f1db9bde?w=1200&q=80",
+      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1200&q=80",
     authorId: "usr_001",
     author: {
       _id: "usr_001",
@@ -964,12 +964,12 @@ export const MOCK_STORIES: Story[] = [
       "Most people warn you away from Meghalaya in the monsoon. Most people are wrong.",
     content: "<p>Full rich text content goes here...</p>",
     coverImage:
-      "https://images.unsplash.com/photo-1581918719906-c2b6b92ae47c?w=1200&q=80",
+      "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80",
     authorId: "usr_admin_001",
     author: {
       _id: "usr_admin_001",
       name: "Ahqaf Ali",
-      email: "ahqaf@getsetjunction.com",
+      email: "ahqaf@editmytrips.com",
       role: "EDITOR",
       createdAt: d(-300),
       updatedAt: d(-1),
@@ -1045,7 +1045,7 @@ export const MOCK_CUSTOMERS: User[] = [
 export const MOCK_BOOKINGS: Booking[] = [
   {
     _id: "bkg_001",
-    bookingNumber: "GSJ10023",
+    bookingNumber: "EMT10023",
     userId: "usr_001",
     user: MOCK_CUSTOMERS[0],
     tripId: "trip_001",
@@ -1089,7 +1089,7 @@ export const MOCK_BOOKINGS: Booking[] = [
   },
   {
     _id: "bkg_002",
-    bookingNumber: "GSJ10024",
+    bookingNumber: "EMT10024",
     userId: "usr_002",
     user: MOCK_CUSTOMERS[1],
     tripId: "trip_003",
@@ -1121,7 +1121,7 @@ export const MOCK_BOOKINGS: Booking[] = [
   },
   {
     _id: "bkg_003",
-    bookingNumber: "GSJ10025",
+    bookingNumber: "EMT10025",
     userId: "usr_003",
     user: MOCK_CUSTOMERS[2],
     tripId: "trip_002",
@@ -1153,7 +1153,7 @@ export const MOCK_BOOKINGS: Booking[] = [
   },
   {
     _id: "bkg_004",
-    bookingNumber: "GSJ10026",
+    bookingNumber: "EMT10026",
     userId: "usr_004",
     user: MOCK_CUSTOMERS[3],
     tripId: "trip_004",
@@ -1245,7 +1245,7 @@ export const MOCK_AUDIT_LOGS: AuditLog[] = [
     admin: {
       _id: "usr_admin_001",
       name: "Ahqaf Ali",
-      email: "ahqaf@getsetjunction.com",
+      email: "ahqaf@editmytrips.com",
       role: "SUPER_ADMIN",
       createdAt: d(-300),
       updatedAt: d(-1),
@@ -1264,7 +1264,7 @@ export const MOCK_AUDIT_LOGS: AuditLog[] = [
     admin: {
       _id: "usr_admin_001",
       name: "Ahqaf Ali",
-      email: "ahqaf@getsetjunction.com",
+      email: "ahqaf@editmytrips.com",
       role: "SUPER_ADMIN",
       createdAt: d(-300),
       updatedAt: d(-1),
@@ -1281,7 +1281,7 @@ export const MOCK_AUDIT_LOGS: AuditLog[] = [
     admin: {
       _id: "usr_admin_001",
       name: "Ahqaf Ali",
-      email: "ahqaf@getsetjunction.com",
+      email: "ahqaf@editmytrips.com",
       role: "SUPER_ADMIN",
       createdAt: d(-300),
       updatedAt: d(-1),

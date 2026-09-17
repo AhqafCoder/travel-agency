@@ -6,7 +6,7 @@ import { BookingStatus, PaymentStatus } from "../models/enums.js";
 
 function generateBookingNumber(): string {
   const seq = Math.floor(10000 + Math.random() * 90000);
-  return `GSJ${seq}`;
+  return `EMT${seq}`;
 }
 
 export interface CreateBookingInput {

@@ -253,7 +253,7 @@ export default function HomePage() {
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-bold text-foreground">Our Community in Action</h2>
             <p className="text-muted-foreground mt-2 max-w-2xl mx-auto">
-              Real moments from real travellers. Tag @getsetjunction to be featured!
+              Real moments from real travellers. Tag @editmytrips to be featured!
             </p>
           </div>
 
@@ -273,12 +273,12 @@ export default function HomePage() {
       </section>
 
       {/* ============================================================
-           TRUST SIGNALS (WHY GETSET JUNCTION)
+           TRUST SIGNALS (WHY EDITMYTRIPS)
       ============================================================= */}
       <section className="py-20 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-foreground">Why Choose GetSet Junction?</h2>
+            <h2 className="text-3xl sm:text-4xl font-bold text-foreground">Why Choose editmytrips?</h2>
             <p className="text-muted-foreground mt-2 max-w-2xl mx-auto">
               We're not just another travel company. We're a community of explorers 
               who believe the best journeys change you.

@@ -3,20 +3,20 @@ import type { TripDifficulty, TripType } from "@/types";
 // ── Site Config ───────────────────────────────
 
 export const SITE = {
-  name: "GetSet Junction",
+  name: "editmytrips",
   tagline: "Go Beyond the Ordinary",
   description:
     "India's most adventurous travel community. Handcrafted trips, trusted captains, and memories that last a lifetime.",
-  url: "https://getsetjunction.com",
-  email: "hello@getsetjunction.com",
+  url: "https://editmytrips.com",
+  email: "hello@editmytrips.com",
   phone: "+91 98765 43210",
   whatsapp: "+919876543210",
   address: "Mumbai, Maharashtra, India",
   social: {
-    instagram: "https://instagram.com/getsetjunction",
-    youtube: "https://youtube.com/@getsetjunction",
-    facebook: "https://facebook.com/getsetjunction",
-    twitter: "https://twitter.com/getsetjunction",
+    instagram: "https://instagram.com/editmytrips",
+    youtube: "https://youtube.com/@editmytrips",
+    facebook: "https://facebook.com/editmytrips",
+    twitter: "https://twitter.com/editmytrips",
   },
 } as const;
 
