@@ -3,10 +3,10 @@ import type { TripDifficulty, TripType } from "@/types";
 // ── Site Config ───────────────────────────────
 
 export const SITE = {
-  name: "editmytrips",
-  tagline: "Go Beyond the Ordinary",
+  name: "EditMyTrips",
+  tagline: "Edit Your Trip. Create Your Story.",
   description:
-    "India's most adventurous travel community. Handcrafted trips, trusted captains, and memories that last a lifetime.",
+    "We don't just sell trips — we craft experiences. Curated adventures across India's most spectacular landscapes, edited to fit you perfectly.",
   url: "https://editmytrips.com",
   email: "hello@editmytrips.com",
   phone: "+91 98765 43210",
@@ -17,50 +17,152 @@ export const SITE = {
     youtube: "https://youtube.com/@editmytrips",
     facebook: "https://facebook.com/editmytrips",
     twitter: "https://twitter.com/editmytrips",
+    whatsapp: "https://wa.me/919876543210",
   },
 } as const;
 
 // ── Navigation ────────────────────────────────
 
 export const NAV_LINKS = [
-  { label: "Explore", href: "/explore" },
-  { label: "Trips", href: "/trips" },
+  { label: "Explore Trips", href: "/trips" },
   { label: "Destinations", href: "/destinations" },
   { label: "Experiences", href: "/experiences" },
-  { label: "Stories", href: "/stories" },
-  { label: "Community", href: "/community" },
+  { label: "Past Trips", href: "/stories" },
+  { label: "About Us", href: "/about" },
 ] as const;
 
 export const FOOTER_LINKS = {
+  explore: [
+    { label: "All Trips", href: "/trips" },
+    { label: "Destinations", href: "/destinations" },
+    { label: "Experiences", href: "/experiences" },
+    { label: "Past Trips", href: "/stories" },
+    { label: "Explore", href: "/explore" },
+  ],
   company: [
     { label: "About Us", href: "/about" },
-    { label: "Blog", href: "/stories" },
-    { label: "Careers", href: "/careers" },
-    { label: "Press", href: "/press" },
     { label: "Contact", href: "/contact" },
-  ],
-  trips: [
-    { label: "Adventure Trips", href: "/trips?type=Adventure" },
-    { label: "Treks & Hikes", href: "/trips?type=Trek" },
-    { label: "Road Trips", href: "/trips?type=Road+Trip" },
-    { label: "Backpacking", href: "/trips?type=Backpacking" },
-    { label: "Group Tours", href: "/trips" },
+    { label: "FAQs", href: "/faqs" },
+    { label: "Careers", href: "/careers" },
   ],
   destinations: [
-    { label: "Himachal Pradesh", href: "/destinations/himachal-pradesh" },
-    { label: "Uttarakhand", href: "/destinations/uttarakhand" },
-    { label: "Rajasthan", href: "/destinations/rajasthan" },
-    { label: "Kerala", href: "/destinations/kerala" },
-    { label: "Goa", href: "/destinations/goa" },
+    { label: "Himachal Edit", href: "/destinations/manali" },
+    { label: "Uttarakhand Edit", href: "/destinations/rishikesh" },
+    { label: "Kashmir Edit", href: "/destinations/kashmir" },
+    { label: "Goa Edit", href: "/destinations/goa" },
+    { label: "North East Edit", href: "/destinations/meghalaya" },
+    { label: "Ladakh Edit", href: "/destinations/spiti-valley" },
   ],
   support: [
-    { label: "FAQs", href: "/faqs" },
     { label: "Cancellation Policy", href: "/cancellation-policy" },
     { label: "Privacy Policy", href: "/privacy-policy" },
     { label: "Terms of Service", href: "/terms" },
     { label: "Refund Policy", href: "/refund-policy" },
   ],
 } as const;
+
+// ── Destination Edits (homepage categories) ──
+
+export const DESTINATION_EDITS = [
+  {
+    label: "Himachal Edit",
+    slug: "manali",
+    image: "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=800&q=80",
+    count: 14,
+    state: "Himachal Pradesh",
+  },
+  {
+    label: "Kashmir Edit",
+    slug: "kashmir",
+    image: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?w=800&q=80",
+    count: 9,
+    state: "Jammu & Kashmir",
+  },
+  {
+    label: "Uttarakhand Edit",
+    slug: "rishikesh",
+    image: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=80",
+    count: 11,
+    state: "Uttarakhand",
+  },
+  {
+    label: "Ladakh Edit",
+    slug: "spiti-valley",
+    image: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=800&q=80",
+    count: 8,
+    state: "Ladakh",
+  },
+  {
+    label: "Goa Edit",
+    slug: "goa",
+    image: "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=800&q=80",
+    count: 9,
+    state: "Goa",
+  },
+  {
+    label: "North East Edit",
+    slug: "meghalaya",
+    image: "https://images.unsplash.com/photo-1601134467661-3d775b999c0b?w=800&q=80",
+    count: 7,
+    state: "Meghalaya",
+  },
+  {
+    label: "Rajasthan Edit",
+    slug: "rajasthan",
+    image: "https://images.unsplash.com/photo-1477587458883-47145ed94245?w=800&q=80",
+    count: 6,
+    state: "Rajasthan",
+  },
+  {
+    label: "Kerala Edit",
+    slug: "kerala",
+    image: "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=800&q=80",
+    count: 5,
+    state: "Kerala",
+  },
+] as const;
+
+// ── Experience Categories ─────────────────────
+
+export const EXPERIENCE_CATEGORIES = [
+  { label: "Adventure", icon: "⛰️", desc: "Push your limits", color: "from-orange-500/20 to-red-500/20" },
+  { label: "Curated", icon: "✨", desc: "Handpicked moments", color: "from-amber-500/20 to-yellow-500/20" },
+  { label: "Peace", icon: "🌿", desc: "Find your calm", color: "from-green-500/20 to-emerald-500/20" },
+  { label: "Backpacking", icon: "🎒", desc: "Travel light, live full", color: "from-blue-500/20 to-cyan-500/20" },
+  { label: "Luxury", icon: "💎", desc: "The finest experiences", color: "from-purple-500/20 to-violet-500/20" },
+  { label: "Road Trips", icon: "🛣️", desc: "The journey is the destination", color: "from-yellow-500/20 to-orange-500/20" },
+  { label: "Nature", icon: "🏔️", desc: "Into the wild", color: "from-teal-500/20 to-green-500/20" },
+  { label: "Weekend Escapes", icon: "🌅", desc: "Quick, memorable getaways", color: "from-pink-500/20 to-rose-500/20" },
+] as const;
+
+// ── Homepage FAQ ─────────────────────────────
+
+export const HOMEPAGE_FAQS = [
+  {
+    q: "How do I book a trip?",
+    a: "Browse our trips, select your preferred departure date, and click 'Book Now'. You'll go through a quick 3-step booking flow — select dates, add traveller details, and confirm payment. Alternatively, use 'Customize Your Trip' to tailor a package to your needs.",
+  },
+  {
+    q: "Can I customize a package?",
+    a: "Absolutely. Every trip on EditMyTrips can be customized. Tell us your group size, preferred dates, accommodation type, activities, and budget — we'll craft a trip that fits you perfectly.",
+  },
+  {
+    q: "What is included in the package price?",
+    a: "Each package page clearly lists inclusions (accommodation, transport, meals, activities, guide, etc.) and exclusions (flights, insurance, personal expenses). Check the 'Inclusions' tab on any trip page.",
+  },
+  {
+    q: "What is the cancellation policy?",
+    a: "Cancellations made 7+ days before departure receive a full refund. Cancellations within 7 days are subject to a partial refund as per our cancellation policy. Customized trips may have different terms.",
+  },
+  {
+    q: "Can I travel solo?",
+    a: "Yes! We welcome solo travellers on all our group trips. It's one of the best ways to meet like-minded people. We also offer solo-specific customized itineraries on request.",
+  },
+  {
+    q: "How do I contact EditMyTrips?",
+    a: "You can reach us via WhatsApp, email, or phone. We're available Monday–Saturday, 10am–7pm IST. For urgent matters, WhatsApp is the fastest channel.",
+  },
+] as const;
 
 // ── Admin Navigation ──────────────────────────
 
@@ -139,10 +241,10 @@ export const TRIP_DIFFICULTIES: TripDifficulty[] = [
 ];
 
 export const DIFFICULTY_COLORS: Record<TripDifficulty, string> = {
-  Easy: "bg-green-100 text-green-700",
-  Moderate: "bg-yellow-100 text-yellow-700",
-  Challenging: "bg-orange-100 text-orange-700",
-  Extreme: "bg-red-100 text-red-700",
+  Easy: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20",
+  Moderate: "bg-amber-500/15 text-amber-400 border-amber-500/20",
+  Challenging: "bg-orange-500/15 text-orange-400 border-orange-500/20",
+  Extreme: "bg-red-500/15 text-red-400 border-red-500/20",
 };
 
 export const DURATION_OPTIONS = [
@@ -179,39 +281,36 @@ export const BOOKING_STATUS_LABELS: Record<string, string> = {
 };
 
 export const BOOKING_STATUS_COLORS: Record<string, string> = {
-  PENDING: "bg-yellow-100 text-yellow-700 border-yellow-200",
-  CONFIRMED: "bg-green-100 text-green-700 border-green-200",
-  CANCELLED: "bg-red-100 text-red-700 border-red-200",
-  COMPLETED: "bg-blue-100 text-blue-700 border-blue-200",
-  REFUNDED: "bg-purple-100 text-purple-700 border-purple-200",
+  PENDING: "bg-yellow-500/15 text-yellow-400 border-yellow-500/20",
+  CONFIRMED: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20",
+  CANCELLED: "bg-red-500/15 text-red-400 border-red-500/20",
+  COMPLETED: "bg-blue-500/15 text-blue-400 border-blue-500/20",
+  REFUNDED: "bg-purple-500/15 text-purple-400 border-purple-500/20",
 };
 
 export const PAYMENT_STATUS_COLORS: Record<string, string> = {
-  PENDING: "bg-yellow-100 text-yellow-700 border-yellow-200",
-  PAID: "bg-green-100 text-green-700 border-green-200",
-  FAILED: "bg-red-100 text-red-700 border-red-200",
-  REFUNDED: "bg-purple-100 text-purple-700 border-purple-200",
+  PENDING: "bg-yellow-500/15 text-yellow-400 border-yellow-500/20",
+  PAID: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20",
+  FAILED: "bg-red-500/15 text-red-400 border-red-500/20",
+  REFUNDED: "bg-purple-500/15 text-purple-400 border-purple-500/20",
 };
 
 export const DEPARTURE_STATUS_COLORS: Record<string, string> = {
-  DRAFT: "bg-gray-100 text-gray-600 border-gray-200",
-  ACTIVE: "bg-green-100 text-green-700 border-green-200",
-  CLOSED: "bg-orange-100 text-orange-700 border-orange-200",
-  CANCELLED: "bg-red-100 text-red-700 border-red-200",
-  COMPLETED: "bg-blue-100 text-blue-700 border-blue-200",
+  DRAFT: "bg-zinc-500/15 text-zinc-400 border-zinc-500/20",
+  ACTIVE: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20",
+  CLOSED: "bg-orange-500/15 text-orange-400 border-orange-500/20",
+  CANCELLED: "bg-red-500/15 text-red-400 border-red-500/20",
+  COMPLETED: "bg-blue-500/15 text-blue-400 border-blue-500/20",
 };
 
 // ── Tax ───────────────────────────────────────
-
-export const GST_RATE = 0.05; // 5% GST on travel packages
+export const GST_RATE = 0.05;
 
 // ── Pagination ────────────────────────────────
-
 export const DEFAULT_PAGE_SIZE = 12;
 export const ADMIN_PAGE_SIZE = 20;
 
 // ── Media ─────────────────────────────────────
-
 export const MEDIA_FOLDERS = [
   "trips",
   "destinations",
@@ -223,16 +322,15 @@ export const MEDIA_FOLDERS = [
 ] as const;
 
 // ── Story Categories ──────────────────────────
-
 export const STORY_CATEGORIES = [
   "Travel Tips",
   "Destination Guide",
-  "Trip Report",
-  "Adventure",
-  "Culture",
-  "Food & Cuisine",
+  "Trip Recap",
+  "Gear & Packing",
+  "Food & Culture",
   "Photography",
-  "Budget Travel",
   "Solo Travel",
-  "Family Travel",
+  "Budget Travel",
+  "Adventure",
+  "Wellness",
 ] as const;

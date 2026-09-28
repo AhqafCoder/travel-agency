@@ -1,135 +1,304 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { ArrowRight, MapPin, Search, Shield, Users, Star, Clock, Award, Sparkles } from "lucide-react";
+import {
+  ArrowRight,
+  Star,
+  Shield,
+  Users,
+  Award,
+  ChevronDown,
+  Check,
+  MessageCircle,
+  Search,
+} from "lucide-react";
 import { TripCard } from "@/components/travel/TripCard";
 import { DestinationCard } from "@/components/travel/DestinationCard";
-import { ExperienceCard } from "@/components/travel/ExperienceCard";
-import { TravellerCard } from "@/components/travel/TravellerCard";
-import { getFeaturedTrips, getTrendingTrips, getFeaturedDestinations, MOCK_EXPERIENCES, MOCK_STORIES, MOCK_CUSTOMERS } from "@/lib/mock-data";
+import {
+  getFeaturedTrips,
+  getTrendingTrips,
+  MOCK_REVIEWS,
+  MOCK_STORIES,
+} from "@/lib/mock-data";
+import { DESTINATION_EDITS, HOMEPAGE_FAQS, SITE } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+
+const HERO_CATEGORIES = [
+  { icon: "⭐", label: "All" },
+  { icon: "⛰️", label: "Mountain" },
+  { icon: "🌀", label: "Offbeat" },
+  { icon: "💼", label: "Workation" },
+  { icon: "🌅", label: "Weekend" },
+  { icon: "🧗", label: "Adventure" },
+  { icon: "🥾", label: "Hike" },
+  { icon: "🏖️", label: "Beach" },
+];
 
 export default function HomePage() {
   const featuredTrips = getFeaturedTrips().slice(0, 3);
-  const trendingTrips = getTrendingTrips().slice(0, 3);
-  const featuredDestinations = getFeaturedDestinations().slice(0, 4);
-  const experiences = MOCK_EXPERIENCES.slice(0, 4);
-  const stories = MOCK_STORIES.filter(s => s.featured).slice(0, 3);
-  const travellers = MOCK_CUSTOMERS.slice(0, 6);
-
-  const trustSignals = [
-    { icon: Shield, title: "Verified Captains", desc: "Every trip led by certified, background-checked captains with 5+ years experience" },
-    { icon: Users, title: "10,000+ Happy Travellers", desc: "Join a community of explorers who've discovered India's hidden gems with us" },
-    { icon: Star, title: "4.9/5 Average Rating", desc: "Consistently rated exceptional across Google, TripAdvisor, and our platform" },
-    { icon: Award, title: "Safety First", desc: "Medical kits, emergency protocols, and 24/7 support on every departure" },
-  ];
+  const trendingTrips = getTrendingTrips().slice(0, 6);
+  const reviews       = MOCK_REVIEWS.filter((r) => r.status === "APPROVED").slice(0, 4);
+  const stories       = MOCK_STORIES.filter((s) => s.featured).slice(0, 3);
 
   return (
-    <div className="flex flex-col">
-      {/* ============================================================
-           HERO SECTION
-      ============================================================= */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Background Image */}
-        <div className="absolute inset-0 z-0">
+    <div className="flex flex-col" style={{ background: "#111", paddingTop: "64px" }}>
+
+      {/* ══════════════════════════════════════════
+           HERO
+      ══════════════════════════════════════════ */}
+      <section className="relative w-full overflow-hidden" style={{ height: "100svh", minHeight: 560, maxHeight: 860 }}>
+
+        {/* BG image */}
+        <div className="absolute inset-0">
           <Image
-            src="https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=1920&q=80"
-            alt="Himalayan mountains"
+            src="/hero1.jpg"
+            alt="Himalayan adventure"
             fill
-            className="object-cover"
+            className="object-cover object-center"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/60 to-background/90" />
+          <div className="absolute inset-0 hero-overlay" />
         </div>
 
-        {/* Content */}
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="text-center max-w-4xl mx-auto">
-            {/* Animated Headline */}
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-foreground mb-6 text-balance">
-              Go Beyond the
-              <br />
-              <span className="brand-gradient-text">Ordinary</span>
-            </h1>
-            <p className="text-lg sm:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
-              Handcrafted adventures across India's most spectacular landscapes. 
-              Small groups. Trusted captains. Memories that last a lifetime.
-            </p>
+        {/* Centered content */}
+        <div className="relative z-10 flex flex-col items-center justify-center h-full px-4" style={{ paddingBottom: "6rem" }}>
+          <h1
+            className="text-center text-white font-bold leading-tight mb-7 text-balance"
+            style={{
+              fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
+              fontSize: "clamp(2.2rem, 6vw, 5rem)",
+              fontWeight: 700,
+              letterSpacing: "-0.02em",
+              textShadow: "0 2px 32px rgba(0,0,0,0.45)",
+            }}
+          >
+            Edit Your Trip.
+            <br />
+            <span style={{ fontStyle: "italic", fontWeight: 800 }}>Live it. Now.</span>
+          </h1>
 
-            {/* Search Bar */}
-            <div className="relative max-w-3xl mx-auto mb-16">
-              <div className="bg-white/90 backdrop-blur-xl rounded-2xl border border-border/20 shadow-xl p-1 md:p-2">
-                <div className="flex flex-col md:flex-row gap-2 md:gap-4 p-4 md:p-6">
-                  <div className="flex-1 relative">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                    <input
-                      type="text"
-                      placeholder="Where do you want to go? Manali, Spiti, Rishikesh..."
-                      className="w-full pl-12 pr-4 py-3 bg-background/50 border border-border/30 rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                    />
-                  </div>
-                  <div className="relative">
-                    <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                    <select className="w-full pl-12 pr-12 py-3 bg-background/50 border border-border/30 rounded-xl text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent appearance-none cursor-pointer">
-                      <option value="">Any Trip Type</option>
-                      <option value="Adventure">Adventure</option>
-                      <option value="Trek">Trekking</option>
-                      <option value="Backpacking">Backpacking</option>
-                      <option value="Cultural">Cultural</option>
-                      <option value="Road Trip">Road Trip</option>
-                    </select>
-                  </div>
-                  <Button size="lg" className="w-full md:w-auto py-3 px-8 text-lg font-semibold gap-2" asChild>
-                    <Link href="/explore">
-                      Search Trips
-                      <ArrowRight className="w-5 h-5" />
-                    </Link>
-                  </Button>
+          {/* White search bar */}
+          <div className="w-full" style={{ maxWidth: 680 }}>
+            <div className="glass-white rounded-full overflow-hidden" style={{ boxShadow: "0 8px 40px rgba(0,0,0,0.40)" }}>
+              <div className="flex items-stretch" style={{ borderRight: "none" }}>
+
+                {/* Destination input */}
+                <div className="flex items-center gap-2.5 flex-1 px-5 py-3.5 min-w-0">
+                  <Search className="shrink-0" style={{ width: 16, height: 16, color: "#9ca3af" }} />
+                  <input
+                    type="text"
+                    placeholder="Search destination or trip…"
+                    style={{
+                      width: "100%",
+                      fontSize: 14,
+                      fontWeight: 500,
+                      color: "#1f2937",
+                      background: "transparent",
+                      outline: "none",
+                      border: "none",
+                    }}
+                  />
                 </div>
+
+                {/* Divider */}
+                <div style={{ width: 1, background: "#e5e7eb", margin: "10px 0" }} />
+
+                {/* Date range — desktop */}
+                <div className="hidden sm:flex items-center gap-2 px-4 py-3.5">
+                  <div>
+                    <p style={{ fontSize: 9, fontWeight: 700, color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.12em" }}>From</p>
+                    <p style={{ fontSize: 13, fontWeight: 600, color: "#374151" }}>Any date</p>
+                  </div>
+                  <ArrowRight style={{ width: 14, height: 14, color: "#d1d5db" }} />
+                  <div>
+                    <p style={{ fontSize: 9, fontWeight: 700, color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.12em" }}>To</p>
+                    <p style={{ fontSize: 13, fontWeight: 600, color: "#374151" }}>Any date</p>
+                  </div>
+                </div>
+
+                {/* Search button */}
+                <Link
+                  href="/explore"
+                  className="flex items-center justify-center gap-2 shrink-0"
+                  style={{
+                    margin: 6,
+                    padding: "0 22px",
+                    borderRadius: 9999,
+                    background: "#111",
+                    color: "#fff",
+                    fontSize: 13,
+                    fontWeight: 700,
+                    whiteSpace: "nowrap",
+                    textDecoration: "none",
+                    minHeight: 40,
+                  }}
+                >
+                  Search
+                </Link>
               </div>
             </div>
 
-            {/* Stats Bar */}
-            <div className="flex flex-wrap justify-center gap-8 md:gap-16 text-center">
-              <div>
-                <p className="text-3xl sm:text-4xl font-bold brand-gradient-text">10,000+</p>
-                <p className="text-sm text-muted-foreground">Travellers</p>
-              </div>
-              <div className="border-l border-border/30 pl-8 md:pl-16">
-                <p className="text-3xl sm:text-4xl font-bold brand-gradient-text">32+</p>
-                <p className="text-sm text-muted-foreground">Handcrafted Trips</p>
-              </div>
-              <div className="border-l border-border/30 pl-8 md:pl-16">
-                <p className="text-3xl sm:text-4xl font-bold brand-gradient-text">4.9/5</p>
-                <p className="text-sm text-muted-foreground">Average Rating</p>
-              </div>
-            </div>
+            <p className="text-center mt-2.5" style={{ fontSize: 11, color: "rgba(255,255,255,0.55)", fontWeight: 500 }}>
+              ✦ Customize any trip · Small groups · No hidden fees
+            </p>
           </div>
         </div>
 
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-          <ArrowRight className="w-6 h-6 text-primary rotate-90" />
+        {/* Category pills — bottom of hero */}
+        <div className="absolute bottom-0 left-0 right-0 z-10">
+          <div className="absolute inset-0" style={{ background: "linear-gradient(to top, #111 0%, rgba(17,17,17,0.7) 60%, transparent 100%)" }} />
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-4 pt-10">
+            <div className="flex items-center gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+              {HERO_CATEGORIES.map((cat) => (
+                <Link
+                  key={cat.label}
+                  href={cat.label === "All" ? "/trips" : `/explore?type=${encodeURIComponent(cat.label)}`}
+                  className="flex items-center gap-1.5 shrink-0 transition-all duration-150"
+                  style={{
+                    padding: "6px 14px",
+                    borderRadius: 9999,
+                    border: "1px solid rgba(255,255,255,0.20)",
+                    background: "rgba(17,17,17,0.60)",
+                    backdropFilter: "blur(12px)",
+                    color: "#fff",
+                    fontSize: 12,
+                    fontWeight: 600,
+                    textDecoration: "none",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  <span>{cat.icon}</span>
+                  {cat.label}
+                </Link>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* ============================================================
-           TRENDING TRIPS
-      ============================================================= */}
-      <section className="py-20 bg-muted/30">
+      {/* ══════════════════════════════════════════
+           DESTINATION EDITS
+      ══════════════════════════════════════════ */}
+      <section style={{ padding: "72px 0", background: "#111" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-12">
+
+          <div className="flex items-end justify-between mb-8">
             <div>
-              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">Trending This Season</h2>
-              <p className="text-muted-foreground mt-2">Our most popular trips right now — selling fast!</p>
+              <p style={{ fontSize: 11, fontWeight: 700, color: "#888", textTransform: "uppercase", letterSpacing: "0.15em", marginBottom: 6 }}>
+                Where do you want to go?
+              </p>
+              <h2 style={{ fontSize: "clamp(1.5rem, 3vw, 2rem)", fontWeight: 700, color: "#fff", margin: 0 }}>
+                Choose Your Edit
+              </h2>
             </div>
-            <Button variant="outline" size="lg" asChild className="gap-2">
-              <Link href="/trips?sort=popular">View All Trending</Link>
-              <ArrowRight className="w-4 h-4" />
-            </Button>
+            <Link href="/destinations" className="flex items-center gap-1" style={{ fontSize: 13, fontWeight: 600, color: "#fff", opacity: 0.7, textDecoration: "none" }}>
+              All Destinations <ArrowRight style={{ width: 14, height: 14 }} />
+            </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid gap-3" style={{ gridTemplateColumns: "repeat(4, 1fr)" }}>
+            {/* Tall first card */}
+            <div style={{ gridRow: "span 2" }}>
+              <DestinationCard
+                name={DESTINATION_EDITS[0].label}
+                slug={DESTINATION_EDITS[0].slug}
+                state={DESTINATION_EDITS[0].state}
+                image={DESTINATION_EDITS[0].image}
+                count={DESTINATION_EDITS[0].count}
+                editLabel={DESTINATION_EDITS[0].label}
+                size="large"
+                featured
+              />
+            </div>
+            {DESTINATION_EDITS.slice(1, 7).map((dest) => (
+              <DestinationCard
+                key={dest.slug}
+                name={dest.label}
+                slug={dest.slug}
+                state={dest.state}
+                image={dest.image}
+                count={dest.count}
+                editLabel={dest.label}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════
+           BANNER 1 — adventure lifestyle
+      ══════════════════════════════════════════ */}
+      <div className="relative w-full overflow-hidden" style={{ height: 260 }}>
+        <Image
+          src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=80"
+          alt="Mountain adventure"
+          fill
+          className="object-cover"
+        />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(90deg, rgba(17,17,17,0.85) 0%, rgba(17,17,17,0.30) 50%, rgba(17,17,17,0.55) 100%)" }} />
+        <div className="absolute inset-0 flex items-center" style={{ paddingLeft: "clamp(1.5rem, 6vw, 5rem)" }}>
+          <div>
+            <p style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.55)", textTransform: "uppercase", letterSpacing: "0.15em", marginBottom: 8 }}>
+              50+ handcrafted trips
+            </p>
+            <h3 style={{ fontSize: "clamp(1.4rem, 3.5vw, 2.4rem)", fontWeight: 700, color: "#fff", margin: "0 0 16px", lineHeight: 1.15 }}>
+              Adventures built<br />around you.
+            </h3>
+            <Link
+              href="/trips"
+              className="inline-flex items-center gap-2"
+              style={{ fontSize: 13, fontWeight: 700, color: "#fff", border: "1px solid rgba(255,255,255,0.4)", borderRadius: 9999, padding: "8px 20px", textDecoration: "none", backdropFilter: "blur(8px)", background: "rgba(255,255,255,0.08)" }}
+            >
+              Explore All Trips <ArrowRight style={{ width: 14, height: 14 }} />
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* ══════════════════════════════════════════
+           FEATURED TRIPS
+      ══════════════════════════════════════════ */}
+      <section style={{ padding: "72px 0", background: "#161616" }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <p style={{ fontSize: 11, fontWeight: 700, color: "#888", textTransform: "uppercase", letterSpacing: "0.15em", marginBottom: 6 }}>
+                Handpicked for you
+              </p>
+              <h2 style={{ fontSize: "clamp(1.5rem, 3vw, 2rem)", fontWeight: 700, color: "#fff", margin: 0 }}>
+                Featured Trips
+              </h2>
+            </div>
+            <Link href="/trips" className="flex items-center gap-1" style={{ fontSize: 13, fontWeight: 600, color: "#fff", opacity: 0.7, textDecoration: "none" }}>
+              View All <ArrowRight style={{ width: 14, height: 14 }} />
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {featuredTrips.map((trip) => (
+              <TripCard key={trip._id} trip={trip} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════
+           TRENDING TRIPS
+      ══════════════════════════════════════════ */}
+      <section style={{ padding: "72px 0", background: "#111" }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <p style={{ fontSize: 11, fontWeight: 700, color: "#888", textTransform: "uppercase", letterSpacing: "0.15em", marginBottom: 6 }}>
+                Popular right now
+              </p>
+              <h2 style={{ fontSize: "clamp(1.5rem, 3vw, 2rem)", fontWeight: 700, color: "#fff", margin: 0 }}>
+                Trending This Season
+              </h2>
+            </div>
+            <Link href="/trips" className="flex items-center gap-1" style={{ fontSize: 13, fontWeight: 600, color: "#fff", opacity: 0.7, textDecoration: "none" }}>
+              Browse All <ArrowRight style={{ width: 14, height: 14 }} />
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {trendingTrips.map((trip) => (
               <TripCard key={trip._id} trip={trip} />
             ))}
@@ -137,203 +306,323 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ============================================================
-           POPULAR DESTINATIONS
-      ============================================================= */}
-      <section className="py-20 bg-background">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-12">
-            <div>
-              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">Popular Destinations</h2>
-              <p className="text-muted-foreground mt-2">Explore India's most spectacular regions</p>
-            </div>
-            <Button variant="outline" size="lg" asChild className="gap-2">
-              <Link href="/destinations">View All Destinations</Link>
-              <ArrowRight className="w-4 h-4" />
-            </Button>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredDestinations.map((dest) => (
-              <DestinationCard key={dest._id} destination={dest} />
-            ))}
-          </div>
+      {/* ══════════════════════════════════════════
+           BANNER 2 — community / people
+      ══════════════════════════════════════════ */}
+      <div className="relative w-full overflow-hidden" style={{ height: 260 }}>
+        <Image
+          src="https://images.unsplash.com/photo-1527631746610-bca00a040d60?w=1600&q=80"
+          alt="Travellers"
+          fill
+          className="object-cover object-top"
+        />
+        <div className="absolute inset-0" style={{ background: "rgba(17,17,17,0.60)" }} />
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+          <p style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.55)", textTransform: "uppercase", letterSpacing: "0.15em", marginBottom: 8 }}>
+            10,000+ happy travellers
+          </p>
+          <h3 style={{ fontSize: "clamp(1.4rem, 3.5vw, 2.4rem)", fontWeight: 700, color: "#fff", margin: "0 0 16px", lineHeight: 1.15 }}>
+            Real people. Real experiences.
+          </h3>
+          <Link
+            href="/stories"
+            className="inline-flex items-center gap-2"
+            style={{ fontSize: 13, fontWeight: 700, color: "#fff", border: "1px solid rgba(255,255,255,0.4)", borderRadius: 9999, padding: "8px 20px", textDecoration: "none", backdropFilter: "blur(8px)", background: "rgba(255,255,255,0.08)" }}
+          >
+            Read Stories <ArrowRight style={{ width: 14, height: 14 }} />
+          </Link>
         </div>
-      </section>
+      </div>
 
-      {/* ============================================================
-           EXPERIENCES
-      ============================================================= */}
-      <section className="py-20 bg-muted/30">
+      {/* ══════════════════════════════════════════
+           WHY EDITMYTRIPS
+      ══════════════════════════════════════════ */}
+      <section style={{ padding: "72px 0", background: "#161616" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-12">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">Curated Experiences</h2>
-              <p className="text-muted-foreground mt-2">Add unique activities to your trip — from sunrise treks to heritage walks</p>
+              <p style={{ fontSize: 11, fontWeight: 700, color: "#888", textTransform: "uppercase", letterSpacing: "0.15em", marginBottom: 10 }}>
+                Why EditMyTrips?
+              </p>
+              <h2 style={{ fontSize: "clamp(1.5rem, 3vw, 2.2rem)", fontWeight: 700, color: "#fff", marginBottom: 16, lineHeight: 1.2 }}>
+                We don&apos;t just sell trips.<br />
+                We create experiences.
+              </h2>
+              <p style={{ fontSize: 14, color: "#888", lineHeight: 1.7, marginBottom: 24 }}>
+                Every trip on EditMyTrips is handcrafted, not templated. We obsess over the
+                details — from where you stay to the route you take to the moments that become stories.
+              </p>
+              <ul style={{ listStyle: "none", padding: 0, margin: "0 0 28px", display: "flex", flexDirection: "column", gap: 10 }}>
+                {[
+                  "Every itinerary built around you, not a template",
+                  "Verified trip captains with 5+ years of experience",
+                  "Small groups — never overcrowded",
+                  "Transparent pricing, no hidden costs ever",
+                ].map((point) => (
+                  <li key={point} className="flex items-start gap-3">
+                    <span className="flex items-center justify-center shrink-0" style={{ width: 18, height: 18, borderRadius: "50%", border: "1px solid rgba(255,255,255,0.25)", marginTop: 2 }}>
+                      <Check style={{ width: 10, height: 10, color: "#fff" }} />
+                    </span>
+                    <span style={{ fontSize: 13, color: "rgba(255,255,255,0.75)" }}>{point}</span>
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href="/trips"
+                className="inline-flex items-center gap-2"
+                style={{ fontSize: 13, fontWeight: 700, color: "#111", background: "#fff", borderRadius: 10, padding: "10px 22px", textDecoration: "none" }}
+              >
+                Explore Trips <ArrowRight style={{ width: 14, height: 14 }} />
+              </Link>
             </div>
-            <Button variant="outline" size="lg" asChild className="gap-2">
-              <Link href="/experiences">View All Experiences</Link>
-              <ArrowRight className="w-4 h-4" />
-            </Button>
-          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {experiences.map((exp) => (
-              <ExperienceCard key={exp._id} experience={exp} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ============================================================
-           STORIES / BLOG
-      ============================================================= */}
-      <section className="py-20 bg-background">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-12">
-            <div>
-              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">Stories from the Trail</h2>
-              <p className="text-muted-foreground mt-2">Real experiences, travel tips, and inspiration from our community</p>
-            </div>
-            <Button variant="outline" size="lg" asChild className="gap-2">
-              <Link href="/stories">Read All Stories</Link>
-              <ArrowRight className="w-4 h-4" />
-            </Button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {stories.map((story) => (
-              <Link key={story._id} href={`/stories/${story.slug}`} className="group">
-                <div className="relative overflow-hidden rounded-2xl border border-border/20 bg-background/50 hover:shadow-lg transition-all">
-                  <div className="relative aspect-[4/3]">
-                    <Image
-                      src={story.coverImage}
-                      alt={story.title}
-                      fill
-                      className="object-cover transition-transform group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
-                    <div className="absolute bottom-0 left-0 right-0 p-4">
-                      <span className="text-xs font-semibold uppercase tracking-wider text-primary-foreground bg-primary px-3 py-1 rounded-full">
-                        {story.category}
-                      </span>
-                    </div>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { icon: Users,  value: "10,000+", label: "Happy Travellers",  sub: "Across India" },
+                { icon: Star,   value: "4.9 / 5",  label: "Average Rating",    sub: "1,200+ reviews" },
+                { icon: Shield, value: "100%",      label: "Verified Captains", sub: "Background-checked" },
+                { icon: Award,  value: "50+",       label: "Curated Trips",     sub: "Handcrafted" },
+              ].map(({ icon: Icon, value, label, sub }) => (
+                <div
+                  key={label}
+                  style={{ padding: "20px", borderRadius: 14, border: "1px solid rgba(255,255,255,0.07)", background: "#1a1a1a" }}
+                >
+                  <div style={{ width: 36, height: 36, borderRadius: 10, border: "1px solid rgba(255,255,255,0.12)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 14 }}>
+                    <Icon style={{ width: 18, height: 18, color: "#fff" }} />
                   </div>
-                  <div className="p-6">
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground mb-3">
-                      <span>{story.readTime} min read</span>
-                      <span>•</span>
-                      <span>{story.views.toLocaleString()} views</span>
-                    </div>
-                    <h3 className="text-lg font-bold text-foreground mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+                  <p style={{ fontSize: "1.35rem", fontWeight: 700, color: "#fff", margin: 0 }}>{value}</p>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.75)", margin: "2px 0 0" }}>{label}</p>
+                  <p style={{ fontSize: 11, color: "#666", margin: 0 }}>{sub}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════
+           PAST TRIPS / STORIES
+      ══════════════════════════════════════════ */}
+      {stories.length > 0 && (
+        <section style={{ padding: "72px 0", background: "#111" }}>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-end justify-between mb-8">
+              <div>
+                <p style={{ fontSize: 11, fontWeight: 700, color: "#888", textTransform: "uppercase", letterSpacing: "0.15em", marginBottom: 6 }}>
+                  Real moments
+                </p>
+                <h2 style={{ fontSize: "clamp(1.5rem, 3vw, 2rem)", fontWeight: 700, color: "#fff", margin: 0 }}>
+                  We&apos;ve Been Here Before.
+                </h2>
+              </div>
+              <Link href="/stories" className="flex items-center gap-1" style={{ fontSize: 13, fontWeight: 600, color: "#fff", opacity: 0.7, textDecoration: "none" }}>
+                All Stories <ArrowRight style={{ width: 14, height: 14 }} />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {stories.map((story, i) => (
+                <Link
+                  key={story._id}
+                  href={`/stories/${story.slug}`}
+                  className={cn("group relative overflow-hidden card-shadow card-shadow-hover transition-all duration-300", i === 0 ? "md:row-span-2" : "")}
+                  style={{ borderRadius: 16, border: "1px solid rgba(255,255,255,0.07)", display: "block", textDecoration: "none" }}
+                >
+                  <div className={cn("relative w-full", i === 0 ? "aspect-[3/4] md:h-full" : "aspect-[16/10]")} style={i === 0 ? { minHeight: 400 } : {}}>
+                    <Image src={story.coverImage} alt={story.title} fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
+                    <div className="absolute inset-0 card-gradient" />
+                  </div>
+                  <div className="absolute bottom-0 left-0 right-0" style={{ padding: "16px 18px" }}>
+                    <span style={{ display: "inline-block", fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.60)", background: "rgba(255,255,255,0.10)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 9999, padding: "2px 10px", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.1em" }}>
+                      {story.category}
+                    </span>
+                    <h3 style={{ fontSize: 15, fontWeight: 700, color: "#fff", margin: 0, lineHeight: 1.3 }} className="line-clamp-2">
                       {story.title}
                     </h3>
-                    <p className="text-sm text-muted-foreground line-clamp-2">{story.excerpt}</p>
-                    <div className="mt-4 flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                        <span className="text-xs font-bold text-primary">
-                          {story.author?.name?.slice(0, 2).toUpperCase()}
-                        </span>
-                      </div>
-                      <span className="text-sm font-medium">{story.author?.name}</span>
+                    <p style={{ fontSize: 11, color: "rgba(255,255,255,0.40)", marginTop: 4 }}>
+                      {story.readTime} min read · {story.views.toLocaleString()} views
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ══════════════════════════════════════════
+           REVIEWS
+      ══════════════════════════════════════════ */}
+      {reviews.length > 0 && (
+        <section style={{ padding: "72px 0", background: "#161616" }}>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-10">
+              <p style={{ fontSize: 11, fontWeight: 700, color: "#888", textTransform: "uppercase", letterSpacing: "0.15em", marginBottom: 6 }}>
+                Real voices
+              </p>
+              <h2 style={{ fontSize: "clamp(1.5rem, 3vw, 2rem)", fontWeight: 700, color: "#fff", margin: 0 }}>
+                What Travellers Say
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {reviews.map((review) => (
+                <div
+                  key={review._id}
+                  className="flex flex-col"
+                  style={{ padding: "18px", borderRadius: 14, border: "1px solid rgba(255,255,255,0.07)", background: "#1a1a1a" }}
+                >
+                  <div className="flex gap-0.5 mb-3">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star key={i} style={{ width: 12, height: 12, fill: i < review.rating ? "#fff" : "rgba(255,255,255,0.12)", color: i < review.rating ? "#fff" : "rgba(255,255,255,0.12)" }} />
+                    ))}
+                  </div>
+                  <p className="flex-1 line-clamp-4" style={{ fontSize: 13, color: "rgba(255,255,255,0.65)", fontStyle: "italic", lineHeight: 1.6, margin: 0 }}>
+                    &ldquo;{review.content}&rdquo;
+                  </p>
+                  <div className="flex items-center gap-2" style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+                    <div className="flex items-center justify-center shrink-0" style={{ width: 30, height: 30, borderRadius: "50%", background: "rgba(255,255,255,0.10)", fontSize: 11, fontWeight: 700, color: "#fff" }}>
+                      {review.user?.name?.slice(0, 2).toUpperCase() ?? "?"}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate" style={{ fontSize: 13, fontWeight: 600, color: "#fff", margin: 0 }}>
+                        {review.user?.name ?? "Traveller"}
+                      </p>
+                      {review.trip?.title && (
+                        <p className="truncate" style={{ fontSize: 11, color: "#555", margin: 0 }}>{review.trip.title}</p>
+                      )}
                     </div>
                   </div>
                 </div>
-              </Link>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      {/* ============================================================
-           COMMUNITY / TRAVELLER PHOTOS
-      ============================================================= */}
-      <section className="py-20 bg-muted/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold text-foreground">Our Community in Action</h2>
-            <p className="text-muted-foreground mt-2 max-w-2xl mx-auto">
-              Real moments from real travellers. Tag @editmytrips to be featured!
+      {/* ══════════════════════════════════════════
+           BANNER 3 — customize CTA
+      ══════════════════════════════════════════ */}
+      <div className="relative w-full overflow-hidden" style={{ minHeight: 340 }}>
+        <Image
+          src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1600&q=80"
+          alt="Mountain"
+          fill
+          className="object-cover"
+        />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(to right, rgba(17,17,17,0.92) 0%, rgba(17,17,17,0.55) 55%, rgba(17,17,17,0.30) 100%)" }} />
+        <div className="absolute inset-0 flex items-center" style={{ paddingLeft: "clamp(1.5rem, 6vw, 5rem)" }}>
+          <div style={{ maxWidth: 480 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.50)", textTransform: "uppercase", letterSpacing: "0.15em", marginBottom: 10 }}>
+              Tailored for you
             </p>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-            {travellers.map((traveller, idx) => (
-              <TravellerCard key={traveller._id} user={traveller} tripsCount={Math.floor(Math.random() * 8) + 1} />
-            ))}
-          </div>
-
-          <div className="text-center mt-10">
-            <Button variant="outline" size="lg" asChild className="gap-2">
-              <Link href="/community">Join the Community</Link>
-              <ArrowRight className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* ============================================================
-           TRUST SIGNALS (WHY EDITMYTRIPS)
-      ============================================================= */}
-      <section className="py-20 bg-background">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-foreground">Why Choose editmytrips?</h2>
-            <p className="text-muted-foreground mt-2 max-w-2xl mx-auto">
-              We're not just another travel company. We're a community of explorers 
-              who believe the best journeys change you.
+            <h2 style={{ fontSize: "clamp(1.5rem, 3.5vw, 2.4rem)", fontWeight: 700, color: "#fff", margin: "0 0 12px", lineHeight: 1.2 }}>
+              This trip doesn&apos;t fit you?<br />
+              <span style={{ fontStyle: "italic" }}>Edit it.</span>
+            </h2>
+            <p style={{ fontSize: 14, color: "rgba(255,255,255,0.55)", lineHeight: 1.65, marginBottom: 22 }}>
+              Tell us your dates, group size, and must-haves. We&apos;ll build a trip
+              that fits around your life — not the other way around.
             </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {trustSignals.map((signal, idx) => (
-              <div 
-                key={signal.title}
-                className="p-8 rounded-2xl border border-border/20 bg-background/50 hover:border-primary/30 hover:shadow-lg transition-all group"
+            <div className="flex flex-wrap gap-3">
+              <Link
+                href="/trips"
+                className="inline-flex items-center gap-2"
+                style={{ fontSize: 13, fontWeight: 700, color: "#111", background: "#fff", borderRadius: 10, padding: "10px 22px", textDecoration: "none" }}
               >
-                <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                  <signal.icon className="w-7 h-7 text-primary group-hover:text-primary-foreground transition-colors" />
-                </div>
-                <h3 className="text-xl font-bold mb-3">{signal.title}</h3>
-                <p className="text-muted-foreground leading-relaxed">{signal.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ============================================================
-           CTA BANNER
-      ============================================================= */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-primary via-brand to-teal">
-            <div className="absolute inset-0 bg-black/10" />
-            <div className="relative p-12 md:p-20 text-center">
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6">
-                Ready for Your Next Adventure?
-              </h2>
-              <p className="text-lg sm:text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-                Browse our handcrafted trips, pick a departure date, and join a group 
-                of like-minded explorers. Your story starts here.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" className="w-full sm:w-auto px-10 py-4 text-lg font-semibold gap-2 bg-white text-primary hover:bg-white/90" asChild>
-                  <Link href="/explore">
-                    Find Your Trip
-                    <ArrowRight className="w-5 h-5" />
-                  </Link>
-                </Button>
-                <Button size="lg" variant="outline" className="w-full sm:w-auto px-10 py-4 text-lg font-semibold border-white text-white hover:bg-white/10" asChild>
-                  <Link href="/destinations">
-                    Browse Destinations
-                  </Link>
-                </Button>
-              </div>
+                Customize Your Trip <ArrowRight style={{ width: 14, height: 14 }} />
+              </Link>
+              <a
+                href={`https://wa.me/${SITE.whatsapp}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2"
+                style={{ fontSize: 13, fontWeight: 600, color: "#fff", border: "1px solid rgba(255,255,255,0.30)", borderRadius: 10, padding: "10px 22px", textDecoration: "none", backdropFilter: "blur(8px)", background: "rgba(255,255,255,0.08)" }}
+              >
+                <MessageCircle style={{ width: 14, height: 14 }} /> WhatsApp Us
+              </a>
             </div>
           </div>
         </div>
+      </div>
+
+      {/* ══════════════════════════════════════════
+           FAQ
+      ══════════════════════════════════════════ */}
+      <section style={{ padding: "72px 0", background: "#161616" }}>
+        <div className="max-w-2xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-10">
+            <p style={{ fontSize: 11, fontWeight: 700, color: "#888", textTransform: "uppercase", letterSpacing: "0.15em", marginBottom: 6 }}>
+              Got questions?
+            </p>
+            <h2 style={{ fontSize: "clamp(1.4rem, 2.5vw, 1.8rem)", fontWeight: 700, color: "#fff", margin: 0 }}>
+              Frequently Asked Questions
+            </h2>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {HOMEPAGE_FAQS.map((faq, i) => (
+              <details
+                key={i}
+                className="group"
+                style={{ border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, background: "#1a1a1a", overflow: "hidden" }}
+              >
+                <summary className="flex items-center justify-between cursor-pointer" style={{ padding: "14px 18px", listStyle: "none" }}>
+                  <span style={{ fontSize: 14, fontWeight: 600, color: "#fff", paddingRight: 12 }}>{faq.q}</span>
+                  <ChevronDown style={{ width: 16, height: 16, color: "#555", flexShrink: 0, transition: "transform 0.2s" }} className="group-open:rotate-180" />
+                </summary>
+                <div style={{ padding: "0 18px 14px", fontSize: 13, color: "#888", lineHeight: 1.65, borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+                  <div style={{ paddingTop: 12 }}>{faq.a}</div>
+                </div>
+              </details>
+            ))}
+          </div>
+          <div className="text-center mt-8">
+            <a
+              href={`https://wa.me/${SITE.whatsapp}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2"
+              style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.60)", textDecoration: "none" }}
+            >
+              <MessageCircle style={{ width: 14, height: 14 }} /> Ask us on WhatsApp
+            </a>
+          </div>
+        </div>
       </section>
+
+      {/* ══════════════════════════════════════════
+           FINAL CTA
+      ══════════════════════════════════════════ */}
+      <section style={{ padding: "80px 0", background: "#111" }}>
+        <div className="max-w-2xl mx-auto px-4 text-center">
+          <p style={{ fontSize: 11, fontWeight: 700, color: "#888", textTransform: "uppercase", letterSpacing: "0.15em", marginBottom: 10 }}>
+            Your next adventure
+          </p>
+          <h2 style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 700, color: "#fff", margin: "0 0 14px", lineHeight: 1.1, letterSpacing: "-0.02em" }}>
+            Where will your story begin?
+          </h2>
+          <p style={{ fontSize: 14, color: "#888", lineHeight: 1.65, marginBottom: 28, maxWidth: 380, marginLeft: "auto", marginRight: "auto" }}>
+            Thousands of travellers have already edited their trips with us. Yours is next.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link
+              href="/trips"
+              className="inline-flex items-center justify-center gap-2"
+              style={{ fontSize: 14, fontWeight: 700, color: "#111", background: "#fff", borderRadius: 12, padding: "12px 28px", textDecoration: "none" }}
+            >
+              Explore All Trips <ArrowRight style={{ width: 15, height: 15 }} />
+            </Link>
+            <Link
+              href="/destinations"
+              className="inline-flex items-center justify-center gap-2"
+              style={{ fontSize: 14, fontWeight: 600, color: "rgba(255,255,255,0.65)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 12, padding: "12px 28px", textDecoration: "none" }}
+            >
+              Browse Destinations
+            </Link>
+          </div>
+        </div>
+      </section>
+
     </div>
   );
 }

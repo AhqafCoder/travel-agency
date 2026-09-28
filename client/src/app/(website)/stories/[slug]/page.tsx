@@ -50,7 +50,7 @@ export default async function StoryDetailPage({ params }: StoryParams) {
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-transparent" />
 
         {/* Back link */}
-        <div className="absolute top-5 left-5 sm:left-8">
+        <div className="absolute top-24 left-5 sm:left-8">
           <Button
             asChild
             variant="outline"

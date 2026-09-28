@@ -21,8 +21,8 @@ export default function StoriesPage() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       {/* Header */}
-      <section className="bg-muted/30 border-b border-border/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+      <section className="bg-muted/30 border-b border-border/20 pt-28">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-14">
           <Badge className="bg-brand-muted text-brand mb-4">The Journal</Badge>
           <h1 className="text-4xl sm:text-5xl font-bold text-foreground">
             Stories from the Trail

@@ -1,5 +1,4 @@
 import { formatPrice } from "@/lib/mock-data";
-import { Separator } from "@/components/ui/separator";
 
 interface PriceBreakdownProps {
   pricePerPerson: number;
@@ -11,40 +10,42 @@ interface PriceBreakdownProps {
   total: number;
 }
 
-export function PriceBreakdown({ 
-  pricePerPerson, 
-  travellersCount, 
-  subtotal, 
-  discount = 0, 
-  couponCode, 
-  tax, 
-  total 
+export function PriceBreakdown({
+  pricePerPerson,
+  travellersCount,
+  subtotal,
+  discount = 0,
+  couponCode,
+  tax,
+  total,
 }: PriceBreakdownProps) {
   const calculatedSubtotal = subtotal ?? pricePerPerson * travellersCount;
-  const calculatedTotal = total ?? calculatedSubtotal - discount + tax;
 
   return (
-    <div className="space-y-3">
-      <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+    <div className="space-y-2.5">
+      <h3 className="text-xs font-semibold text-foreground/60 uppercase tracking-wide mb-3">
         Price Breakdown
       </h3>
 
       <div className="space-y-2 text-sm">
-        {/* Base price */}
+        {/* Base */}
         <div className="flex justify-between">
           <span className="text-muted-foreground">
-            Trip price × {travellersCount}
+            {formatPrice(pricePerPerson)} × {travellersCount} person
+            {travellersCount > 1 ? "s" : ""}
           </span>
-          <span className="font-medium">{formatPrice(pricePerPerson * travellersCount)}</span>
+          <span className="font-medium text-foreground">
+            {formatPrice(pricePerPerson * travellersCount)}
+          </span>
         </div>
 
         {/* Discount */}
         {discount > 0 && (
-          <div className="flex justify-between text-teal">
-            <span className="flex items-center gap-1">
+          <div className="flex justify-between text-emerald-400">
+            <span className="flex items-center gap-1.5">
               Discount
               {couponCode && (
-                <span className="text-xs bg-teal-muted text-teal px-1.5 py-0.5 rounded">
+                <span className="text-[10px] bg-emerald-500/15 border border-emerald-500/25 px-1.5 py-0.5 rounded">
                   {couponCode}
                 </span>
               )}
@@ -53,30 +54,34 @@ export function PriceBreakdown({
           </div>
         )}
 
-        <Separator className="my-1" />
+        {/* Divider */}
+        <div className="border-t border-white/6" />
 
         {/* Subtotal */}
         <div className="flex justify-between font-medium">
-          <span>Subtotal</span>
-          <span>{formatPrice(calculatedSubtotal - discount)}</span>
+          <span className="text-foreground/70">Subtotal</span>
+          <span className="text-foreground">
+            {formatPrice(calculatedSubtotal - discount)}
+          </span>
         </div>
 
         {/* GST */}
-        <div className="flex justify-between text-sm text-muted-foreground">
+        <div className="flex justify-between text-muted-foreground">
           <span>GST (5%)</span>
           <span>{formatPrice(tax)}</span>
         </div>
 
-        <Separator className="my-1" />
+        {/* Divider */}
+        <div className="border-t border-white/6" />
 
         {/* Total */}
-        <div className="flex justify-between text-lg font-bold text-foreground">
-          <span>Total Payable</span>
-          <span>{formatPrice(calculatedTotal)}</span>
+        <div className="flex justify-between text-base font-bold">
+          <span className="text-foreground">Total Payable</span>
+          <span className="text-primary">{formatPrice(total)}</span>
         </div>
       </div>
 
-      <p className="text-xs text-muted-foreground text-center">
+      <p className="text-[10px] text-muted-foreground text-center pt-1">
         Inclusive of all taxes. No hidden charges.
       </p>
     </div>

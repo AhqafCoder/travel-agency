@@ -23,7 +23,7 @@ export default function ExperiencesPage() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       {/* Page Header */}
-      <div className="bg-muted/30 py-12">
+      <div className="bg-muted/30 pt-28 pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl font-bold text-foreground">Experiences</h1>
           <p className="text-muted-foreground mt-2">
