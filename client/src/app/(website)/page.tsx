@@ -9,9 +9,9 @@ import {
   ChevronDown,
   Check,
   MessageCircle,
-  Search,
 } from "lucide-react";
 import { TripCard } from "@/components/travel/TripCard";
+import { HeroSearchBar } from "@/components/travel/HeroSearchBar";
 import { DestinationCard } from "@/components/travel/DestinationCard";
 import {
   getFeaturedTrips,
@@ -76,71 +76,7 @@ export default function HomePage() {
             <span style={{ fontStyle: "italic", fontWeight: 800 }}>Live it. Now.</span>
           </h1>
 
-          {/* White search bar */}
-          <div className="w-full" style={{ maxWidth: 680 }}>
-            <div className="glass-white rounded-full overflow-hidden" style={{ boxShadow: "0 8px 40px rgba(0,0,0,0.40)" }}>
-              <div className="flex items-stretch" style={{ borderRight: "none" }}>
-
-                {/* Destination input */}
-                <div className="flex items-center gap-2.5 flex-1 px-5 py-3.5 min-w-0">
-                  <Search className="shrink-0" style={{ width: 16, height: 16, color: "#9ca3af" }} />
-                  <input
-                    type="text"
-                    placeholder="Search destination or trip…"
-                    style={{
-                      width: "100%",
-                      fontSize: 14,
-                      fontWeight: 500,
-                      color: "#1f2937",
-                      background: "transparent",
-                      outline: "none",
-                      border: "none",
-                    }}
-                  />
-                </div>
-
-                {/* Divider */}
-                <div style={{ width: 1, background: "#e5e7eb", margin: "10px 0" }} />
-
-                {/* Date range — desktop */}
-                <div className="hidden sm:flex items-center gap-2 px-4 py-3.5">
-                  <div>
-                    <p style={{ fontSize: 9, fontWeight: 700, color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.12em" }}>From</p>
-                    <p style={{ fontSize: 13, fontWeight: 600, color: "#374151" }}>Any date</p>
-                  </div>
-                  <ArrowRight style={{ width: 14, height: 14, color: "#d1d5db" }} />
-                  <div>
-                    <p style={{ fontSize: 9, fontWeight: 700, color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.12em" }}>To</p>
-                    <p style={{ fontSize: 13, fontWeight: 600, color: "#374151" }}>Any date</p>
-                  </div>
-                </div>
-
-                {/* Search button */}
-                <Link
-                  href="/explore"
-                  className="flex items-center justify-center gap-2 shrink-0"
-                  style={{
-                    margin: 6,
-                    padding: "0 22px",
-                    borderRadius: 9999,
-                    background: "#111",
-                    color: "#fff",
-                    fontSize: 13,
-                    fontWeight: 700,
-                    whiteSpace: "nowrap",
-                    textDecoration: "none",
-                    minHeight: 40,
-                  }}
-                >
-                  Search
-                </Link>
-              </div>
-            </div>
-
-            <p className="text-center mt-2.5" style={{ fontSize: 11, color: "rgba(255,255,255,0.55)", fontWeight: 500 }}>
-              ✦ Customize any trip · Small groups · No hidden fees
-            </p>
-          </div>
+          <HeroSearchBar />
         </div>
 
         {/* Category pills — bottom of hero */}

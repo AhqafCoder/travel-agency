@@ -194,6 +194,26 @@
     border: 1px solid rgba(255,255,255,0.15);
   }
 
+  .hero-date-input {
+    display: block;
+    width: 100%;
+    min-width: 118px;
+    margin-top: 1px;
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    color-scheme: light;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .hero-date-input::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.45;
+  }
+
   /* ── Card shadows ── */
   .card-shadow {
     box-shadow: 0 2px 16px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.04);

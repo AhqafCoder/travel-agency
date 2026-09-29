@@ -6,7 +6,8 @@ import Image from "next/image";
 import { TripCard } from "@/components/travel/TripCard";
 import type { Trip } from "@/types";
 import { TRIP_TYPES, TRIP_DIFFICULTIES, DURATION_OPTIONS, PRICE_RANGES, SORT_OPTIONS } from "@/lib/constants";
-import { MOCK_TRIPS } from "@/lib/mock-data";
+import { MOCK_DEPARTURES, MOCK_TRIPS } from "@/lib/mock-data";
+import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -51,6 +52,8 @@ function ExplorePageContent() {
   const initialMinDuration = searchParams.get("minDuration") ? Number(searchParams.get("minDuration")) : 1;
   const initialMaxDuration = searchParams.get("maxDuration") ? Number(searchParams.get("maxDuration")) : 30;
   const initialSort = searchParams.get("sort") || "popular";
+  const initialFrom = searchParams.get("from") || "";
+  const initialTo = searchParams.get("to") || "";
 
   const [search, setSearch] = useState(initialSearch);
   const [tripType, setTripType] = useState(initialType);
@@ -59,6 +62,8 @@ function ExplorePageContent() {
   const [priceRange, setPriceRange] = useState<[number, number]>([initialMinPrice, initialMaxPrice]);
   const [durationRange, setDurationRange] = useState<[number, number]>([initialMinDuration, initialMaxDuration]);
   const [sort, setSort] = useState(initialSort);
+  const [fromDate, setFromDate] = useState(initialFrom);
+  const [toDate, setToDate] = useState(initialTo);
   const [showFilters, setShowFilters] = useState(false);
   const [filteredTrips, setFilteredTrips] = useState<Trip[]>([]);
 
@@ -74,9 +79,11 @@ function ExplorePageContent() {
     if (durationRange[0] > 1) params.set("minDuration", durationRange[0].toString());
     if (durationRange[1] < 30) params.set("maxDuration", durationRange[1].toString());
     if (sort !== "popular") params.set("sort", sort);
+    if (fromDate) params.set("from", fromDate);
+    if (toDate) params.set("to", toDate);
 
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
-  }, [search, tripType, difficulty, destination, priceRange, durationRange, sort, router, pathname]);
+  }, [search, tripType, difficulty, destination, priceRange, durationRange, sort, fromDate, toDate, router, pathname]);
 
   // Filter trips based on current state
   useEffect(() => {
@@ -95,6 +102,18 @@ function ExplorePageContent() {
     if (tripType) result = result.filter(t => t.tripType === tripType);
     if (difficulty) result = result.filter(t => t.difficulty === difficulty);
     if (destination) result = result.filter(t => t.destinationId === destination);
+
+    if (fromDate || toDate) {
+      result = result.filter((t) =>
+        MOCK_DEPARTURES.some((dep) => {
+          if (dep.tripId !== t._id) return false;
+          const start = format(new Date(dep.startDate), "yyyy-MM-dd");
+          if (fromDate && start < fromDate) return false;
+          if (toDate && start > toDate) return false;
+          return true;
+        })
+      );
+    }
 
     // Price filter (using discountedPrice or basePrice)
     result = result.filter(t => {
@@ -124,7 +143,7 @@ function ExplorePageContent() {
     }
 
     setFilteredTrips(result);
-  }, [search, tripType, difficulty, destination, priceRange, durationRange, sort]);
+  }, [search, tripType, difficulty, destination, priceRange, durationRange, sort, fromDate, toDate]);
 
   // Sync URL changes to state (for browser back/forward)
   useEffect(() => {
@@ -141,6 +160,8 @@ function ExplorePageContent() {
       searchParams.get("maxDuration") ? Number(searchParams.get("maxDuration")) : 30,
     ]);
     setSort(searchParams.get("sort") || "popular");
+    setFromDate(searchParams.get("from") || "");
+    setToDate(searchParams.get("to") || "");
   }, [searchParams]);
 
   // Active filter count
@@ -149,6 +170,8 @@ function ExplorePageContent() {
     tripType,
     difficulty,
     destination,
+    fromDate,
+    toDate,
     priceRange[0] > 0,
     priceRange[1] < 999999,
     durationRange[0] > 1,
@@ -161,6 +184,8 @@ function ExplorePageContent() {
     setTripType("");
     setDifficulty("");
     setDestination("");
+    setFromDate("");
+    setToDate("");
     setPriceRange([0, 999999]);
     setDurationRange([1, 30]);
     setSort("popular");
@@ -175,6 +200,13 @@ function ExplorePageContent() {
           <p className="text-muted-foreground mt-2">
             Find your perfect adventure. Filter by type, difficulty, price, and more.
           </p>
+          {(fromDate || toDate) && (
+            <p className="text-sm text-foreground/70 mt-3">
+              Departing {fromDate ? format(new Date(`${fromDate}T00:00:00`), "d MMM yyyy") : "any date"}
+              {" → "}
+              {toDate ? format(new Date(`${toDate}T00:00:00`), "d MMM yyyy") : "any date"}
+            </p>
+          )}
         </div>
       </div>
 
