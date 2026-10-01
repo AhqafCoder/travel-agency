@@ -310,18 +310,19 @@ export function Navbar() {
                   )}
                 </div>
               ) : (
-                <Link
-                  href="/login"
+                <button
+                  onClick={() => window.dispatchEvent(new CustomEvent("open-login-modal"))}
                   style={{
-                    padding: "7px 14px", borderRadius: 8, textDecoration: "none",
+                    padding: "7px 14px", borderRadius: 8, border: "none", background: "transparent",
                     fontSize: 13, fontWeight: 500,
                     color: "rgba(255,255,255,0.60)",
+                    cursor: "pointer",
                     transition: "color 0.15s",
                     fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
                   }}
                 >
                   Log in
-                </Link>
+                </button>
               )}
 
               {/* CTA */}
@@ -457,12 +458,12 @@ export function Navbar() {
               </>
             ) : (
               <>
-                <Link href="/login" onClick={() => setMobileOpen(false)} style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "12px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.10)", textDecoration: "none", fontSize: 14, fontWeight: 600, color: "rgba(255,255,255,0.60)", fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif' }}>
+                <button onClick={() => { setMobileOpen(false); window.dispatchEvent(new CustomEvent("open-login-modal")); }} style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "100%", padding: "12px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.10)", background: "transparent", cursor: "pointer", fontSize: 14, fontWeight: 600, color: "rgba(255,255,255,0.60)", fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif' }}>
                   Log in
-                </Link>
-                <Link href="/register" onClick={() => setMobileOpen(false)} style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "12px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.10)", textDecoration: "none", fontSize: 14, fontWeight: 600, color: "#fff", background: "rgba(255,255,255,0.06)", fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif' }}>
+                </button>
+                <button onClick={() => { setMobileOpen(false); window.dispatchEvent(new CustomEvent("open-register-modal")); }} style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "100%", padding: "12px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.10)", textDecoration: "none", fontSize: 14, fontWeight: 600, color: "#fff", background: "rgba(255,255,255,0.06)", cursor: "pointer", fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif' }}>
                   Sign up free
-                </Link>
+                </button>
               </>
             )}
             <Link

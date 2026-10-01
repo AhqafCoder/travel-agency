@@ -9,6 +9,10 @@ const envSchema = z.object({
   CLIENT_ORIGIN: z.string().url().default("http://localhost:3000"),
   MONGODB_URI: z.string().default("mongodb://127.0.0.1:27017/editmytrips"),
   JWT_SECRET: z.string().default("dev-secret-change-me"),
+  // Cloudinary
+  CLOUDINARY_CLOUD_NAME: z.string().default(""),
+  CLOUDINARY_API_KEY: z.string().default(""),
+  CLOUDINARY_API_SECRET: z.string().default(""),
 });
 
 const parsed = envSchema.safeParse(process.env);

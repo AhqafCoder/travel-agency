@@ -159,10 +159,17 @@ export function AuthFooterLink({
   href: string;
   label: string;
 }) {
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (href === "/login") {
+      e.preventDefault();
+      window.dispatchEvent(new CustomEvent("open-login-modal"));
+    }
+  };
+
   return (
     <p className="text-sm text-muted-foreground text-center">
       {prompt}{" "}
-      <Link href={href} className="font-medium text-primary hover:underline">
+      <Link href={href} onClick={handleClick} className="font-medium text-primary hover:underline">
         {label}
       </Link>
     </p>

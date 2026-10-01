@@ -1,0 +1,379 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useForm, Controller, useFieldArray } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { toast } from "sonner";
+import { api } from "@/lib/api";
+import { Trip, Destination } from "@/types";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Plus, Trash2, GripVertical } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+
+  const tripSchema = z.object({
+  title: z.string().min(3),
+  slug: z.string().min(3),
+  shortDescription: z.string().min(10),
+  description: z.string().min(10),
+  destinationId: z.string().min(1, "Destination is required"),
+  type: z.enum(["GROUP", "PRIVATE", "HONEYMOON"]),
+  difficulty: z.enum(["EASY", "MODERATE", "HARD", "EXPERT"]),
+  durationDays: z.number().min(1),
+  basePrice: z.number().min(0),
+  maxGroupSize: z.number().min(1),
+  status: z.enum(["DRAFT", "PUBLISHED", "ARCHIVED"]),
+  highlights: z.array(z.string()).min(1, "At least one highlight is required"),
+  inclusions: z.array(z.string()),
+  exclusions: z.array(z.string()),
+  itinerary: z.array(
+    z.object({
+      dayNumber: z.number(),
+      title: z.string().min(1),
+      description: z.string().min(1),
+      activities: z.array(z.string()),
+      meals: z.array(z.string()),
+      stay: z.string().optional(),
+      transport: z.string().optional(),
+      distance: z.string().optional(),
+      highlights: z.array(z.string()),
+    })
+  ).min(1, "At least one itinerary day is required"),
+});
+
+type TripFormValues = z.infer<typeof tripSchema>;
+
+interface TripFormProps {
+  initialData?: Trip;
+  isEdit?: boolean;
+}
+
+export function TripForm({ initialData, isEdit }: TripFormProps) {
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { data: destData } = useQuery({
+    queryKey: ["admin", "destinations"],
+    queryFn: () => api.adminListDestinations(),
+  });
+
+  const form = useForm<TripFormValues>({
+    resolver: zodResolver(tripSchema),
+    defaultValues: initialData ? {
+      title: initialData.title || "",
+      slug: initialData.slug || "",
+      shortDescription: initialData.shortDescription || "",
+      description: initialData.description || "",
+      destinationId: typeof initialData.destination === "string" ? initialData.destination : initialData.destination?._id || "",
+      type: initialData.type || "GROUP",
+      difficulty: initialData.difficulty || "MODERATE",
+      durationDays: initialData.durationDays || 1,
+      basePrice: initialData.basePrice || 0,
+      maxGroupSize: initialData.maxGroupSize || 10,
+      status: initialData.status || "DRAFT",
+      highlights: initialData.highlights || [""],
+      inclusions: initialData.inclusions || [],
+      exclusions: initialData.exclusions || [],
+      itinerary: initialData.itinerary?.length ? initialData.itinerary : [{ dayNumber: 1, title: "", description: "", activities: [], meals: [], highlights: [] }],
+    } : {
+      title: "",
+      slug: "",
+      shortDescription: "",
+      description: "",
+      destinationId: "",
+      type: "GROUP",
+      difficulty: "MODERATE",
+      durationDays: 1,
+      basePrice: 0,
+      maxGroupSize: 10,
+      status: "DRAFT",
+      highlights: [""],
+      inclusions: [],
+      exclusions: [],
+      itinerary: [{ dayNumber: 1, title: "", description: "", activities: [], meals: [], highlights: [] }],
+    },
+  });
+
+  const { fields: highlightFields, append: appendHighlight, remove: removeHighlight } = useFieldArray({
+    control: form.control,
+    name: "highlights" as never, // cast due to zod typing quirks with string arrays
+  });
+
+  const { fields: inclusionFields, append: appendInclusion, remove: removeInclusion } = useFieldArray({
+    control: form.control,
+    name: "inclusions" as never,
+  });
+
+  const { fields: exclusionFields, append: appendExclusion, remove: removeExclusion } = useFieldArray({
+    control: form.control,
+    name: "exclusions" as never,
+  });
+
+  const { fields: itineraryFields, append: appendItinerary, remove: removeItinerary } = useFieldArray({
+    control: form.control,
+    name: "itinerary",
+  });
+
+  const onSubmit = async (values: TripFormValues) => {
+    try {
+      setIsSubmitting(true);
+      if (isEdit && initialData) {
+        await api.adminUpdateTrip(initialData._id, values);
+        toast.success("Trip updated successfully");
+      } else {
+        await api.adminCreateTrip(values);
+        toast.success("Trip created successfully");
+        router.push("/admin/trips");
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Failed to save trip");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight">{isEdit ? "Edit Trip" : "Create New Trip"}</h2>
+          <p className="text-slate-500">Fill in the details below to {isEdit ? "update" : "create"} a trip.</p>
+        </div>
+        <div className="flex gap-4">
+          <Button type="button" variant="outline" onClick={() => router.back()}>Cancel</Button>
+          <Button type="submit" className="bg-[#FF6B35] hover:bg-[#e85a25] text-white" disabled={isSubmitting}>
+            {isSubmitting ? "Saving..." : isEdit ? "Save Changes" : "Create Trip"}
+          </Button>
+        </div>
+      </div>
+
+      <Tabs defaultValue="basic" className="w-full">
+        <TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent mb-6">
+          <TabsTrigger value="basic" className="data-[state=active]:border-b-2 data-[state=active]:border-[#FF6B35] rounded-none px-4 py-2">Basic Info</TabsTrigger>
+          <TabsTrigger value="content" className="data-[state=active]:border-b-2 data-[state=active]:border-[#FF6B35] rounded-none px-4 py-2">Content</TabsTrigger>
+          <TabsTrigger value="itinerary" className="data-[state=active]:border-b-2 data-[state=active]:border-[#FF6B35] rounded-none px-4 py-2">Itinerary</TabsTrigger>
+          <TabsTrigger value="pricing" className="data-[state=active]:border-b-2 data-[state=active]:border-[#FF6B35] rounded-none px-4 py-2">Pricing & Settings</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="basic" className="space-y-6 max-w-3xl">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Title</Label>
+              <Input {...form.register("title")} placeholder="e.g. Majestic Himalayas" />
+              {form.formState.errors.title && <p className="text-sm text-red-500">{form.formState.errors.title.message}</p>}
+            </div>
+            <div className="space-y-2">
+              <Label>Slug</Label>
+              <Input {...form.register("slug")} placeholder="e.g. majestic-himalayas" />
+            </div>
+          </div>
+          
+          <div className="space-y-2">
+            <Label>Destination</Label>
+            <Controller
+              control={form.control}
+              name="destination"
+              render={({ field }) => (
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select destination" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {destData?.destinations?.map((d) => (
+                      <SelectItem key={d._id} value={d._id}>{d.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Description</Label>
+            <Textarea {...form.register("description")} rows={5} placeholder="Full description of the trip..." />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="content" className="space-y-8 max-w-3xl">
+          {/* Highlights */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <Label className="text-base font-semibold">Highlights</Label>
+              <Button type="button" variant="outline" size="sm" onClick={() => appendHighlight("")}>
+                <Plus className="h-4 w-4 mr-2" /> Add Highlight
+              </Button>
+            </div>
+            {highlightFields.map((field, index) => (
+              <div key={field.id} className="flex gap-2">
+                <Input {...form.register(`highlights.${index}` as const)} placeholder="e.g. Visit the Taj Mahal at sunrise" />
+                <Button type="button" variant="ghost" size="icon" onClick={() => removeHighlight(index)}>
+                  <Trash2 className="h-4 w-4 text-red-500" />
+                </Button>
+              </div>
+            ))}
+          </div>
+
+          {/* Inclusions */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <Label className="text-base font-semibold">Inclusions</Label>
+              <Button type="button" variant="outline" size="sm" onClick={() => appendInclusion("")}>
+                <Plus className="h-4 w-4 mr-2" /> Add Inclusion
+              </Button>
+            </div>
+            {inclusionFields.map((field, index) => (
+              <div key={field.id} className="flex gap-2">
+                <Input {...form.register(`inclusions.${index}` as const)} placeholder="e.g. 3 nights 4-star accommodation" />
+                <Button type="button" variant="ghost" size="icon" onClick={() => removeInclusion(index)}>
+                  <Trash2 className="h-4 w-4 text-red-500" />
+                </Button>
+              </div>
+            ))}
+          </div>
+          
+          {/* Exclusions */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <Label className="text-base font-semibold">Exclusions</Label>
+              <Button type="button" variant="outline" size="sm" onClick={() => appendExclusion("")}>
+                <Plus className="h-4 w-4 mr-2" /> Add Exclusion
+              </Button>
+            </div>
+            {exclusionFields.map((field, index) => (
+              <div key={field.id} className="flex gap-2">
+                <Input {...form.register(`exclusions.${index}` as const)} placeholder="e.g. International flights" />
+                <Button type="button" variant="ghost" size="icon" onClick={() => removeExclusion(index)}>
+                  <Trash2 className="h-4 w-4 text-red-500" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="itinerary" className="space-y-6 max-w-4xl">
+          <div className="flex justify-between items-center">
+            <Label className="text-base font-semibold">Day-by-Day Itinerary</Label>
+            <Button type="button" variant="outline" size="sm" onClick={() => appendItinerary({ day: itineraryFields.length + 1, title: "", description: "", activities: [], meals: [] })}>
+              <Plus className="h-4 w-4 mr-2" /> Add Day
+            </Button>
+          </div>
+
+          <div className="space-y-4">
+            {itineraryFields.map((field, index) => (
+              <div key={field.id} className="border rounded-xl p-4 space-y-4 bg-slate-50 dark:bg-slate-900/50">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-semibold text-lg flex items-center gap-2">
+                    <GripVertical className="h-5 w-5 text-slate-400 cursor-grab" />
+                    Day {index + 1}
+                  </h4>
+                  <Button type="button" variant="ghost" size="icon" onClick={() => removeItinerary(index)}>
+                    <Trash2 className="h-4 w-4 text-red-500" />
+                  </Button>
+                </div>
+                
+                <div className="grid gap-4">
+                  <div className="space-y-2">
+                    <Label>Day Title</Label>
+                    <Input {...form.register(`itinerary.${index}.title` as const)} placeholder="e.g. Arrival in Delhi" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Description</Label>
+                    <Textarea {...form.register(`itinerary.${index}.description` as const)} rows={3} />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Accommodation (Optional)</Label>
+                      <Input {...form.register(`itinerary.${index}.accommodation` as const)} placeholder="e.g. Taj Palace Hotel" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="pricing" className="space-y-6 max-w-3xl">
+          <div className="grid grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label>Base Price ($)</Label>
+              <Input type="number" {...form.register("basePrice", { valueAsNumber: true })} />
+            </div>
+            <div className="space-y-2">
+              <Label>Duration (Days)</Label>
+              <Input type="number" {...form.register("durationDays", { valueAsNumber: true })} />
+            </div>
+            <div className="space-y-2">
+              <Label>Max Group Size</Label>
+              <Input type="number" {...form.register("maxGroupSize", { valueAsNumber: true })} />
+            </div>
+            <div className="space-y-2">
+              <Label>Status</Label>
+              <Controller
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="DRAFT">Draft</SelectItem>
+                      <SelectItem value="PUBLISHED">Published</SelectItem>
+                      <SelectItem value="ARCHIVED">Archived</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Trip Type</Label>
+              <Controller
+                control={form.control}
+                name="type"
+                render={({ field }) => (
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="GROUP">Group Tour</SelectItem>
+                      <SelectItem value="PRIVATE">Private Tour</SelectItem>
+                      <SelectItem value="HONEYMOON">Honeymoon</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Difficulty</Label>
+              <Controller
+                control={form.control}
+                name="difficulty"
+                render={({ field }) => (
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="EASY">Easy</SelectItem>
+                      <SelectItem value="MODERATE">Moderate</SelectItem>
+                      <SelectItem value="HARD">Hard</SelectItem>
+                      <SelectItem value="EXPERT">Expert</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+          </div>
+        </TabsContent>
+      </Tabs>
+    </form>
+  );
+}

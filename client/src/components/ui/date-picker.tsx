@@ -4,14 +4,13 @@ import * as React from "react";
 import { format, parseISO, isValid, startOfDay } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { cn } from "@/lib/utils"; // or wherever your cn helper lives
+import { cn } from "@/lib/utils";
 
 interface DatePickerProps {
   label?: string;
@@ -48,11 +47,12 @@ export function DatePicker({
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <button
-          type="button"
+      <PopoverTrigger asChild={false}>
+        <div
+          role="button"
+          tabIndex={0}
           className={cn(
-            "flex flex-col items-start text-left min-w-[92px] px-1 py-0.5 rounded-md hover:bg-black/5 transition-colors",
+            "flex flex-col items-start text-left min-w-[92px] px-1 py-0.5 rounded-md hover:bg-black/5 transition-colors cursor-pointer select-none",
             className
           )}
         >
@@ -88,7 +88,7 @@ export function DatePicker({
               </>
             )}
           </span>
-        </button>
+        </div>
       </PopoverTrigger>
 
       <PopoverContent className="w-auto p-0" align="start">
@@ -101,7 +101,6 @@ export function DatePicker({
             if (max && date > max) return true;
             return false;
           }}
-          initialFocus
         />
       </PopoverContent>
     </Popover>

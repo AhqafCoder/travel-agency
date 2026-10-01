@@ -40,7 +40,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${geistMono.variable} h-full`}>
+    <html lang="en" className={`${geistMono.variable} h-full`} data-scroll-behavior="smooth">
       <head>
         <link rel="icon" href="/favicon.png" type="image/png" />
       </head>

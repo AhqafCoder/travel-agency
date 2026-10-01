@@ -57,8 +57,8 @@ function SignInPrompt() {
             you&apos;re signed in.
           </p>
           <div className="flex gap-3">
-            <Button asChild>
-              <Link href="/login">Log in</Link>
+            <Button onClick={() => window.dispatchEvent(new CustomEvent("open-login-modal"))}>
+              Log in
             </Button>
             <Button variant="outline" asChild>
               <Link href="/register">Create account</Link>

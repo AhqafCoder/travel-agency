@@ -13,7 +13,7 @@ export function createApp(): Express {
   app.use(helmet());
   app.use(
     cors({
-      origin: env.CLIENT_ORIGIN,
+      origin: [env.CLIENT_ORIGIN, "http://localhost:3000", "http://localhost:3001", "http://127.0.0.1:3000"],
       credentials: true,
     })
   );
