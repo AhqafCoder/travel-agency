@@ -71,7 +71,7 @@ export default function HomePage() {
               textShadow: "0 2px 32px rgba(0,0,0,0.45)",
             }}
           >
-            Edit Your Trip.
+            Edit My Trips.
             <br />
             <span style={{ fontStyle: "italic", fontWeight: 800 }}>Live it. Now.</span>
           </h1>
