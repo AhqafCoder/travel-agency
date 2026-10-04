@@ -47,15 +47,18 @@ export function DatePicker({
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild={false}>
-        <div
-          role="button"
-          tabIndex={0}
-          className={cn(
-            "flex flex-col items-start text-left min-w-[92px] px-1 py-0.5 rounded-md hover:bg-black/5 transition-colors cursor-pointer select-none",
-            className
-          )}
-        >
+      <PopoverTrigger
+        render={
+          <div
+            role="button"
+            tabIndex={0}
+            className={cn(
+              "flex flex-col items-start text-left min-w-[92px] px-1 py-0.5 rounded-md hover:bg-black/5 transition-colors cursor-pointer select-none",
+              className
+            )}
+          />
+        }
+      >
           {label && (
             <span
               style={{
@@ -88,7 +91,6 @@ export function DatePicker({
               </>
             )}
           </span>
-        </div>
       </PopoverTrigger>
 
       <PopoverContent className="w-auto p-0" align="start">

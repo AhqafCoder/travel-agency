@@ -77,7 +77,7 @@ export default function AdminExperiencesPage() {
 
       <DataTable
         columns={columns}
-        data={data?.experiences || []}
+        data={data?.data || []}
         isLoading={isLoading}
         searchKey="title"
         searchPlaceholder="Search experiences..."

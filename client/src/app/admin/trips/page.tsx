@@ -45,7 +45,7 @@ export default function AdminTripsPage() {
       accessor: (trip) => (
         <div>
           <div className="font-medium text-slate-900 dark:text-slate-100">{trip.title}</div>
-          <div className="text-xs text-slate-500">{trip.durationDays} Days • {trip.type}</div>
+          <div className="text-xs text-slate-500">{trip.durationDays} Days • {trip.tripType}</div>
         </div>
       )
     },
@@ -100,12 +100,15 @@ export default function AdminTripsPage() {
             ]
           },
           {
-            key: "type",
+            key: "tripType",
             label: "Type",
             options: [
-              { label: "Group", value: "GROUP" },
-              { label: "Private", value: "PRIVATE" },
-              { label: "Honeymoon", value: "HONEYMOON" },
+              { label: "Adventure", value: "Adventure" },
+              { label: "Cultural", value: "Cultural" },
+              { label: "Wildlife", value: "Wildlife" },
+              { label: "Beach", value: "Beach" },
+              { label: "Trek", value: "Trek" },
+              { label: "Luxury", value: "Luxury" },
             ]
           }
         ]}

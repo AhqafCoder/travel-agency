@@ -1,6 +1,12 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
+  // The monorepo root (client/ + server/) is one level above this app;
+  // without this, Turbopack picks up stray lockfiles in home dir and warns.
+  turbopack: {
+    root: path.join(__dirname, ".."),
+  },
   images: {
     remotePatterns: [
       {

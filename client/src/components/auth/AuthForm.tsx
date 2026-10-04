@@ -23,7 +23,7 @@ interface AuthFormProps {
   title: string;
   description: string;
   submitLabel: string;
-  footer: ReactNode;
+  footer?: ReactNode;
 }
 
 export function AuthForm({

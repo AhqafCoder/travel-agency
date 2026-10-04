@@ -16,10 +16,10 @@ export default function AdminBookingsPage() {
 
   const columns: Column<Booking>[] = [
     {
-      key: "bookingReference",
+      key: "bookingNumber",
       header: "Ref",
       sortable: true,
-      accessor: (booking) => <span className="font-mono text-xs font-semibold">{booking.bookingReference || booking._id?.slice(-8).toUpperCase()}</span>
+      accessor: (booking) => <span className="font-mono text-xs font-semibold">{booking.bookingNumber || booking._id?.slice(-8).toUpperCase()}</span>
     },
     {
       key: "user",
@@ -46,16 +46,16 @@ export default function AdminBookingsPage() {
       )
     },
     {
-      key: "totalAmount",
+      key: "total",
       header: "Amount",
       sortable: true,
-      accessor: (booking) => `$${booking.totalAmount}`
+      accessor: (booking) => `$${booking.total}`
     },
     {
-      key: "status",
+      key: "bookingStatus",
       header: "Status",
       sortable: true,
-      accessor: (booking) => <StatusBadge status={booking.status} />
+      accessor: (booking) => <StatusBadge status={booking.bookingStatus} />
     }
   ];
 
@@ -70,7 +70,7 @@ export default function AdminBookingsPage() {
 
       <DataTable
         columns={columns}
-        data={data?.bookings || []}
+        data={data?.data || []}
         isLoading={isLoading}
         searchKey="user" // Need to handle nested search carefully, API should ideally filter
         searchPlaceholder="Search bookings..."
@@ -91,12 +91,12 @@ export default function AdminBookingsPage() {
             <Button variant="ghost" size="icon" title="View Details">
               <Eye className="h-4 w-4 text-blue-500" />
             </Button>
-            {booking.status === "PENDING" && (
+            {booking.bookingStatus === "PENDING" && (
               <Button variant="ghost" size="icon" title="Confirm Booking">
                 <CheckCircle className="h-4 w-4 text-emerald-500" />
               </Button>
             )}
-            {booking.status !== "CANCELLED" && (
+            {booking.bookingStatus !== "CANCELLED" && (
               <Button variant="ghost" size="icon" title="Cancel Booking">
                 <XCircle className="h-4 w-4 text-red-500" />
               </Button>

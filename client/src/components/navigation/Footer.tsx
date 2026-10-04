@@ -8,10 +8,10 @@ import {
   Mail,
   Phone,
   MessageCircle,
-  ArrowRight,
   ArrowUp,
 } from "lucide-react";
 import { SITE, FOOTER_LINKS } from "@/lib/constants";
+import { EnquiryForm } from "@/components/forms/EnquiryForm";
 
 const SOCIALS = [
   { icon: Camera, href: SITE.social.instagram, label: "Instagram" },
@@ -41,37 +41,54 @@ export function Footer() {
       />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* ── CTA panel ───────────────────────────────── */}
+        {/* ── Enquiry panel ──────────────────────────── */}
         <div className="-translate-y-0 pt-14">
           <div className="rounded-3xl border border-white/8 bg-gradient-to-br from-white/[0.06] to-white/[0.02] px-6 py-10 sm:px-10 sm:py-12">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
-              <div className="max-w-xl">
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
+              <div className="lg:col-span-2">
                 <h3 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
-                  Ready to edit your trip?
+                  Plan your trip with us
                 </h3>
                 <p className="mt-3 text-muted-foreground text-sm sm:text-base leading-relaxed">
-                  Tell us where you want to go. We&apos;ll build the perfect
-                  experience around you.
+                  Tell us where you want to go and when. Our travel experts
+                  will craft a customised itinerary and get back to you within
+                  24 hours.
                 </p>
-              </div>
 
-              <div className="flex flex-col sm:flex-row gap-3 shrink-0">
-                <Link
-                  href="/trips"
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white text-[#111] font-semibold text-sm hover:bg-white/90 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-                >
-                  Customize your trip
-                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
-                </Link>
+                <ul className="mt-6 space-y-3 text-sm text-muted-foreground">
+                  <li className="flex items-center gap-2.5">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/15 text-primary">
+                      <Mail className="w-3.5 h-3.5" />
+                    </span>
+                    Free customisation on every trip
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/15 text-primary">
+                      <MessageCircle className="w-3.5 h-3.5" />
+                    </span>
+                    Reply within 24 hours, guaranteed
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/15 text-primary">
+                      <Phone className="w-3.5 h-3.5" />
+                    </span>
+                    No spam — one call, one plan
+                  </li>
+                </ul>
+
                 <a
                   href={`https://wa.me/${SITE.whatsapp}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl border border-white/15 text-foreground font-semibold text-sm hover:bg-white/8 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                  className="mt-7 inline-flex items-center gap-2 rounded-xl border border-white/15 px-5 py-2.5 text-sm font-semibold text-foreground hover:bg-white/8 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                 >
                   <MessageCircle className="w-4 h-4" />
-                  Chat on WhatsApp
+                  Prefer WhatsApp? Chat with us
                 </a>
+              </div>
+
+              <div className="lg:col-span-3">
+                <EnquiryForm variant="dark" />
               </div>
             </div>
           </div>

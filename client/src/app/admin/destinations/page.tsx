@@ -85,7 +85,7 @@ export default function AdminDestinationsPage() {
 
       <DataTable
         columns={columns}
-        data={data?.destinations || []}
+        data={data?.data || []}
         isLoading={isLoading}
         searchKey="name"
         searchPlaceholder="Search destinations..."

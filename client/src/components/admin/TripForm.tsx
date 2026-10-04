@@ -24,13 +24,12 @@ import { useQuery } from "@tanstack/react-query";
   shortDescription: z.string().min(10),
   description: z.string().min(10),
   destinationId: z.string().min(1, "Destination is required"),
-  type: z.enum(["GROUP", "PRIVATE", "HONEYMOON"]),
-  difficulty: z.enum(["EASY", "MODERATE", "HARD", "EXPERT"]),
+  tripType: z.enum(["Adventure", "Cultural", "Wildlife", "Beach", "Pilgrimage", "Backpacking", "Luxury", "Road Trip", "Trek", "Workation"]),
+  difficulty: z.enum(["Easy", "Moderate", "Challenging", "Extreme"]),
   durationDays: z.number().min(1),
   basePrice: z.number().min(0),
   maxGroupSize: z.number().min(1),
   status: z.enum(["DRAFT", "PUBLISHED", "ARCHIVED"]),
-  highlights: z.array(z.string()).min(1, "At least one highlight is required"),
   inclusions: z.array(z.string()),
   exclusions: z.array(z.string()),
   itinerary: z.array(
@@ -39,7 +38,7 @@ import { useQuery } from "@tanstack/react-query";
       title: z.string().min(1),
       description: z.string().min(1),
       activities: z.array(z.string()),
-      meals: z.array(z.string()),
+      meals: z.array(z.enum(["Breakfast", "Lunch", "Dinner"])),
       stay: z.string().optional(),
       transport: z.string().optional(),
       distance: z.string().optional(),
@@ -71,14 +70,13 @@ export function TripForm({ initialData, isEdit }: TripFormProps) {
       slug: initialData.slug || "",
       shortDescription: initialData.shortDescription || "",
       description: initialData.description || "",
-      destinationId: typeof initialData.destination === "string" ? initialData.destination : initialData.destination?._id || "",
-      type: initialData.type || "GROUP",
-      difficulty: initialData.difficulty || "MODERATE",
+      destinationId: typeof initialData.destinationId === "string" ? initialData.destinationId : initialData.destinationId || "",
+      tripType: initialData.tripType || "Adventure",
+      difficulty: initialData.difficulty || "Moderate",
       durationDays: initialData.durationDays || 1,
       basePrice: initialData.basePrice || 0,
       maxGroupSize: initialData.maxGroupSize || 10,
       status: initialData.status || "DRAFT",
-      highlights: initialData.highlights || [""],
       inclusions: initialData.inclusions || [],
       exclusions: initialData.exclusions || [],
       itinerary: initialData.itinerary?.length ? initialData.itinerary : [{ dayNumber: 1, title: "", description: "", activities: [], meals: [], highlights: [] }],
@@ -88,22 +86,16 @@ export function TripForm({ initialData, isEdit }: TripFormProps) {
       shortDescription: "",
       description: "",
       destinationId: "",
-      type: "GROUP",
-      difficulty: "MODERATE",
+      tripType: "Adventure",
+      difficulty: "Moderate",
       durationDays: 1,
       basePrice: 0,
       maxGroupSize: 10,
       status: "DRAFT",
-      highlights: [""],
       inclusions: [],
       exclusions: [],
       itinerary: [{ dayNumber: 1, title: "", description: "", activities: [], meals: [], highlights: [] }],
     },
-  });
-
-  const { fields: highlightFields, append: appendHighlight, remove: removeHighlight } = useFieldArray({
-    control: form.control,
-    name: "highlights" as never, // cast due to zod typing quirks with string arrays
   });
 
   const { fields: inclusionFields, append: appendInclusion, remove: removeInclusion } = useFieldArray({
@@ -179,14 +171,14 @@ export function TripForm({ initialData, isEdit }: TripFormProps) {
             <Label>Destination</Label>
             <Controller
               control={form.control}
-              name="destination"
+              name="destinationId"
               render={({ field }) => (
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select onValueChange={field.onChange} value={field.value}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select destination" />
                   </SelectTrigger>
                   <SelectContent>
-                    {destData?.destinations?.map((d) => (
+                    {destData?.data?.map((d) => (
                       <SelectItem key={d._id} value={d._id}>{d.name}</SelectItem>
                     ))}
                   </SelectContent>
@@ -202,24 +194,6 @@ export function TripForm({ initialData, isEdit }: TripFormProps) {
         </TabsContent>
 
         <TabsContent value="content" className="space-y-8 max-w-3xl">
-          {/* Highlights */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <Label className="text-base font-semibold">Highlights</Label>
-              <Button type="button" variant="outline" size="sm" onClick={() => appendHighlight("")}>
-                <Plus className="h-4 w-4 mr-2" /> Add Highlight
-              </Button>
-            </div>
-            {highlightFields.map((field, index) => (
-              <div key={field.id} className="flex gap-2">
-                <Input {...form.register(`highlights.${index}` as const)} placeholder="e.g. Visit the Taj Mahal at sunrise" />
-                <Button type="button" variant="ghost" size="icon" onClick={() => removeHighlight(index)}>
-                  <Trash2 className="h-4 w-4 text-red-500" />
-                </Button>
-              </div>
-            ))}
-          </div>
-
           {/* Inclusions */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -260,7 +234,7 @@ export function TripForm({ initialData, isEdit }: TripFormProps) {
         <TabsContent value="itinerary" className="space-y-6 max-w-4xl">
           <div className="flex justify-between items-center">
             <Label className="text-base font-semibold">Day-by-Day Itinerary</Label>
-            <Button type="button" variant="outline" size="sm" onClick={() => appendItinerary({ day: itineraryFields.length + 1, title: "", description: "", activities: [], meals: [] })}>
+            <Button type="button" variant="outline" size="sm" onClick={() => appendItinerary({ dayNumber: itineraryFields.length + 1, title: "", description: "", activities: [], meals: [], highlights: [] })}>
               <Plus className="h-4 w-4 mr-2" /> Add Day
             </Button>
           </div>
@@ -290,7 +264,7 @@ export function TripForm({ initialData, isEdit }: TripFormProps) {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label>Accommodation (Optional)</Label>
-                      <Input {...form.register(`itinerary.${index}.accommodation` as const)} placeholder="e.g. Taj Palace Hotel" />
+                      <Input {...form.register(`itinerary.${index}.stay` as const)} placeholder="e.g. Taj Palace Hotel" />
                     </div>
                   </div>
                 </div>
@@ -319,7 +293,7 @@ export function TripForm({ initialData, isEdit }: TripFormProps) {
                 control={form.control}
                 name="status"
                 render={({ field }) => (
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -336,16 +310,23 @@ export function TripForm({ initialData, isEdit }: TripFormProps) {
               <Label>Trip Type</Label>
               <Controller
                 control={form.control}
-                name="type"
+                name="tripType"
                 render={({ field }) => (
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="GROUP">Group Tour</SelectItem>
-                      <SelectItem value="PRIVATE">Private Tour</SelectItem>
-                      <SelectItem value="HONEYMOON">Honeymoon</SelectItem>
+                      <SelectItem value="Adventure">Adventure</SelectItem>
+                      <SelectItem value="Cultural">Cultural</SelectItem>
+                      <SelectItem value="Wildlife">Wildlife</SelectItem>
+                      <SelectItem value="Beach">Beach</SelectItem>
+                      <SelectItem value="Pilgrimage">Pilgrimage</SelectItem>
+                      <SelectItem value="Backpacking">Backpacking</SelectItem>
+                      <SelectItem value="Luxury">Luxury</SelectItem>
+                      <SelectItem value="Road Trip">Road Trip</SelectItem>
+                      <SelectItem value="Trek">Trek</SelectItem>
+                      <SelectItem value="Workation">Workation</SelectItem>
                     </SelectContent>
                   </Select>
                 )}
@@ -357,15 +338,15 @@ export function TripForm({ initialData, isEdit }: TripFormProps) {
                 control={form.control}
                 name="difficulty"
                 render={({ field }) => (
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="EASY">Easy</SelectItem>
-                      <SelectItem value="MODERATE">Moderate</SelectItem>
-                      <SelectItem value="HARD">Hard</SelectItem>
-                      <SelectItem value="EXPERT">Expert</SelectItem>
+                      <SelectItem value="Easy">Easy</SelectItem>
+                      <SelectItem value="Moderate">Moderate</SelectItem>
+                      <SelectItem value="Challenging">Challenging</SelectItem>
+                      <SelectItem value="Extreme">Extreme</SelectItem>
                     </SelectContent>
                   </Select>
                 )}

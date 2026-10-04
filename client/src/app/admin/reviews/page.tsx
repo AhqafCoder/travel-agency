@@ -6,7 +6,7 @@ import { DataTable, Column } from "@/components/admin/DataTable";
 import { StatusBadge } from "@/components/admin/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, XCircle, Trash2 } from "lucide-react";
-import { Review } from "@/types";
+import { Review, ReviewStatus } from "@/types";
 import { useState } from "react";
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
 import { toast } from "sonner";
@@ -34,7 +34,7 @@ export default function AdminReviewsPage() {
     }
   };
 
-  const handleStatusChange = async (id: string, status: string) => {
+  const handleStatusChange = async (id: string, status: ReviewStatus) => {
     try {
       await api.adminUpdateReview(id, { status });
       toast.success(`Review ${status.toLowerCase()} successfully`);
@@ -75,12 +75,12 @@ export default function AdminReviewsPage() {
       )
     },
     {
-      key: "text",
+      key: "content",
       header: "Review",
       sortable: false,
       accessor: (review) => (
-        <div className="max-w-xs truncate text-xs text-slate-500" title={review.text}>
-          {review.text}
+        <div className="max-w-xs truncate text-xs text-slate-500" title={review.content}>
+          {review.content}
         </div>
       )
     },
@@ -103,9 +103,9 @@ export default function AdminReviewsPage() {
 
       <DataTable
         columns={columns}
-        data={data?.reviews || []}
+        data={data?.data || []}
         isLoading={isLoading}
-        searchKey="text"
+        searchKey="content"
         searchPlaceholder="Search reviews..."
         filterOptions={[
           {
@@ -132,21 +132,21 @@ export default function AdminReviewsPage() {
         actions={(review) => (
           <>
             {review.status !== "APPROVED" && (
-              <Button 
-                variant="ghost" 
-                size="icon" 
+              <Button
+                variant="ghost"
+                size="icon"
                 title="Approve"
-                onClick={() => handleStatusChange(review._id, "APPROVED")}
+                onClick={() => handleStatusChange(review._id, "APPROVED" as ReviewStatus)}
               >
                 <CheckCircle className="h-4 w-4 text-emerald-500" />
               </Button>
             )}
             {review.status !== "REJECTED" && (
-              <Button 
-                variant="ghost" 
-                size="icon" 
+              <Button
+                variant="ghost"
+                size="icon"
                 title="Reject"
-                onClick={() => handleStatusChange(review._id, "REJECTED")}
+                onClick={() => handleStatusChange(review._id, "REJECTED" as ReviewStatus)}
               >
                 <XCircle className="h-4 w-4 text-orange-500" />
               </Button>

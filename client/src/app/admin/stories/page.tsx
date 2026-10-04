@@ -54,16 +54,16 @@ export default function AdminStoriesPage() {
       accessor: (story) => story.author?.name || "Unknown"
     },
     {
-      key: "isPublished",
+      key: "status",
       header: "Status",
       sortable: true,
       accessor: (story) => (
         <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-          story.isPublished 
-            ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400" 
+          story.status === "PUBLISHED"
+            ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400"
             : "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400"
         }`}>
-          {story.isPublished ? "Published" : "Draft"}
+          {story.status === "PUBLISHED" ? "Published" : "Draft"}
         </span>
       )
     },
@@ -86,7 +86,7 @@ export default function AdminStoriesPage() {
 
       <DataTable
         columns={columns}
-        data={data?.stories || []}
+        data={data?.data || []}
         isLoading={isLoading}
         searchKey="title"
         searchPlaceholder="Search stories..."

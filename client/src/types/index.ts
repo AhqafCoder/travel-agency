@@ -143,8 +143,8 @@ export interface Captain {
 // ── Itinerary Day ─────────────────────────────
 
 export interface ItineraryDay {
-  _id: string;
-  tripId: string;
+  _id?: string;
+  tripId?: string;
   dayNumber: number;
   title: string;
   description: string;
@@ -171,6 +171,7 @@ export interface Trip {
   basePrice: number;
   discountedPrice?: number;
   tripType: TripType;
+  type?: TripType; // alias for tripType
   difficulty: TripDifficulty;
   minAge: number;
   maxGroupSize: number;
@@ -262,6 +263,7 @@ export interface BookingTraveller {
 export interface Booking {
   _id: string;
   bookingNumber: string; // EMT10023
+  bookingReference?: string; // alias for bookingNumber
   userId: string;
   user?: User;
   tripId: string;
@@ -275,8 +277,10 @@ export interface Booking {
   couponCode?: string;
   tax: number;
   total: number;
+  totalAmount?: number; // alias for total
   paymentStatus: PaymentStatus;
   bookingStatus: BookingStatus;
+  status?: BookingStatus | PaymentStatus; // combined status for UI
   notes?: string;
   cancelReason?: string;
   payments?: Payment[];
@@ -313,13 +317,16 @@ export interface Coupon {
   description?: string;
   type: CouponType;
   value: number; // percentage or fixed INR amount
+  discountValue?: number; // alias for value
   minimumAmount: number;
   maximumDiscount?: number; // cap for percentage coupons
   usageLimit: number;
   usedCount: number;
+  usageCount?: number; // alias for usedCount
   validFrom: Date;
   validUntil: Date;
   active: boolean;
+  isActive?: boolean; // alias for active
   applicableTripIds?: string[]; // empty = all trips
   createdAt: Date;
   updatedAt: Date;
@@ -337,6 +344,7 @@ export interface Review {
   rating: number; // 1–5
   title?: string;
   content: string;
+  text?: string; // alias for content
   images?: string[];
   status: ReviewStatus;
   verifiedBooking: boolean;
@@ -359,6 +367,7 @@ export interface Story {
   category: string;
   tags: string[];
   status: StoryStatus;
+  isPublished?: boolean; // alias for status === 'PUBLISHED'
   featured: boolean;
   metaTitle?: string;
   metaDescription?: string;

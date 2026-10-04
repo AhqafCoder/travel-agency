@@ -49,13 +49,13 @@ export default function AdminCouponsPage() {
       key: "discount",
       header: "Discount",
       sortable: true,
-      accessor: (coupon) => coupon.type === "PERCENTAGE" ? `${coupon.discountValue}%` : `$${coupon.discountValue}`
+      accessor: (coupon) => coupon.type === "PERCENTAGE" ? `${coupon.value}%` : `$${coupon.value}`
     },
     {
       key: "usage",
       header: "Usage",
       sortable: false,
-      accessor: (coupon) => `${coupon.usageCount} / ${coupon.usageLimit || "∞"}`
+      accessor: (coupon) => `${coupon.usedCount} / ${coupon.usageLimit || "∞"}`
     },
     {
       key: "expiry",
@@ -64,10 +64,10 @@ export default function AdminCouponsPage() {
       accessor: (coupon) => coupon.validUntil ? new Date(coupon.validUntil).toLocaleDateString() : "Never"
     },
     {
-      key: "isActive",
+      key: "active",
       header: "Status",
       sortable: true,
-      accessor: (coupon) => <StatusBadge status={coupon.isActive ? "ACTIVE" : "INACTIVE"} />
+      accessor: (coupon) => <StatusBadge status={coupon.active ? "ACTIVE" : "INACTIVE"} />
     }
   ];
 
@@ -82,7 +82,7 @@ export default function AdminCouponsPage() {
 
       <DataTable
         columns={columns}
-        data={data?.coupons || []}
+        data={data?.data || []}
         isLoading={isLoading}
         searchKey="code"
         searchPlaceholder="Search codes..."

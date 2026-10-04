@@ -141,7 +141,7 @@ export function DataTable<T extends Record<string, any>>({
               key={filter.key}
               value={filters[filter.key] || "ALL"}
               onValueChange={(val) => {
-                setFilters((prev) => ({ ...prev, [filter.key]: val }));
+                setFilters((prev) => ({ ...prev, [filter.key]: val ?? "ALL" }));
                 setCurrentPage(1);
               }}
             >

@@ -41,8 +41,8 @@ export default function AdminCustomersPage() {
       sortable: true,
       accessor: (user) => (
         <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-          user.role === "USER" 
-            ? "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400" 
+          user.role === "CUSTOMER"
+            ? "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400"
             : "bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400"
         }`}>
           {user.role}
@@ -77,7 +77,7 @@ export default function AdminCustomersPage() {
             key: "role",
             label: "Role",
             options: [
-              { label: "User", value: "USER" },
+              { label: "Customer", value: "CUSTOMER" },
               { label: "Admin", value: "ADMIN" },
               { label: "Super Admin", value: "SUPER_ADMIN" },
               { label: "Operations", value: "OPERATIONS" },

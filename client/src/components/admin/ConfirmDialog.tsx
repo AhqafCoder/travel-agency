@@ -18,6 +18,7 @@ interface ConfirmDialogProps {
   description: string;
   confirmLabel?: string;
   cancelLabel?: string;
+  confirmText?: string; // alias for confirmLabel
   variant?: "destructive" | "default";
   loading?: boolean;
   onConfirm: () => void;
@@ -29,11 +30,13 @@ export function ConfirmDialog({
   title,
   description,
   confirmLabel = "Confirm",
+  confirmText,
   cancelLabel = "Cancel",
   variant = "destructive",
   loading = false,
   onConfirm,
 }: ConfirmDialogProps) {
+  const finalConfirmLabel = confirmText || confirmLabel;
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-[#0f172a] border-white/10 text-white max-w-sm">
@@ -65,7 +68,7 @@ export function ConfirmDialog({
             disabled={loading}
             className={variant === "destructive" ? "bg-red-600 hover:bg-red-700" : ""}
           >
-            {loading ? "Processing..." : confirmLabel}
+            {loading ? "Processing..." : finalConfirmLabel}
           </Button>
         </DialogFooter>
       </DialogContent>
