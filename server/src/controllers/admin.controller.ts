@@ -3,7 +3,6 @@ import { Trip } from "../models/Trip.js";
 import { Departure } from "../models/Departure.js";
 import { Booking } from "../models/Booking.js";
 import { User } from "../models/User.js";
-import { Payment } from "../models/Payment.js";
 
 /** GET /api/admin/stats — Dashboard KPIs */
 export async function getDashboardStats(_req: Request, res: Response): Promise<void> {

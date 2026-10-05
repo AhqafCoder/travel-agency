@@ -25,7 +25,7 @@ export const createLead = async (req: Request, res: Response): Promise<void> => 
     res.status(201).json({
       success: true,
       message: "Enquiry submitted successfully",
-      lead,
+      data: lead,
     });
   } catch (error: any) {
     console.error("Error creating lead:", error);
@@ -62,11 +62,14 @@ export const adminListLeads = async (req: Request, res: Response): Promise<void>
     ]);
 
     res.json({
-      leads,
-      total,
-      page: pageNum,
-      pageSize: limitNum,
-      totalPages: Math.ceil(total / limitNum),
+      success: true,
+      data: leads,
+      meta: {
+        total,
+        page: pageNum,
+        pageSize: limitNum,
+        totalPages: Math.ceil(total / limitNum),
+      },
     });
   } catch (error: any) {
     console.error("Error listing leads:", error);
@@ -85,7 +88,7 @@ export const adminGetLead = async (req: Request, res: Response): Promise<void> =
       return;
     }
 
-    res.json({ lead });
+    res.json({ success: true, data: lead });
   } catch (error: any) {
     console.error("Error getting lead:", error);
     res.status(500).json({ error: error.message || "Failed to fetch lead details" });
@@ -111,8 +114,7 @@ export const adminUpdateLead = async (req: Request, res: Response): Promise<void
 
     res.json({
       success: true,
-      message: "Lead updated successfully",
-      lead,
+      data: lead,
     });
   } catch (error: any) {
     console.error("Error updating lead:", error);

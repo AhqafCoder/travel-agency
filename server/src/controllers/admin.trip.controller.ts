@@ -1,7 +1,6 @@
 import type { Request, Response } from "express";
 import { Trip } from "../models/Trip.js";
 import { Departure } from "../models/Departure.js";
-import type { AuthUser } from "../middleware/auth.js";
 
 function escapeRegExp(v: string) {
   return v.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");

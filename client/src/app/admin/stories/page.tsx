@@ -1,15 +1,15 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { DataTable, Column } from "@/components/admin/DataTable";
 import { Button } from "@/components/ui/button";
 import { Plus, Edit, Trash2 } from "lucide-react";
+import Link from "next/link";
 import { Story } from "@/types";
 import { useState } from "react";
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
 import { toast } from "sonner";
-import { useQueryClient } from "@tanstack/react-query";
 
 export default function AdminStoriesPage() {
   const queryClient = useQueryClient();
@@ -40,50 +40,62 @@ export default function AdminStoriesPage() {
       sortable: true,
       accessor: (story) => (
         <div className="flex items-center gap-3">
-          {story.coverImage && (
-            <img src={story.coverImage} alt={story.title} className="w-10 h-10 rounded-md object-cover" />
+          {story.coverImage ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={story.coverImage}
+              alt={story.title}
+              className="h-10 w-10 rounded-md object-cover"
+            />
+          ) : (
+            <div className="h-10 w-10 rounded-md bg-muted/60" />
           )}
-          <div className="font-medium text-slate-900 dark:text-slate-100">{story.title}</div>
+          <div>
+            <div className="font-medium text-foreground">{story.title}</div>
+            <div className="text-xs text-muted-foreground">{story.category}</div>
+          </div>
         </div>
-      )
+      ),
     },
     {
       key: "author",
       header: "Author",
       sortable: true,
-      accessor: (story) => story.author?.name || "Unknown"
+      accessor: (story) => story.author?.name || "—",
+    },
+    {
+      key: "views",
+      header: "Views",
+      sortable: true,
+      accessor: (story) => story.views?.toLocaleString() ?? "0",
     },
     {
       key: "status",
       header: "Status",
       sortable: true,
       accessor: (story) => (
-        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-          story.status === "PUBLISHED"
-            ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400"
-            : "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400"
-        }`}>
+        <span
+          className={`rounded-full px-2.5 py-1 text-xs font-medium ${
+            story.status === "PUBLISHED"
+              ? "bg-emerald-500/10 text-emerald-600"
+              : "bg-muted text-muted-foreground"
+          }`}
+        >
           {story.status === "PUBLISHED" ? "Published" : "Draft"}
         </span>
-      )
+      ),
     },
     {
       key: "publishedAt",
       header: "Date",
       sortable: true,
-      accessor: (story) => story.publishedAt ? new Date(story.publishedAt).toLocaleDateString() : "-"
-    }
+      accessor: (story) =>
+        story.publishedAt ? new Date(story.publishedAt).toLocaleDateString() : "—",
+    },
   ];
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Stories</h1>
-        <p className="text-slate-500 dark:text-slate-400">
-          Manage blog posts, travel guides, and customer stories.
-        </p>
-      </div>
-
       <DataTable
         columns={columns}
         data={data?.data || []}
@@ -91,23 +103,30 @@ export default function AdminStoriesPage() {
         searchKey="title"
         searchPlaceholder="Search stories..."
         primaryAction={
-          <Button className="bg-[#FF6B35] hover:bg-[#e85a25] text-white">
-            <Plus className="mr-2 h-4 w-4" />
-            New Story
+          <Button
+            className="bg-orange-500 text-white hover:bg-orange-600"
+            asChild
+          >
+            <Link href="/admin/stories/new">
+              <Plus className="mr-2 h-4 w-4" />
+              New Story
+            </Link>
           </Button>
         }
         actions={(story) => (
           <>
-            <Button variant="ghost" size="icon" title="Edit">
-              <Edit className="h-4 w-4 text-blue-500" />
+            <Button variant="ghost" size="icon" title="Edit" asChild>
+              <Link href={`/admin/stories/${story._id}/edit`}>
+                <Edit className="h-4 w-4 text-sky-600" />
+              </Link>
             </Button>
-            <Button 
-              variant="ghost" 
-              size="icon" 
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => setDeleteId(story._id)}
               title="Delete"
             >
-              <Trash2 className="h-4 w-4 text-red-500" />
+              <Trash2 className="h-4 w-4 text-red-600" />
             </Button>
           </>
         )}

@@ -100,13 +100,13 @@ export default function AdminLeadsPage() {
       case "NEW":
         return "bg-blue-500/10 text-blue-400 border-blue-500/20";
       case "CONTACTED":
-        return "bg-amber-500/10 text-amber-400 border-amber-500/20";
+        return "bg-amber-500/10 text-amber-600 border-amber-500/20";
       case "CONVERTED":
-        return "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+        return "bg-emerald-500/10 text-emerald-600 border-emerald-500/20";
       case "CLOSED":
-        return "bg-zinc-500/10 text-zinc-400 border-zinc-500/20";
+        return "bg-muted text-muted-foreground border-border";
       default:
-        return "bg-zinc-500/10 text-zinc-400 border-zinc-500/20";
+        return "bg-muted text-muted-foreground border-border";
     }
   };
 
@@ -115,17 +115,17 @@ export default function AdminLeadsPage() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">Enquiry Leads</h1>
-          <p className="text-sm text-zinc-400 mt-1">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Enquiry Leads</h1>
+          <p className="text-sm text-muted-foreground mt-1">
             Manage customer enquiries submitted from website pop-up forms ({totalLeads} total)
           </p>
         </div>
       </div>
 
       {/* Filters and Search */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 bg-zinc-900/60 p-4 rounded-xl border border-zinc-800">
+      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 bg-muted/50 p-4 rounded-xl border border-border">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
             type="text"
             placeholder="Search by name, email, phone or destination..."
@@ -134,19 +134,19 @@ export default function AdminLeadsPage() {
               setSearch(e.target.value);
               setPage(1);
             }}
-            className="w-full pl-10 pr-4 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-white placeholder-zinc-500 text-sm focus:outline-none focus:border-orange-500 transition-colors"
+            className="w-full pl-10 pr-4 py-2 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:border-orange-500 transition-colors"
           />
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="text-xs text-zinc-400 font-medium">Status:</span>
+          <span className="text-xs text-muted-foreground font-medium">Status:</span>
           <select
             value={statusFilter}
             onChange={(e) => {
               setStatusFilter(e.target.value);
               setPage(1);
             }}
-            className="bg-zinc-950 border border-zinc-800 text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-orange-500"
+            className="bg-background border border-border text-foreground text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-orange-500"
           >
             <option value="ALL">All Statuses</option>
             <option value="NEW">New</option>
@@ -158,11 +158,11 @@ export default function AdminLeadsPage() {
       </div>
 
       {/* Leads Table */}
-      <div className="bg-zinc-900/40 border border-zinc-800/80 rounded-xl overflow-hidden backdrop-blur-sm">
+      <div className="bg-muted/40 border border-border rounded-xl overflow-hidden backdrop-blur-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-zinc-800 bg-zinc-950/60 text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+              <tr className="border-b border-border bg-muted/60 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 <th className="py-3.5 px-4">Customer</th>
                 <th className="py-3.5 px-4">Contact</th>
                 <th className="py-3.5 px-4">Destination</th>
@@ -172,55 +172,55 @@ export default function AdminLeadsPage() {
                 <th className="py-3.5 px-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-800/60 text-sm text-zinc-300">
+            <tbody className="divide-y divide-border text-sm text-foreground">
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-zinc-500">
+                  <td colSpan={7} className="py-12 text-center text-muted-foreground">
                     Loading leads...
                   </td>
                 </tr>
               ) : leads.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-zinc-500">
+                  <td colSpan={7} className="py-12 text-center text-muted-foreground">
                     No enquiry leads found.
                   </td>
                 </tr>
               ) : (
                 leads.map((lead) => (
-                  <tr key={lead._id} className="hover:bg-zinc-800/30 transition-colors">
-                    <td className="py-4 px-4 font-medium text-white">
+                  <tr key={lead._id} className="hover:bg-muted/60 transition-colors">
+                    <td className="py-4 px-4 font-medium text-foreground">
                       <div className="flex items-center gap-2">
-                        <span className="w-8 h-8 rounded-full bg-orange-500/10 text-orange-400 flex items-center font-bold justify-center text-xs">
+                        <span className="w-8 h-8 rounded-full bg-orange-500/10 text-orange-600 flex items-center font-bold justify-center text-xs">
                           {lead.name?.charAt(0).toUpperCase()}
                         </span>
                         <div>
-                          <div className="font-semibold text-white">{lead.name}</div>
-                          <div className="text-xs text-zinc-500">ID: {lead._id.slice(-6)}</div>
+                          <div className="font-semibold text-foreground">{lead.name}</div>
+                          <div className="text-xs text-muted-foreground">ID: {lead._id.slice(-6)}</div>
                         </div>
                       </div>
                     </td>
                     <td className="py-4 px-4">
                       <div className="flex flex-col gap-0.5 text-xs">
-                        <span className="flex items-center gap-1.5 text-zinc-300">
-                          <Mail className="w-3.5 h-3.5 text-zinc-500" /> {lead.email}
+                        <span className="flex items-center gap-1.5 text-foreground">
+                          <Mail className="w-3.5 h-3.5 text-muted-foreground" /> {lead.email}
                         </span>
-                        <span className="flex items-center gap-1.5 text-zinc-400">
-                          <Phone className="w-3.5 h-3.5 text-zinc-500" /> {lead.phone}
+                        <span className="flex items-center gap-1.5 text-muted-foreground">
+                          <Phone className="w-3.5 h-3.5 text-muted-foreground" /> {lead.phone}
                         </span>
                       </div>
                     </td>
                     <td className="py-4 px-4">
-                      <span className="inline-flex items-center gap-1 text-orange-400 font-medium">
+                      <span className="inline-flex items-center gap-1 text-orange-600 font-medium">
                         <MapPin className="w-3.5 h-3.5" /> {lead.destination}
                       </span>
                     </td>
                     <td className="py-4 px-4">
-                      <div className="flex flex-col gap-0.5 text-xs text-zinc-400">
+                      <div className="flex flex-col gap-0.5 text-xs text-muted-foreground">
                         <span className="flex items-center gap-1.5">
-                          <Calendar className="w-3.5 h-3.5 text-zinc-500" /> {lead.date}
+                          <Calendar className="w-3.5 h-3.5 text-muted-foreground" /> {lead.date}
                         </span>
                         <span className="flex items-center gap-1.5">
-                          <Users className="w-3.5 h-3.5 text-zinc-500" /> {lead.noOfPeople} {lead.noOfPeople === 1 ? "person" : "people"}
+                          <Users className="w-3.5 h-3.5 text-muted-foreground" /> {lead.noOfPeople} {lead.noOfPeople === 1 ? "person" : "people"}
                         </span>
                       </div>
                     </td>
@@ -229,7 +229,7 @@ export default function AdminLeadsPage() {
                         {lead.status}
                       </span>
                     </td>
-                    <td className="py-4 px-4 text-xs text-zinc-400">
+                    <td className="py-4 px-4 text-xs text-muted-foreground">
                       {new Date(lead.createdAt).toLocaleDateString()} {new Date(lead.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </td>
                     <td className="py-4 px-4 text-right">
@@ -241,14 +241,14 @@ export default function AdminLeadsPage() {
                             setIsDetailOpen(true);
                           }}
                           title="View Details"
-                          className="p-1.5 bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 hover:text-white rounded-lg transition-colors"
+                          className="p-1.5 bg-muted hover:bg-muted/80 text-foreground hover:text-foreground rounded-lg transition-colors"
                         >
                           <Eye className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => setLeadToDelete(lead)}
                           title="Delete Lead"
-                          className="p-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition-colors"
+                          className="p-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-600 rounded-lg transition-colors"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -263,22 +263,22 @@ export default function AdminLeadsPage() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-zinc-800 bg-zinc-950/40 text-xs text-zinc-400">
+          <div className="flex items-center justify-between px-4 py-3 border-t border-border bg-muted/40 text-xs text-muted-foreground">
             <div>
-              Showing page <span className="font-medium text-white">{page}</span> of <span className="font-medium text-white">{totalPages}</span> ({totalLeads} total enquiries)
+              Showing page <span className="font-medium text-foreground">{page}</span> of <span className="font-medium text-foreground">{totalPages}</span> ({totalLeads} total enquiries)
             </div>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setPage((p) => Math.max(p - 1, 1))}
                 disabled={page === 1}
-                className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-3 py-1.5 bg-muted hover:bg-muted/80 text-foreground rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Previous
               </button>
               <button
                 onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
                 disabled={page === totalPages}
-                className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-3 py-1.5 bg-muted hover:bg-muted/80 text-foreground rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Next
               </button>
@@ -290,21 +290,21 @@ export default function AdminLeadsPage() {
       {/* Lead Detail & Notes Modal */}
       {isDetailOpen && selectedLead && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+          <div className="bg-card border border-border rounded-2xl w-full max-w-xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800 bg-zinc-950">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-background">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-orange-500/10 text-orange-400 flex items-center justify-center font-bold">
+                <div className="w-10 h-10 rounded-xl bg-orange-500/10 text-orange-600 flex items-center justify-center font-bold">
                   {selectedLead.name.charAt(0).toUpperCase()}
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-white">{selectedLead.name}</h3>
-                  <p className="text-xs text-zinc-400">Enquiry submitted on {new Date(selectedLead.createdAt).toLocaleString()}</p>
+                  <h3 className="text-lg font-bold text-foreground">{selectedLead.name}</h3>
+                  <p className="text-xs text-muted-foreground">Enquiry submitted on {new Date(selectedLead.createdAt).toLocaleString()}</p>
                 </div>
               </div>
               <button
                 onClick={() => setIsDetailOpen(false)}
-                className="text-zinc-400 hover:text-white p-1 rounded-lg hover:bg-zinc-800 transition-colors"
+                className="text-muted-foreground hover:text-foreground p-1 rounded-lg hover:bg-muted transition-colors"
               >
                 ✕
               </button>
@@ -313,8 +313,8 @@ export default function AdminLeadsPage() {
             {/* Modal Body */}
             <div className="p-6 space-y-6 overflow-y-auto">
               {/* Status Selector */}
-              <div className="bg-zinc-950/60 p-4 rounded-xl border border-zinc-800/80 space-y-2">
-                <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Update Enquiry Status</label>
+              <div className="bg-muted/60 p-4 rounded-xl border border-border space-y-2">
+                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Update Enquiry Status</label>
                 <div className="flex flex-wrap gap-2">
                   {["NEW", "CONTACTED", "CONVERTED", "CLOSED"].map((s) => (
                     <button
@@ -324,7 +324,7 @@ export default function AdminLeadsPage() {
                       className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
                         selectedLead.status === s
                           ? "bg-orange-500 text-white border-orange-500 shadow-lg shadow-orange-500/20"
-                          : "bg-zinc-900 text-zinc-400 border-zinc-800 hover:border-zinc-700 hover:text-white"
+                          : "bg-background text-muted-foreground border-border hover:border-primary/50 hover:text-foreground"
                       }`}
                     >
                       {s}
@@ -335,39 +335,39 @@ export default function AdminLeadsPage() {
 
               {/* Enquiry Details Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="bg-zinc-950/40 p-3.5 rounded-xl border border-zinc-800/60">
-                  <span className="text-xs text-zinc-500 block mb-1">Email Address</span>
-                  <a href={`mailto:${selectedLead.email}`} className="text-sm font-medium text-orange-400 hover:underline flex items-center gap-1.5">
+                <div className="bg-muted/40 p-3.5 rounded-xl border border-border">
+                  <span className="text-xs text-muted-foreground block mb-1">Email Address</span>
+                  <a href={`mailto:${selectedLead.email}`} className="text-sm font-medium text-orange-600 hover:underline flex items-center gap-1.5">
                     <Mail className="w-4 h-4" /> {selectedLead.email}
                   </a>
                 </div>
 
-                <div className="bg-zinc-950/40 p-3.5 rounded-xl border border-zinc-800/60">
-                  <span className="text-xs text-zinc-500 block mb-1">Phone Number</span>
-                  <a href={`tel:${selectedLead.phone}`} className="text-sm font-medium text-orange-400 hover:underline flex items-center gap-1.5">
+                <div className="bg-muted/40 p-3.5 rounded-xl border border-border">
+                  <span className="text-xs text-muted-foreground block mb-1">Phone Number</span>
+                  <a href={`tel:${selectedLead.phone}`} className="text-sm font-medium text-orange-600 hover:underline flex items-center gap-1.5">
                     <Phone className="w-4 h-4" /> {selectedLead.phone}
                   </a>
                 </div>
 
-                <div className="bg-zinc-950/40 p-3.5 rounded-xl border border-zinc-800/60">
-                  <span className="text-xs text-zinc-500 block mb-1">Destination</span>
-                  <span className="text-sm font-semibold text-white flex items-center gap-1.5">
+                <div className="bg-muted/40 p-3.5 rounded-xl border border-border">
+                  <span className="text-xs text-muted-foreground block mb-1">Destination</span>
+                  <span className="text-sm font-semibold text-foreground flex items-center gap-1.5">
                     <MapPin className="w-4 h-4 text-orange-500" /> {selectedLead.destination}
                   </span>
                 </div>
 
-                <div className="bg-zinc-950/40 p-3.5 rounded-xl border border-zinc-800/60">
-                  <span className="text-xs text-zinc-500 block mb-1">Travel Date & Group Size</span>
-                  <div className="flex items-center gap-3 text-sm text-zinc-200">
-                    <span className="flex items-center gap-1"><Calendar className="w-4 h-4 text-zinc-500" /> {selectedLead.date}</span>
-                    <span className="flex items-center gap-1"><Users className="w-4 h-4 text-zinc-500" /> {selectedLead.noOfPeople} pax</span>
+                <div className="bg-muted/40 p-3.5 rounded-xl border border-border">
+                  <span className="text-xs text-muted-foreground block mb-1">Travel Date & Group Size</span>
+                  <div className="flex items-center gap-3 text-sm text-foreground">
+                    <span className="flex items-center gap-1"><Calendar className="w-4 h-4 text-muted-foreground" /> {selectedLead.date}</span>
+                    <span className="flex items-center gap-1"><Users className="w-4 h-4 text-muted-foreground" /> {selectedLead.noOfPeople} pax</span>
                   </div>
                 </div>
               </div>
 
               {/* Internal Admin Notes */}
               <div className="space-y-2">
-                <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
+                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
                   <MessageSquare className="w-3.5 h-3.5" /> Internal Admin Notes
                 </label>
                 <textarea
@@ -375,7 +375,7 @@ export default function AdminLeadsPage() {
                   value={adminNotes}
                   onChange={(e) => setAdminNotes(e.target.value)}
                   placeholder="Add notes about customer conversation, follow-up calls, custom quote details..."
-                  className="w-full p-3 bg-zinc-950 border border-zinc-800 rounded-xl text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-orange-500"
+                  className="w-full p-3 bg-background border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-orange-500"
                 />
                 <div className="flex justify-end">
                   <button
@@ -390,10 +390,10 @@ export default function AdminLeadsPage() {
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-end px-6 py-4 border-t border-zinc-800 bg-zinc-950">
+            <div className="flex items-center justify-end px-6 py-4 border-t border-border bg-background">
               <button
                 onClick={() => setIsDetailOpen(false)}
-                className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-semibold rounded-lg transition-colors"
+                className="px-4 py-2 bg-muted hover:bg-muted/80 text-foreground text-xs font-semibold rounded-lg transition-colors"
               >
                 Close
               </button>

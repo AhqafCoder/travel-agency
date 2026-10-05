@@ -69,7 +69,7 @@ export default function AdminDashboardPage() {
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-slate-500 dark:text-slate-400">
+          <p className="text-muted-foreground dark:text-muted-foreground">
             Welcome back, {user?.name}. Here's what's happening today.
           </p>
         </div>
@@ -150,7 +150,7 @@ export default function AdminDashboardPage() {
           <h3 className="font-semibold text-lg mb-4">Recent Bookings</h3>
           <div className="space-y-4">
             {stats?.recentBookings.length === 0 ? (
-              <p className="text-slate-500 text-sm">No recent bookings.</p>
+              <p className="text-muted-foreground text-sm">No recent bookings.</p>
             ) : (
               stats?.recentBookings.map((booking: any) => (
                 <div key={booking._id} className="flex items-center justify-between">
@@ -160,7 +160,7 @@ export default function AdminDashboardPage() {
                     </div>
                     <div>
                       <p className="text-sm font-medium">{booking.userId?.name || 'Unknown'}</p>
-                      <p className="text-xs text-slate-500 line-clamp-1 max-w-[150px]">{booking.tripId?.title || 'Unknown Trip'}</p>
+                      <p className="text-xs text-muted-foreground line-clamp-1 max-w-[150px]">{booking.tripId?.title || 'Unknown Trip'}</p>
                     </div>
                   </div>
                   <div className="text-right">

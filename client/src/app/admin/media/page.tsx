@@ -41,7 +41,7 @@ export default function AdminMediaPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Media Library</h1>
-          <p className="text-slate-500 dark:text-slate-400">
+          <p className="text-muted-foreground dark:text-muted-foreground">
             Upload images for trips, destinations, and experiences.
           </p>
         </div>
@@ -54,7 +54,7 @@ export default function AdminMediaPage() {
             onChange={handleUpload}
           />
           <Button 
-            className="bg-[#FF6B35] hover:bg-[#e85a25] text-white"
+            className="bg-[#FF6B35] hover:bg-[#e85a25] text-foreground"
             onClick={() => fileInputRef.current?.click()}
             disabled={isUploading}
           >
@@ -65,11 +65,11 @@ export default function AdminMediaPage() {
       </div>
 
       <div className="rounded-xl border border-dashed border-slate-300 dark:border-slate-800 p-12 flex flex-col items-center justify-center text-center bg-slate-50 dark:bg-slate-900/50">
-        <div className="h-12 w-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-4 text-slate-400">
+        <div className="h-12 w-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-4 text-muted-foreground">
           <Upload className="h-6 w-6" />
         </div>
         <h3 className="text-lg font-medium mb-1">Upload images to Cloudinary</h3>
-        <p className="text-sm text-slate-500 max-w-sm mx-auto mb-4">
+        <p className="text-sm text-muted-foreground max-w-sm mx-auto mb-4">
           Click the upload button to select an image from your computer. The image will be uploaded to Cloudinary and the URL will be copied to your clipboard.
         </p>
         <Button variant="outline" onClick={() => fileInputRef.current?.click()} disabled={isUploading}>

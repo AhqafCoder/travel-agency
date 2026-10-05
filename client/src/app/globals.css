@@ -101,6 +101,71 @@
 }
 
 /* ═══════════════════════════════════════════════
+   LIGHT THEME SCOPE — admin dashboard
+   Toggled via body.admin-light (see admin layout).
+   Lives on <body> so portals (dialogs, popovers,
+   tooltips) inherit the light tokens too.
+═══════════════════════════════════════════════ */
+body.admin-light {
+  color-scheme: light;
+
+  --brand:            #111111;
+  --brand-foreground: #ffffff;
+  --surface:          #f7f7f8;
+  --surface-2:        #ececee;
+
+  --background:        #ffffff;
+  --foreground:        #18181b;
+
+  --card:              #ffffff;
+  --card-foreground:   #18181b;
+
+  --popover:           #ffffff;
+  --popover-foreground:#18181b;
+
+  --primary:           #f97316;
+  --primary-foreground:#ffffff;
+
+  --secondary:         #f4f4f5;
+  --secondary-foreground:#18181b;
+
+  --muted:             #f4f4f5;
+  --muted-foreground:  #71717a;
+
+  --accent:            #f4f4f5;
+  --accent-foreground: #18181b;
+
+  --destructive:       #ef4444;
+
+  --border:            rgba(0,0,0,0.09);
+  --input:             rgba(0,0,0,0.12);
+  --ring:              rgba(249,115,22,0.45);
+
+  --sidebar:                #fafafa;
+  --sidebar-foreground:     #18181b;
+  --sidebar-primary:        #f97316;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent:         #f0f0f1;
+  --sidebar-accent-foreground: #18181b;
+  --sidebar-border:         rgba(0,0,0,0.08);
+  --sidebar-ring:           rgba(249,115,22,0.45);
+}
+
+body.admin-light {
+  background: #ffffff;
+  color: #18181b;
+}
+
+body.admin-light h1,
+body.admin-light h2,
+body.admin-light h3,
+body.admin-light h4,
+body.admin-light h5,
+body.admin-light h6 {
+  color: #18181b;
+}
+
+/* ═══════════════════════════════════════════════
    BASE
 ═══════════════════════════════════════════════ */
 @layer base {

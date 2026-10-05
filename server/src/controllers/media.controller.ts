@@ -1,5 +1,4 @@
 import type { Request, Response } from "express";
-import type { AuthUser } from "../middleware/auth.js";
 import { uploadToCloudinary, deleteFromCloudinary } from "../lib/cloudinary.js";
 
 /**

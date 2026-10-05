@@ -5,7 +5,7 @@ import { api } from "@/lib/api";
 import { DataTable, Column } from "@/components/admin/DataTable";
 import { StatusBadge } from "@/components/admin/StatusBadge";
 import { Button } from "@/components/ui/button";
-import { Plus, Edit, Eye, Trash2 } from "lucide-react";
+import { Plus, Edit, Eye, Trash2, Globe, GlobeLock } from "lucide-react";
 import Link from "next/link";
 import { Trip } from "@/types";
 import { useState } from "react";
@@ -37,6 +37,17 @@ export default function AdminTripsPage() {
     }
   };
 
+  const togglePublish = async (trip: Trip) => {
+    const next = trip.status === "PUBLISHED" ? "DRAFT" : "PUBLISHED";
+    try {
+      await api.admin.trips.setStatus(trip._id, next);
+      toast.success(next === "PUBLISHED" ? "Trip published" : "Trip unpublished");
+      queryClient.invalidateQueries({ queryKey: ["admin", "trips"] });
+    } catch (error: any) {
+      toast.error(error.message || "Failed to update trip status");
+    }
+  };
+
   const columns: Column<Trip>[] = [
     {
       key: "title",
@@ -45,7 +56,7 @@ export default function AdminTripsPage() {
       accessor: (trip) => (
         <div>
           <div className="font-medium text-slate-900 dark:text-slate-100">{trip.title}</div>
-          <div className="text-xs text-slate-500">{trip.durationDays} Days • {trip.tripType}</div>
+          <div className="text-xs text-muted-foreground">{trip.durationDays} Days • {trip.tripType}</div>
         </div>
       )
     },
@@ -78,7 +89,7 @@ export default function AdminTripsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Trips</h1>
-        <p className="text-slate-500 dark:text-slate-400">
+        <p className="text-muted-foreground dark:text-muted-foreground">
           Manage your travel itineraries, pricing, and content.
         </p>
       </div>
@@ -113,7 +124,7 @@ export default function AdminTripsPage() {
           }
         ]}
         primaryAction={
-          <Button className="bg-[#FF6B35] hover:bg-[#e85a25] text-white" asChild>
+          <Button className="bg-[#FF6B35] hover:bg-[#e85a25] text-foreground" asChild>
             <Link href="/admin/trips/new">
               <Plus className="mr-2 h-4 w-4" />
               New Trip
@@ -124,21 +135,33 @@ export default function AdminTripsPage() {
           <>
             <Button variant="ghost" size="icon" asChild title="View Public Page">
               <Link href={`/trips/${trip.slug}`} target="_blank">
-                <Eye className="h-4 w-4 text-slate-500" />
+                <Eye className="h-4 w-4 text-muted-foreground" />
               </Link>
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => togglePublish(trip)}
+              title={trip.status === "PUBLISHED" ? "Unpublish" : "Publish"}
+            >
+              {trip.status === "PUBLISHED" ? (
+                <GlobeLock className="h-4 w-4 text-amber-600" />
+              ) : (
+                <Globe className="h-4 w-4 text-emerald-600" />
+              )}
             </Button>
             <Button variant="ghost" size="icon" asChild title="Edit">
               <Link href={`/admin/trips/${trip._id}/edit`}>
-                <Edit className="h-4 w-4 text-blue-500" />
+                <Edit className="h-4 w-4 text-sky-600" />
               </Link>
             </Button>
-            <Button 
-              variant="ghost" 
-              size="icon" 
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => setDeleteId(trip._id)}
               title="Delete"
             >
-              <Trash2 className="h-4 w-4 text-red-500" />
+              <Trash2 className="h-4 w-4 text-red-600" />
             </Button>
           </>
         )}

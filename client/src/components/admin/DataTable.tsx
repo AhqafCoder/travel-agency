@@ -123,7 +123,7 @@ export function DataTable<T extends Record<string, any>>({
         <div className="flex flex-1 items-center gap-2">
           {searchKey && (
             <div className="relative max-w-sm flex-1">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder={searchPlaceholder}
                 value={searchTerm}
@@ -146,7 +146,7 @@ export function DataTable<T extends Record<string, any>>({
               }}
             >
               <SelectTrigger className="w-[150px] bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
-                <Filter className="mr-2 h-3.5 w-3.5 text-slate-400" />
+                <Filter className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
                 <SelectValue placeholder={filter.label} />
               </SelectTrigger>
               <SelectContent>
@@ -168,7 +168,7 @@ export function DataTable<T extends Record<string, any>>({
       <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            <thead className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 text-xs font-semibold uppercase tracking-wider text-muted-foreground dark:text-muted-foreground">
               <tr>
                 {columns.map((col) => (
                   <th
@@ -179,7 +179,7 @@ export function DataTable<T extends Record<string, any>>({
                       <button
                         type="button"
                         onClick={() => handleSort(col.key)}
-                        className="flex items-center gap-1 hover:text-slate-900 dark:hover:text-white transition-colors"
+                        className="flex items-center gap-1 hover:text-slate-900 dark:hover:text-foreground transition-colors"
                       >
                         {col.header}
                         <ArrowUpDown className="h-3 w-3 opacity-60" />
@@ -212,7 +212,7 @@ export function DataTable<T extends Record<string, any>>({
                 <tr>
                   <td
                     colSpan={columns.length + (actions ? 1 : 0)}
-                    className="px-4 py-12 text-center text-slate-500 dark:text-slate-400"
+                    className="px-4 py-12 text-center text-muted-foreground dark:text-muted-foreground"
                   >
                     No records found.
                   </td>
@@ -243,7 +243,7 @@ export function DataTable<T extends Record<string, any>>({
         </div>
 
         {/* Footer Pagination */}
-        <div className="flex items-center justify-between border-t border-slate-200 dark:border-slate-800 px-4 py-3 bg-slate-50/50 dark:bg-slate-800/30 text-xs text-slate-500 dark:text-slate-400">
+        <div className="flex items-center justify-between border-t border-slate-200 dark:border-slate-800 px-4 py-3 bg-slate-50/50 dark:bg-slate-800/30 text-xs text-muted-foreground dark:text-muted-foreground">
           <div>
             Showing{" "}
             <span className="font-semibold text-slate-900 dark:text-slate-100">

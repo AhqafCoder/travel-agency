@@ -1,4 +1,4 @@
-import type { User, Trip, Destination, Experience, Story, Booking, Review, Coupon, TripDeparture, PaginationMeta, DashboardStats, RevenueChartData } from "@/types";
+import type { User, Trip, Destination, Experience, Story, Booking, Review, Coupon, TripDeparture, Payment, Captain, PaginationMeta, DashboardStats, RevenueChartData } from "@/types";
 
 // ─────────────────────────────────────────────
 // Client API layer — talks to the Express server
@@ -347,6 +347,20 @@ export const api = {
       },
     },
 
+    // Customers
+    customers: {
+      list(params?: Record<string, string>): Promise<PaginatedData<User>> {
+        const qs = new URLSearchParams(params ?? {}).toString();
+        return requestPaginated<User>(`/admin/customers${qs ? `?${qs}` : ""}`);
+      },
+      get(id: string): Promise<{ user: User; bookings: Booking[] }> {
+        return request(`/admin/customers/${id}`);
+      },
+      update(id: string, data: { role?: string; name?: string; phone?: string }): Promise<User> {
+        return request<User>(`/admin/customers/${id}`, { method: "PATCH", body: data });
+      },
+    },
+
     // Reviews
     reviews: {
       list(params?: Record<string, string>): Promise<PaginatedData<Review>> {
@@ -400,6 +414,15 @@ export const api = {
   },
 
   // ── Flattened Admin API Aliases ───────────────────────────────────────
+  adminListAllDepartures(params?: Record<string, string>): Promise<PaginatedData<TripDeparture>> {
+    return requestPaginated<TripDeparture>(`/admin/departures${new URLSearchParams(params ?? {})}`);
+  },
+  adminListPayments(params?: Record<string, string>): Promise<PaginatedData<Payment>> {
+    return requestPaginated<Payment>(`/admin/payments${new URLSearchParams(params ?? {})}`);
+  },
+  adminListCaptains(params?: Record<string, string>): Promise<PaginatedData<Captain>> {
+    return requestPaginated<Captain>(`/admin/captains${new URLSearchParams(params ?? {})}`);
+  },
   adminGetDashboardStats(): Promise<DashboardStats & { recentBookings: any[]; revenueChart: RevenueChartData[] }> {
     return request("/admin/stats");
   },
@@ -451,8 +474,8 @@ export const api = {
   adminListBookings(params?: Record<string, string>): Promise<PaginatedData<Booking>> {
     return this.admin.bookings.list(params);
   },
-  adminListCustomers(): Promise<{ users: User[] }> {
-    return request<{ users: User[] }>("/admin/customers");
+  adminListCustomers(params?: Record<string, string>): Promise<PaginatedData<User>> {
+    return this.admin.customers.list(params);
   },
   adminListReviews(params?: Record<string, string>): Promise<PaginatedData<Review>> {
     return this.admin.reviews.list(params);

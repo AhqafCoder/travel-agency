@@ -1,25 +1,51 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { api } from "@/lib/api";
 import { DataTable, Column } from "@/components/admin/DataTable";
 import { StatusBadge } from "@/components/admin/StatusBadge";
 import { Button } from "@/components/ui/button";
-import { Eye, CheckCircle, XCircle } from "lucide-react";
-import { Booking } from "@/types";
+import { CheckCircle, XCircle } from "lucide-react";
+import { Booking, BookingStatus } from "@/types";
+import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
+import { toast } from "sonner";
 
 export default function AdminBookingsPage() {
+  const queryClient = useQueryClient();
+  const [action, setAction] = useState<{ booking: Booking; status: BookingStatus } | null>(null);
+  const [busy, setBusy] = useState(false);
+
   const { data, isLoading } = useQuery({
     queryKey: ["admin", "bookings"],
     queryFn: () => api.adminListBookings(),
   });
+
+  const confirmAction = async () => {
+    if (!action) return;
+    setBusy(true);
+    try {
+      await api.admin.bookings.updateStatus(action.booking._id, action.status);
+      toast.success(`Booking ${action.booking.bookingNumber} → ${action.status.toLowerCase()}`);
+      queryClient.invalidateQueries({ queryKey: ["admin", "bookings"] });
+    } catch (error: any) {
+      toast.error(error.message || "Failed to update booking");
+    } finally {
+      setBusy(false);
+      setAction(null);
+    }
+  };
 
   const columns: Column<Booking>[] = [
     {
       key: "bookingNumber",
       header: "Ref",
       sortable: true,
-      accessor: (booking) => <span className="font-mono text-xs font-semibold">{booking.bookingNumber || booking._id?.slice(-8).toUpperCase()}</span>
+      accessor: (booking) => (
+        <span className="font-mono text-xs font-semibold text-orange-600">
+          {booking.bookingNumber}
+        </span>
+      ),
     },
     {
       key: "user",
@@ -27,10 +53,10 @@ export default function AdminBookingsPage() {
       sortable: true,
       accessor: (booking) => (
         <div>
-          <div className="font-medium">{booking.user?.name || "Unknown"}</div>
-          <div className="text-xs text-slate-500">{booking.user?.email || ""}</div>
+          <div className="font-medium text-foreground">{booking.user?.name || "Unknown"}</div>
+          <div className="text-xs text-muted-foreground">{booking.user?.email || ""}</div>
         </div>
-      )
+      ),
     },
     {
       key: "trip",
@@ -38,71 +64,91 @@ export default function AdminBookingsPage() {
       sortable: true,
       accessor: (booking) => (
         <div>
-          <div className="font-medium">{booking.trip?.title || "Unknown"}</div>
-          <div className="text-xs text-slate-500">
-            {booking.travellers?.length || 1} traveller(s)
+          <div className="font-medium text-foreground">{booking.trip?.title || "Unknown"}</div>
+          <div className="text-xs text-muted-foreground">
+            {booking.travellers?.length || booking.travellersCount || 1} traveller(s)
           </div>
         </div>
-      )
+      ),
     },
     {
       key: "total",
       header: "Amount",
       sortable: true,
-      accessor: (booking) => `$${booking.total}`
+      accessor: (booking) => (
+        <div>
+          <div className="font-semibold">₹{booking.total?.toLocaleString()}</div>
+          <div className="text-xs text-muted-foreground">{booking.paymentStatus}</div>
+        </div>
+      ),
     },
     {
       key: "bookingStatus",
       header: "Status",
       sortable: true,
-      accessor: (booking) => <StatusBadge status={booking.bookingStatus} />
-    }
+      accessor: (booking) => <StatusBadge status={booking.bookingStatus} />,
+    },
   ];
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Bookings</h1>
-        <p className="text-slate-500 dark:text-slate-400">
-          Manage customer reservations and payment statuses.
-        </p>
-      </div>
-
       <DataTable
         columns={columns}
         data={data?.data || []}
         isLoading={isLoading}
-        searchKey="user" // Need to handle nested search carefully, API should ideally filter
+        searchKey="bookingNumber"
         searchPlaceholder="Search bookings..."
         filterOptions={[
           {
-            key: "status",
+            key: "bookingStatus",
             label: "Status",
             options: [
               { label: "Pending", value: "PENDING" },
               { label: "Confirmed", value: "CONFIRMED" },
-              { label: "Cancelled", value: "CANCELLED" },
               { label: "Completed", value: "COMPLETED" },
-            ]
-          }
+              { label: "Cancelled", value: "CANCELLED" },
+            ],
+          },
         ]}
         actions={(booking) => (
           <>
-            <Button variant="ghost" size="icon" title="View Details">
-              <Eye className="h-4 w-4 text-blue-500" />
-            </Button>
             {booking.bookingStatus === "PENDING" && (
-              <Button variant="ghost" size="icon" title="Confirm Booking">
-                <CheckCircle className="h-4 w-4 text-emerald-500" />
+              <Button
+                variant="ghost"
+                size="icon"
+                title="Confirm Booking"
+                onClick={() => setAction({ booking, status: "CONFIRMED" })}
+              >
+                <CheckCircle className="h-4 w-4 text-emerald-600" />
               </Button>
             )}
-            {booking.bookingStatus !== "CANCELLED" && (
-              <Button variant="ghost" size="icon" title="Cancel Booking">
-                <XCircle className="h-4 w-4 text-red-500" />
+            {booking.bookingStatus !== "CANCELLED" && booking.bookingStatus !== "COMPLETED" && (
+              <Button
+                variant="ghost"
+                size="icon"
+                title="Cancel Booking"
+                onClick={() => setAction({ booking, status: "CANCELLED" })}
+              >
+                <XCircle className="h-4 w-4 text-red-600" />
               </Button>
             )}
           </>
         )}
+      />
+
+      <ConfirmDialog
+        open={!!action}
+        onOpenChange={(open) => !open && setAction(null)}
+        title={action?.status === "CONFIRMED" ? "Confirm Booking" : "Cancel Booking"}
+        description={
+          action
+            ? `${action.status === "CONFIRMED" ? "Confirm" : "Cancel"} booking ${action.booking.bookingNumber} for ${action.booking.user?.name || "this customer"}?`
+            : ""
+        }
+        onConfirm={confirmAction}
+        confirmText={action?.status === "CONFIRMED" ? "Confirm" : "Cancel Booking"}
+        variant={action?.status === "CONFIRMED" ? "default" : "destructive"}
+        loading={busy}
       />
     </div>
   );

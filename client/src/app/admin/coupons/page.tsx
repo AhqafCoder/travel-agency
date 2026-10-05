@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { DataTable, Column } from "@/components/admin/DataTable";
 import { Button } from "@/components/ui/button";
@@ -8,13 +8,14 @@ import { Plus, Edit, Trash2 } from "lucide-react";
 import { Coupon } from "@/types";
 import { useState } from "react";
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
+import { CouponDialog } from "@/components/admin/CouponDialog";
 import { toast } from "sonner";
-import { useQueryClient } from "@tanstack/react-query";
-import { StatusBadge } from "@/components/admin/StatusBadge";
 
 export default function AdminCouponsPage() {
   const queryClient = useQueryClient();
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingCoupon, setEditingCoupon] = useState<Coupon | null>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin", "coupons"],
@@ -40,46 +41,51 @@ export default function AdminCouponsPage() {
       header: "Code",
       sortable: true,
       accessor: (coupon) => (
-        <span className="font-mono font-semibold px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded">
+        <span className="rounded bg-muted px-2 py-1 font-mono font-semibold text-orange-600">
           {coupon.code}
         </span>
-      )
+      ),
     },
     {
       key: "discount",
       header: "Discount",
       sortable: true,
-      accessor: (coupon) => coupon.type === "PERCENTAGE" ? `${coupon.value}%` : `$${coupon.value}`
+      accessor: (coupon) =>
+        coupon.type === "PERCENTAGE" ? `${coupon.value}%` : `₹${coupon.value.toLocaleString()}`,
     },
     {
       key: "usage",
       header: "Usage",
       sortable: false,
-      accessor: (coupon) => `${coupon.usedCount} / ${coupon.usageLimit || "∞"}`
+      accessor: (coupon) => `${coupon.usedCount} / ${coupon.usageLimit || "∞"}`,
     },
     {
-      key: "expiry",
-      header: "Expires",
+      key: "validUntil",
+      header: "Valid Until",
       sortable: true,
-      accessor: (coupon) => coupon.validUntil ? new Date(coupon.validUntil).toLocaleDateString() : "Never"
+      accessor: (coupon) =>
+        coupon.validUntil ? new Date(coupon.validUntil).toLocaleDateString() : "Never",
     },
     {
       key: "active",
       header: "Status",
       sortable: true,
-      accessor: (coupon) => <StatusBadge status={coupon.active ? "ACTIVE" : "INACTIVE"} />
-    }
+      accessor: (coupon) => (
+        <span
+          className={`rounded-full px-2.5 py-1 text-xs font-medium ${
+            coupon.active
+              ? "bg-emerald-500/15 text-emerald-400"
+              : "bg-muted text-muted-foreground"
+          }`}
+        >
+          {coupon.active ? "Active" : "Inactive"}
+        </span>
+      ),
+    },
   ];
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Coupons</h1>
-        <p className="text-slate-500 dark:text-slate-400">
-          Manage discount codes and promotions.
-        </p>
-      </div>
-
       <DataTable
         columns={columns}
         data={data?.data || []}
@@ -87,26 +93,46 @@ export default function AdminCouponsPage() {
         searchKey="code"
         searchPlaceholder="Search codes..."
         primaryAction={
-          <Button className="bg-[#FF6B35] hover:bg-[#e85a25] text-white">
+          <Button
+            className="bg-orange-500 text-white hover:bg-orange-600"
+            onClick={() => {
+              setEditingCoupon(null);
+              setDialogOpen(true);
+            }}
+          >
             <Plus className="mr-2 h-4 w-4" />
             New Coupon
           </Button>
         }
         actions={(coupon) => (
           <>
-            <Button variant="ghost" size="icon" title="Edit">
-              <Edit className="h-4 w-4 text-blue-500" />
+            <Button
+              variant="ghost"
+              size="icon"
+              title="Edit"
+              onClick={() => {
+                setEditingCoupon(coupon);
+                setDialogOpen(true);
+              }}
+            >
+              <Edit className="h-4 w-4 text-sky-400" />
             </Button>
-            <Button 
-              variant="ghost" 
-              size="icon" 
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => setDeleteId(coupon._id)}
               title="Delete"
             >
-              <Trash2 className="h-4 w-4 text-red-500" />
+              <Trash2 className="h-4 w-4 text-red-400" />
             </Button>
           </>
         )}
+      />
+
+      <CouponDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        coupon={editingCoupon}
       />
 
       <ConfirmDialog

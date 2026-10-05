@@ -1,15 +1,15 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { DataTable, Column } from "@/components/admin/DataTable";
 import { Button } from "@/components/ui/button";
 import { Plus, Edit, Trash2 } from "lucide-react";
+import Link from "next/link";
 import { Experience } from "@/types";
 import { useState } from "react";
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
 import { toast } from "sonner";
-import { useQueryClient } from "@tanstack/react-query";
 
 export default function AdminExperiencesPage() {
   const queryClient = useQueryClient();
@@ -40,41 +40,60 @@ export default function AdminExperiencesPage() {
       sortable: true,
       accessor: (exp) => (
         <div className="flex items-center gap-3">
-          {exp.images?.[0] && (
-            <img src={exp.images[0]} alt={exp.title} className="w-10 h-10 rounded-md object-cover" />
+          {exp.images?.[0] ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={exp.images[0]}
+              alt={exp.title}
+              className="h-10 w-10 rounded-md object-cover"
+            />
+          ) : (
+            <div className="h-10 w-10 rounded-md bg-muted/60" />
           )}
-          <div className="font-medium text-slate-900 dark:text-slate-100">{exp.title}</div>
+          <div>
+            <div className="font-medium text-foreground">{exp.title}</div>
+            <div className="text-xs text-muted-foreground">{exp.category}</div>
+          </div>
         </div>
-      )
+      ),
     },
     {
       key: "destination",
       header: "Destination",
       sortable: true,
-      accessor: (exp) => exp.destination?.name || "Unknown"
+      accessor: (exp) => exp.destination?.name || "—",
     },
     {
       key: "price",
       header: "Price",
       sortable: true,
-      accessor: (exp) => `$${exp.price}`
+      accessor: (exp) => `₹${exp.price.toLocaleString()}`,
     },
     {
       key: "duration",
       header: "Duration",
       sortable: true,
-    }
+    },
+    {
+      key: "status",
+      header: "Status",
+      sortable: true,
+      accessor: (exp) => (
+        <span
+          className={`rounded-full px-2.5 py-1 text-xs font-medium ${
+            exp.status === "ACTIVE"
+              ? "bg-emerald-500/10 text-emerald-600"
+              : "bg-muted text-muted-foreground"
+          }`}
+        >
+          {exp.status}
+        </span>
+      ),
+    },
   ];
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Experiences</h1>
-        <p className="text-slate-500 dark:text-slate-400">
-          Manage local activities, workshops, and day tours.
-        </p>
-      </div>
-
       <DataTable
         columns={columns}
         data={data?.data || []}
@@ -82,23 +101,30 @@ export default function AdminExperiencesPage() {
         searchKey="title"
         searchPlaceholder="Search experiences..."
         primaryAction={
-          <Button className="bg-[#FF6B35] hover:bg-[#e85a25] text-white">
-            <Plus className="mr-2 h-4 w-4" />
-            New Experience
+          <Button
+            className="bg-orange-500 text-white hover:bg-orange-600"
+            asChild
+          >
+            <Link href="/admin/experiences/new">
+              <Plus className="mr-2 h-4 w-4" />
+              New Experience
+            </Link>
           </Button>
         }
         actions={(exp) => (
           <>
-            <Button variant="ghost" size="icon" title="Edit">
-              <Edit className="h-4 w-4 text-blue-500" />
+            <Button variant="ghost" size="icon" title="Edit" asChild>
+              <Link href={`/admin/experiences/${exp._id}/edit`}>
+                <Edit className="h-4 w-4 text-sky-600" />
+              </Link>
             </Button>
-            <Button 
-              variant="ghost" 
-              size="icon" 
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => setDeleteId(exp._id)}
               title="Delete"
             >
-              <Trash2 className="h-4 w-4 text-red-500" />
+              <Trash2 className="h-4 w-4 text-red-600" />
             </Button>
           </>
         )}

@@ -39,24 +39,24 @@ export function ConfirmDialog({
   const finalConfirmLabel = confirmText || confirmLabel;
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-[#0f172a] border-white/10 text-white max-w-sm">
+      <DialogContent className="bg-card border-border text-foreground max-w-sm">
         <DialogHeader>
           <div className="flex items-center gap-3">
             {variant === "destructive" && (
-              <div className="w-10 h-10 rounded-full bg-red-500/15 flex items-center justify-center shrink-0">
-                <AlertTriangle className="w-5 h-5 text-red-400" />
+              <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center shrink-0">
+                <AlertTriangle className="w-5 h-5 text-red-600" />
               </div>
             )}
             <div>
-              <DialogTitle className="text-white">{title}</DialogTitle>
-              <DialogDescription className="text-slate-400 mt-1">{description}</DialogDescription>
+              <DialogTitle className="text-foreground">{title}</DialogTitle>
+              <DialogDescription className="text-muted-foreground mt-1">{description}</DialogDescription>
             </div>
           </div>
         </DialogHeader>
         <DialogFooter className="gap-2">
           <Button
             variant="ghost"
-            className="text-slate-400 hover:text-white"
+            className="text-muted-foreground hover:text-foreground"
             onClick={() => onOpenChange(false)}
             disabled={loading}
           >

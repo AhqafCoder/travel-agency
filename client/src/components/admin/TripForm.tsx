@@ -17,6 +17,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Trash2, GripVertical } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { ImageUploader } from "@/components/admin/ImageUploader";
+import { DeparturesManager } from "@/components/admin/DeparturesManager";
 
   const tripSchema = z.object({
   title: z.string().min(3),
@@ -57,6 +59,10 @@ interface TripFormProps {
 export function TripForm({ initialData, isEdit }: TripFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [coverImage, setCoverImage] = useState<string[]>(
+    initialData?.coverImage ? [initialData.coverImage] : []
+  );
+  const [gallery, setGallery] = useState<string[]>(initialData?.gallery ?? []);
 
   const { data: destData } = useQuery({
     queryKey: ["admin", "destinations"],
@@ -116,11 +122,16 @@ export function TripForm({ initialData, isEdit }: TripFormProps) {
   const onSubmit = async (values: TripFormValues) => {
     try {
       setIsSubmitting(true);
+      const payload = {
+        ...values,
+        coverImage: coverImage[0] ?? "",
+        gallery,
+      };
       if (isEdit && initialData) {
-        await api.adminUpdateTrip(initialData._id, values);
+        await api.adminUpdateTrip(initialData._id, payload);
         toast.success("Trip updated successfully");
       } else {
-        await api.adminCreateTrip(values);
+        await api.adminCreateTrip(payload);
         toast.success("Trip created successfully");
         router.push("/admin/trips");
       }
@@ -152,6 +163,9 @@ export function TripForm({ initialData, isEdit }: TripFormProps) {
           <TabsTrigger value="content" className="data-[state=active]:border-b-2 data-[state=active]:border-[#FF6B35] rounded-none px-4 py-2">Content</TabsTrigger>
           <TabsTrigger value="itinerary" className="data-[state=active]:border-b-2 data-[state=active]:border-[#FF6B35] rounded-none px-4 py-2">Itinerary</TabsTrigger>
           <TabsTrigger value="pricing" className="data-[state=active]:border-b-2 data-[state=active]:border-[#FF6B35] rounded-none px-4 py-2">Pricing & Settings</TabsTrigger>
+          {isEdit && (
+            <TabsTrigger value="departures" className="data-[state=active]:border-b-2 data-[state=active]:border-[#FF6B35] rounded-none px-4 py-2">Departures</TabsTrigger>
+          )}
         </TabsList>
 
         <TabsContent value="basic" className="space-y-6 max-w-3xl">
@@ -228,6 +242,23 @@ export function TripForm({ initialData, isEdit }: TripFormProps) {
                 </Button>
               </div>
             ))}
+          </div>
+
+          {/* Media */}
+          <div className="space-y-6 border-t border-border pt-6">
+            <ImageUploader
+              label="Cover Image"
+              value={coverImage}
+              onChange={setCoverImage}
+              folder="trips"
+              single
+            />
+            <ImageUploader
+              label="Gallery"
+              value={gallery}
+              onChange={setGallery}
+              folder="trips"
+            />
           </div>
         </TabsContent>
 
@@ -354,6 +385,11 @@ export function TripForm({ initialData, isEdit }: TripFormProps) {
             </div>
           </div>
         </TabsContent>
+        {isEdit && initialData && (
+          <TabsContent value="departures" className="max-w-3xl">
+            <DeparturesManager tripId={initialData._id} />
+          </TabsContent>
+        )}
       </Tabs>
     </form>
   );

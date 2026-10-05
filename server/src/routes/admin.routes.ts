@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { requireAuth, requireRole } from "../middleware/auth.js";
 import { asyncHandler } from "../middleware/asyncHandler.js";
+import { UserRole } from "../models/enums.js";
 import { getDashboardStats } from "../controllers/admin.controller.js";
 import {
   adminListTrips,
@@ -63,14 +64,19 @@ import {
   adminUpdateLead,
   adminDeleteLead,
 } from "../controllers/admin.lead.controller.js";
+import {
+  adminListAllDepartures,
+  adminListPayments,
+  adminListCaptains,
+} from "../controllers/admin.misc.controller.js";
 
 const router = Router();
 
 // All admin routes require auth. Role checks are fine-grained per sub-resource.
 router.use(requireAuth);
-const su = requireRole("SUPER_ADMIN", "ADMIN");
-const ops = requireRole("SUPER_ADMIN", "ADMIN", "OPERATIONS");
-const editor = requireRole("SUPER_ADMIN", "ADMIN", "OPERATIONS", "EDITOR");
+const su = requireRole(UserRole.SUPER_ADMIN, UserRole.ADMIN);
+const ops = requireRole(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.OPERATIONS);
+const editor = requireRole(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.OPERATIONS, UserRole.EDITOR);
 
 // ── Dashboard ─────────────────────────────────────────────────────────────
 router.get("/stats", ops, asyncHandler(getDashboardStats));
@@ -137,5 +143,10 @@ router.delete("/experiences/:id", su, asyncHandler(adminDeleteExperience));
 	router.get("/leads/:id", ops, asyncHandler(adminGetLead));
 	router.patch("/leads/:id", ops, asyncHandler(adminUpdateLead));
 	router.delete("/leads/:id", su, asyncHandler(adminDeleteLead));
+
+	// ── Departures (all) / Payments / Captains ───────────────────────────────
+	router.get("/departures", ops, asyncHandler(adminListAllDepartures));
+	router.get("/payments", ops, asyncHandler(adminListPayments));
+	router.get("/captains", editor, asyncHandler(adminListCaptains));
 
 export default router;

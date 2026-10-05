@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { DataTable, Column } from "@/components/admin/DataTable";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,6 @@ import { Destination } from "@/types";
 import { useState } from "react";
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
 import { toast } from "sonner";
-import { useQueryClient } from "@tanstack/react-query";
 
 export default function AdminDestinationsPage() {
   const queryClient = useQueryClient();
@@ -41,48 +40,56 @@ export default function AdminDestinationsPage() {
       sortable: true,
       accessor: (dest) => (
         <div className="flex items-center gap-3">
-          {dest.heroImage && (
-            <img src={dest.heroImage} alt={dest.name} className="w-10 h-10 rounded-md object-cover" />
+          {dest.heroImage ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={dest.heroImage}
+              alt={dest.name}
+              className="h-10 w-10 rounded-md object-cover"
+            />
+          ) : (
+            <div className="h-10 w-10 rounded-md bg-muted/60" />
           )}
           <div>
-            <div className="font-medium text-slate-900 dark:text-slate-100">{dest.name}</div>
-            <div className="text-xs text-slate-500">{dest.state || dest.country}</div>
+            <div className="font-medium text-foreground">{dest.name}</div>
+            <div className="text-xs text-muted-foreground">
+              {dest.state ? `${dest.state}, ` : ""}
+              {dest.country}
+            </div>
           </div>
         </div>
-      )
+      ),
     },
     {
-      key: "region",
-      header: "Region",
+      key: "slug",
+      header: "Slug",
       sortable: true,
+      accessor: (dest) => (
+        <span className="font-mono text-xs text-muted-foreground">{dest.slug}</span>
+      ),
     },
     {
-      key: "bestTimeToVisit",
+      key: "bestTime",
       header: "Best Time",
       sortable: false,
     },
     {
-      key: "tripCount",
-      header: "Trips",
-      sortable: false,
-      accessor: (dest) => (
-        <span className="inline-flex items-center justify-center bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-full text-xs font-medium">
-          {/* Mock trip count until aggregated server-side */}
-          {Math.floor(Math.random() * 10) + 1} 
-        </span>
-      )
-    }
+      key: "featured",
+      header: "Featured",
+      sortable: true,
+      accessor: (dest) =>
+        dest.featured ? (
+          <span className="rounded-full bg-orange-500/10 px-2.5 py-1 text-xs font-medium text-orange-600">
+            Featured
+          </span>
+        ) : (
+          <span className="text-xs text-muted-foreground/80">—</span>
+        ),
+    },
   ];
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Destinations</h1>
-        <p className="text-slate-500 dark:text-slate-400">
-          Manage travel destinations and their content.
-        </p>
-      </div>
-
       <DataTable
         columns={columns}
         data={data?.data || []}
@@ -90,23 +97,30 @@ export default function AdminDestinationsPage() {
         searchKey="name"
         searchPlaceholder="Search destinations..."
         primaryAction={
-          <Button className="bg-[#FF6B35] hover:bg-[#e85a25] text-white">
-            <Plus className="mr-2 h-4 w-4" />
-            New Destination
+          <Button
+            className="bg-orange-500 text-white hover:bg-orange-600"
+            asChild
+          >
+            <Link href="/admin/destinations/new">
+              <Plus className="mr-2 h-4 w-4" />
+              New Destination
+            </Link>
           </Button>
         }
         actions={(dest) => (
           <>
-            <Button variant="ghost" size="icon" title="Edit">
-              <Edit className="h-4 w-4 text-blue-500" />
+            <Button variant="ghost" size="icon" title="Edit" asChild>
+              <Link href={`/admin/destinations/${dest._id}/edit`}>
+                <Edit className="h-4 w-4 text-sky-600" />
+              </Link>
             </Button>
-            <Button 
-              variant="ghost" 
-              size="icon" 
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => setDeleteId(dest._id)}
               title="Delete"
             >
-              <Trash2 className="h-4 w-4 text-red-500" />
+              <Trash2 className="h-4 w-4 text-red-600" />
             </Button>
           </>
         )}
