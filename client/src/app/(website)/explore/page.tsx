@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useEffect, useCallback, Suspense } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
 import { TripCard } from "@/components/travel/TripCard";
-import type { Trip } from "@/types";
+import type { Trip, TripDeparture } from "@/types";
 import { TRIP_TYPES, TRIP_DIFFICULTIES, DURATION_OPTIONS, PRICE_RANGES, SORT_OPTIONS } from "@/lib/constants";
-import { MOCK_DEPARTURES, MOCK_TRIPS } from "@/lib/mock-data";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,6 +18,10 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { X, Filter, SlidersHorizontal, ChevronDown, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+// Stable identities so useEffect dependency arrays never churn.
+const EMPTY_TRIPS: Trip[] = [];
+const EMPTY_DEPARTURES: TripDeparture[] = [];
 
 export default function ExplorePage() {
   return (
@@ -66,6 +71,19 @@ function ExplorePageContent() {
   const [toDate, setToDate] = useState(initialTo);
   const [showFilters, setShowFilters] = useState(false);
   const [filteredTrips, setFilteredTrips] = useState<Trip[]>([]);
+  // Live data: all published trips + upcoming departures (date filtering stays client-side).
+  // Stable EMPTY refs keep the filter effect's dependencies from changing
+  // identity every render (which caused an infinite setState loop).
+  const { data: tripsResult } = useQuery({
+    queryKey: ["explore-trips"],
+    queryFn: () => api.trips.list({ pageSize: "50" }),
+  });
+  const { data: departuresData } = useQuery({
+    queryKey: ["explore-departures"],
+    queryFn: () => api.departures.list(),
+  });
+  const allTrips = tripsResult?.data ?? EMPTY_TRIPS;
+  const allDepartures = departuresData ?? EMPTY_DEPARTURES;
 
   // Update URL when filters change
   const updateURL = useCallback(() => {
@@ -87,7 +105,7 @@ function ExplorePageContent() {
 
   // Filter trips based on current state
   useEffect(() => {
-    let result = [...MOCK_TRIPS].filter(trip => trip.status === "PUBLISHED");
+    let result = [...allTrips].filter(trip => trip.status === "PUBLISHED");
 
     if (search) {
       const query = search.toLowerCase();
@@ -105,7 +123,7 @@ function ExplorePageContent() {
 
     if (fromDate || toDate) {
       result = result.filter((t) =>
-        MOCK_DEPARTURES.some((dep) => {
+        allDepartures.some((dep) => {
           if (dep.tripId !== t._id) return false;
           const start = format(new Date(dep.startDate), "yyyy-MM-dd");
           if (fromDate && start < fromDate) return false;
@@ -143,7 +161,7 @@ function ExplorePageContent() {
     }
 
     setFilteredTrips(result);
-  }, [search, tripType, difficulty, destination, priceRange, durationRange, sort, fromDate, toDate]);
+  }, [search, tripType, difficulty, destination, priceRange, durationRange, sort, fromDate, toDate, allTrips, allDepartures]);
 
   // Sync URL changes to state (for browser back/forward)
   useEffect(() => {

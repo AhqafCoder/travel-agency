@@ -6,8 +6,11 @@ import { Calendar, Clock, Eye, ArrowLeft, ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { getStoryBySlug, MOCK_STORIES } from "@/lib/mock-data";
+import { getStoryBySlugPublic, listStoriesPublic } from "@/server/services/public.service";
 import { format } from "date-fns";
+
+// Live DB data (seats, prices, views) — always render fresh.
+export const dynamic = "force-dynamic";
 
 type StoryParams = { params: Promise<{ slug: string }> };
 
@@ -15,7 +18,7 @@ export async function generateMetadata({
   params,
 }: StoryParams): Promise<Metadata> {
   const { slug } = await params;
-  const story = getStoryBySlug(slug);
+  const story = await getStoryBySlugPublic(slug);
   if (!story) return { title: "Story Not Found" };
   return {
     title: story.metaTitle ?? story.title,
@@ -25,13 +28,12 @@ export async function generateMetadata({
 
 export default async function StoryDetailPage({ params }: StoryParams) {
   const { slug } = await params;
-  const story = getStoryBySlug(slug);
+  const story = await getStoryBySlugPublic(slug, { countView: true });
   if (!story) notFound();
 
-  // "Increment" views locally for the mock — real counter lives in the API.
-  const views = story.views + 1;
+  const views = story.views;
 
-  const moreStories = MOCK_STORIES.filter(
+  const moreStories = (await listStoriesPublic()).filter(
     (s) => s.slug !== story.slug && s.status === "PUBLISHED"
   ).slice(0, 3);
 

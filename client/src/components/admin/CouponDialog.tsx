@@ -32,6 +32,7 @@ const couponSchema = z
     validFrom: z.string().min(1, "Start date is required"),
     validUntil: z.string().min(1, "End date is required"),
     active: z.boolean(),
+    promoted: z.boolean(),
   })
   .refine((v) => new Date(v.validUntil) > new Date(v.validFrom), {
     message: "End date must be after the start date",
@@ -72,6 +73,7 @@ export function CouponDialog({
       validFrom: fmt(new Date()),
       validUntil: "",
       active: true,
+      promoted: false,
     },
   });
 
@@ -90,6 +92,7 @@ export function CouponDialog({
               validFrom: fmt(coupon.validFrom),
               validUntil: fmt(coupon.validUntil),
               active: coupon.active,
+              promoted: coupon.promoted ?? false,
             }
           : {
               code: "",
@@ -102,6 +105,7 @@ export function CouponDialog({
               validFrom: fmt(new Date()),
               validUntil: "",
               active: true,
+              promoted: false,
             }
       );
     }
@@ -192,6 +196,11 @@ export function CouponDialog({
           <label className="flex items-center gap-3 text-sm text-muted-foreground">
             <input type="checkbox" {...register("active")} className="h-4 w-4 accent-orange-500" />
             Active (customers can use this code)
+          </label>
+
+          <label className="flex items-center gap-3 text-sm text-muted-foreground">
+            <input type="checkbox" {...register("promoted")} className="h-4 w-4 accent-orange-500" />
+            Suggest on booking page (shows the code publicly as an offer chip)
           </label>
 
           <DialogFooter>

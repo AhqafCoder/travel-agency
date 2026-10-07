@@ -1,5 +1,5 @@
 import { BookingTraveller, Trip, TripDeparture } from "@/types";
-import { formatPrice } from "@/lib/mock-data";
+import { formatPrice } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 
 interface BookingSummaryProps {

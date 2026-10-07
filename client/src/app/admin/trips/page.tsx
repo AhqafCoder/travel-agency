@@ -70,7 +70,7 @@ export default function AdminTripsPage() {
       key: "basePrice",
       header: "Price",
       sortable: true,
-      accessor: (trip) => `$${trip.basePrice}`
+      accessor: (trip) => `₹${trip.basePrice.toLocaleString("en-IN")}`
     },
     {
       key: "difficulty",

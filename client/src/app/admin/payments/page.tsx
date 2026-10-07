@@ -28,7 +28,7 @@ export default function AdminPaymentsPage() {
       sortable: true,
       accessor: (payment) => (
         <span className="font-semibold">
-          {payment.currency} {payment.amount?.toLocaleString()}
+          ₹{(payment.amount ?? 0).toLocaleString("en-IN")}
         </span>
       ),
     },

@@ -327,6 +327,7 @@ export interface Coupon {
   validUntil: Date;
   active: boolean;
   isActive?: boolean; // alias for active
+  promoted?: boolean; // shown publicly as a suggested code on the booking page
   applicableTripIds?: string[]; // empty = all trips
   createdAt: Date;
   updatedAt: Date;

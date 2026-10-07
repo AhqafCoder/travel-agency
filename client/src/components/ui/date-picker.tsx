@@ -49,9 +49,8 @@ export function DatePicker({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
         render={
-          <div
-            role="button"
-            tabIndex={0}
+          <button
+            type="button"
             className={cn(
               "flex flex-col items-start text-left min-w-[92px] px-1 py-0.5 rounded-md hover:bg-black/5 transition-colors cursor-pointer select-none",
               className

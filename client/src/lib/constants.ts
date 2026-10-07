@@ -9,15 +9,13 @@ export const SITE = {
     "We don't just sell trips — we craft experiences. Curated adventures across India's most spectacular landscapes, edited to fit you perfectly.",
   url: "https://editmytrips.com",
   email: "hello@editmytrips.com",
-  phone: "+91 98765 43210",
-  whatsapp: "+919876543210",
-  address: "Mumbai, Maharashtra, India",
+  phone: "+91 87555 77146",
+  whatsapp: "+918755577146",
+  address: "2nd Floor, D Tower, Above Deepak Sweets, Krishna Vanti Colony, Bareilly, Uttar Pradesh – 243001",
   social: {
     instagram: "https://instagram.com/editmytrips",
-    youtube: "https://youtube.com/@editmytrips",
-    facebook: "https://facebook.com/editmytrips",
-    twitter: "https://twitter.com/editmytrips",
-    whatsapp: "https://wa.me/919876543210",
+    facebook: "https://www.facebook.com/profile.php?id=61575187543626",
+    whatsapp: "https://wa.me/918755577146",
   },
 } as const;
 

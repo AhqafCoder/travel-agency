@@ -1,6 +1,8 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -16,13 +18,17 @@ import {
   Star,
   LogOut,
   Loader2,
+  XCircle,
+  PenLine,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { MOCK_CUSTOMERS, MOCK_BOOKINGS, formatPrice } from "@/lib/mock-data";
-import type { BookingStatus } from "@/types";
+import { api, ApiError } from "@/lib/api";
+import { formatPrice } from "@/lib/utils";
+import type { Booking, BookingStatus } from "@/types";
+import { ReviewDialog } from "@/components/reviews/ReviewDialog";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/auth/AuthContext";
 
@@ -73,9 +79,15 @@ function SignInPrompt() {
 function BookingCard({
   booking,
   past,
+  onCancel,
+  cancelling,
+  onWriteReview,
 }: {
-  booking: (typeof MOCK_BOOKINGS)[number];
+  booking: Booking;
   past?: boolean;
+  onCancel?: (booking: Booking) => void;
+  cancelling?: boolean;
+  onWriteReview?: (booking: Booking) => void;
 }) {
   if (past) {
     return (
@@ -107,6 +119,17 @@ function BookingCard({
                 year: "numeric",
               })}
             </p>
+            {onWriteReview && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="mt-3"
+                onClick={() => onWriteReview(booking)}
+              >
+                <PenLine className="w-3.5 h-3.5 mr-1" />
+                Write a review
+              </Button>
+            )}
           </CardContent>
         </div>
       </Card>
@@ -161,12 +184,30 @@ function BookingCard({
               {booking.bookingNumber}
             </span>
           </div>
-          <Link
-            href={`/trips/${booking.trip?.slug}`}
-            className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
-          >
-            View trip <ArrowRight className="w-4 h-4" />
-          </Link>
+          <div className="flex items-center gap-2">
+            {onCancel && booking.bookingStatus !== "CANCELLED" && (
+              <Button
+                size="sm"
+                variant="ghost"
+                className="text-muted-foreground hover:text-red-600"
+                disabled={cancelling}
+                onClick={() => onCancel(booking)}
+              >
+                {cancelling ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <XCircle className="w-3.5 h-3.5 mr-1" />
+                )}
+                Cancel
+              </Button>
+            )}
+            <Link
+              href={`/trips/${booking.trip?.slug}`}
+              className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
+            >
+              View trip <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
         </div>
       </CardContent>
     </Card>
@@ -176,15 +217,39 @@ function BookingCard({
 export function ProfileShell() {
   const { user, status, logout } = useAuth();
   const router = useRouter();
+  const queryClient = useQueryClient();
 
-  // While the session is being restored, show a lightweight loading state.
-  const bookings = useMemo(() => {
-    if (!user) return [];
-    // A registered user may not match mock ids — fall back to empty state.
-    const mockUser = MOCK_CUSTOMERS.find((c) => c._id === user._id);
-    if (!mockUser) return [];
-    return MOCK_BOOKINGS.filter((b) => b.userId === mockUser._id);
-  }, [user]);
+  // Live bookings for the signed-in traveller.
+  const { data: bookings = [], isLoading: bookingsLoading } = useQuery({
+    queryKey: ["my-bookings"],
+    queryFn: () => api.bookings.list(),
+    enabled: status === "authenticated",
+  });
+
+  const [reviewBooking, setReviewBooking] = useState<Booking | null>(null);
+  const [cancellingId, setCancellingId] = useState<string | null>(null);
+
+  const cancelBooking = async (booking: Booking) => {
+    const reason = window.prompt(
+      "Sorry to see you go — mind telling us why? (required)",
+      "Change of plans"
+    );
+    if (reason === null) return; // cancelled
+    if (!reason.trim()) {
+      toast.error("A cancellation reason is required.");
+      return;
+    }
+    setCancellingId(booking._id);
+    try {
+      await api.bookings.cancel(booking._id, reason.trim());
+      toast.success(`Booking ${booking.bookingNumber} cancelled. Seats released.`);
+      queryClient.invalidateQueries({ queryKey: ["my-bookings"] });
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : "Could not cancel the booking.");
+    } finally {
+      setCancellingId(null);
+    }
+  };
 
   if (status === "loading") {
     return (
@@ -199,11 +264,23 @@ export function ProfileShell() {
     return <SignInPrompt />;
   }
 
+  if (bookingsLoading) {
+    return (
+      <div className="flex items-center justify-center py-24 text-muted-foreground">
+        <Loader2 className="w-6 h-6 animate-spin mr-2" />
+        Loading your bookings…
+      </div>
+    );
+  }
+
   const upcoming = bookings.filter(
     (b) => b.bookingStatus === "CONFIRMED" || b.bookingStatus === "PENDING"
   );
   const past = bookings.filter((b) => b.bookingStatus === "COMPLETED");
-  const totalSpent = bookings.reduce((sum, b) => sum + b.total, 0);
+  // Money actually spent = paid bookings only (pending payment doesn't count).
+  const totalSpent = bookings
+    .filter((b) => b.paymentStatus === "PAID")
+    .reduce((sum, b) => sum + b.total, 0);
 
   const handleLogout = () => {
     logout();
@@ -214,7 +291,7 @@ export function ProfileShell() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       {/* Page header */}
-      <section className="bg-muted/30 border-b border-border/20">
+      <section className="bg-muted/30 border-b border-border/20 pt-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           <div className="flex flex-col sm:flex-row sm:items-center gap-6">
             <Avatar className="w-20 h-20 sm:w-24 sm:h-24 border-4 border-background shadow-lg">
@@ -311,7 +388,12 @@ export function ProfileShell() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {upcoming.map((booking) => (
-                <BookingCard key={booking._id} booking={booking} />
+                <BookingCard
+                  key={booking._id}
+                  booking={booking}
+                  onCancel={cancelBooking}
+                  cancelling={cancellingId === booking._id}
+                />
               ))}
             </div>
           )}
@@ -326,12 +408,27 @@ export function ProfileShell() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {past.map((booking) => (
-                <BookingCard key={booking._id} booking={booking} past />
+                <BookingCard
+                  key={booking._id}
+                  booking={booking}
+                  past
+                  onWriteReview={setReviewBooking}
+                />
               ))}
             </div>
           </section>
         )}
       </div>
+
+      <ReviewDialog
+        booking={reviewBooking}
+        open={!!reviewBooking}
+        onClose={() => setReviewBooking(null)}
+        onSubmitted={() => {
+          toast.success("Thanks for sharing! Your review will appear after moderation.");
+          queryClient.invalidateQueries({ queryKey: ["pending-reviews"] });
+        }}
+      />
     </div>
   );
 }

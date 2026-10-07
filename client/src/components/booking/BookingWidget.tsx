@@ -6,20 +6,22 @@ import { Trip, TripDeparture } from "@/types";
 import { DateSelector } from "@/components/booking/DateSelector";
 import { TravellerSelector } from "@/components/booking/TravellerSelector";
 import { PriceBreakdown } from "@/components/booking/PriceBreakdown";
-import { formatPrice, getTripDepartures } from "@/lib/mock-data";
+import { formatPrice } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { Clock, Users, Shield, AlertCircle, ArrowRight } from "lucide-react";
 
 interface BookingWidgetProps {
   trip: Trip;
+  /** Server-fetched upcoming departures (ACTIVE/DRAFT, future dates). */
+  departures: TripDeparture[];
 }
 
-export function BookingWidget({ trip }: BookingWidgetProps) {
-  const departures = getTripDepartures(trip._id).filter(
+export function BookingWidget({ trip, departures }: BookingWidgetProps) {
+  const bookable = departures.filter(
     (d) => d.status === "ACTIVE" && d.availableSeats > 0
   );
   const [selectedDeparture, setSelectedDeparture] =
-    useState<TripDeparture | null>(departures[0] || null);
+    useState<TripDeparture | null>(bookable[0] || null);
   const [travellersCount, setTravellersCount] = useState(1);
 
   const pricePerPerson =
@@ -79,7 +81,7 @@ export function BookingWidget({ trip }: BookingWidgetProps) {
       {/* Selectors */}
       <div className="p-5 space-y-0 border-b border-white/6">
         <DateSelector
-          departures={departures}
+          departures={bookable}
           selected={selectedDeparture}
           onSelect={setSelectedDeparture}
         />

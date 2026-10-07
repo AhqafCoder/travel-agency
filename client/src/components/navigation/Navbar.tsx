@@ -13,9 +13,11 @@ import {
   ChevronDown,
   ArrowRight,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { NAV_LINKS, SITE } from "@/lib/constants";
+import { lockScroll, unlockScroll } from "@/lib/scroll-lock";
 import { useAuth } from "@/components/auth/AuthContext";
+import { useTheme } from "@/components/theme/ThemeProvider";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 /* ── Mega-menu data for "Destinations" ── */
 const QUICK_DESTINATIONS = [
@@ -27,6 +29,8 @@ const QUICK_DESTINATIONS = [
   { label: "North East Edit",  href: "/destinations/meghalaya",    icon: "🌿" },
 ];
 
+const FONT = '"Helvetica Neue", Helvetica, Arial, sans-serif';
+
 export function Navbar() {
   const [scrolled, setScrolled]       = useState(false);
   const [mobileOpen, setMobileOpen]   = useState(false);
@@ -35,6 +39,7 @@ export function Navbar() {
   const pathname  = usePathname();
   const router    = useRouter();
   const { user, status, logout } = useAuth();
+  const { theme } = useTheme();
   const destRef   = useRef<HTMLDivElement>(null);
   const userRef   = useRef<HTMLDivElement>(null);
 
@@ -54,8 +59,8 @@ export function Navbar() {
 
   /* body scroll lock when mobile open */
   useEffect(() => {
-    document.body.style.overflow = mobileOpen ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
+    if (mobileOpen) lockScroll();
+    return () => unlockScroll();
   }, [mobileOpen]);
 
   /* close dropdowns on outside click */
@@ -67,6 +72,30 @@ export function Navbar() {
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
+
+  /* ── Theme palette ── */
+  const light = theme === "light";
+  const c = {
+    bar:            light ? "#ffffff" : "#1c1c1c",
+    barScrolled:    light ? "rgba(255,255,255,0.85)" : "rgba(28,28,28,0.90)",
+    border:         light ? "rgba(0,0,0,0.08)" : "rgba(255,255,255,0.08)",
+    textStrong:     light ? "#111111" : "#ffffff",
+    text:           light ? "rgba(0,0,0,0.62)" : "rgba(255,255,255,0.60)",
+    textMuted:      light ? "rgba(0,0,0,0.45)" : "rgba(255,255,255,0.45)",
+    textFaint:      light ? "rgba(0,0,0,0.35)" : "rgba(255,255,255,0.35)",
+    pill:           light ? "rgba(0,0,0,0.05)" : "rgba(255,255,255,0.06)",
+    panel:          light ? "#ffffff" : "#232323",
+    panelBorder:    light ? "rgba(0,0,0,0.10)" : "rgba(255,255,255,0.10)",
+    panelShadow:    light ? "0 16px 64px rgba(0,0,0,0.16)" : "0 16px 64px rgba(0,0,0,0.70)",
+    menuShadow:     light ? "0 12px 48px rgba(0,0,0,0.14)" : "0 12px 48px rgba(0,0,0,0.65)",
+    avatarBg:       light ? "rgba(0,0,0,0.08)" : "rgba(255,255,255,0.15)",
+    ghost:          light ? "rgba(0,0,0,0.05)" : "rgba(255,255,255,0.05)",
+    ghostSoft:      light ? "rgba(0,0,0,0.04)" : "rgba(255,255,255,0.04)",
+    ctaBg:          light ? "#111111" : "#ffffff",
+    ctaFg:          light ? "#ffffff" : "#111111",
+    menuBg:         light ? "#f7f7f8" : "#181818",
+    dangerBg:       light ? "rgba(239,68,68,0.08)" : "rgba(239,68,68,0.10)",
+  };
 
   const isAuthenticated = status === "authenticated";
 
@@ -82,8 +111,8 @@ export function Navbar() {
     position: "fixed",
     top: 0, left: 0, right: 0,
     zIndex: 50,
-    background: scrolled ? "rgba(17,17,17,0.97)" : "#111111",
-    borderBottom: scrolled ? "1px solid rgba(255,255,255,0.07)" : "1px solid transparent",
+    background: scrolled ? c.barScrolled : c.bar,
+    borderBottom: scrolled ? `1px solid ${c.border}` : "1px solid transparent",
     backdropFilter: scrolled ? "blur(20px)" : "none",
     transition: "background 0.3s, border-color 0.3s, backdrop-filter 0.3s",
   };
@@ -101,14 +130,15 @@ export function Navbar() {
                 alt="EditMyTrips"
                 width={24}
                 height={24}
+                className="light:invert"
                 style={{ objectFit: "contain", borderRadius: 6 }}
                 priority
               />
               <span style={{
-                fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
+                fontFamily: FONT,
                 fontWeight: 700,
                 fontSize: 17,
-                color: "#fff",
+                color: c.textStrong,
                 letterSpacing: "-0.01em",
                 whiteSpace: "nowrap",
               }}>
@@ -132,11 +162,11 @@ export function Navbar() {
                           display: "flex", alignItems: "center", gap: 4,
                           padding: "7px 10px", borderRadius: 8,
                           fontSize: 13, fontWeight: 500,
-                          color: destOpen ? "#fff" : "rgba(255,255,255,0.60)",
-                          background: destOpen ? "rgba(255,255,255,0.06)" : "transparent",
+                          color: destOpen ? c.textStrong : c.text,
+                          background: destOpen ? c.pill : "transparent",
                           border: "none", cursor: "pointer",
                           transition: "color 0.15s, background 0.15s",
-                          fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
+                          fontFamily: FONT,
                           whiteSpace: "nowrap",
                         }}
                       >
@@ -158,15 +188,15 @@ export function Navbar() {
                           left: "50%",
                           transform: "translateX(-50%)",
                           width: 360,
-                          background: "#1a1a1a",
-                          border: "1px solid rgba(255,255,255,0.08)",
+                          background: c.panel,
+                          border: `1px solid ${c.panelBorder}`,
                           borderRadius: 14,
-                          boxShadow: "0 16px 64px rgba(0,0,0,0.70)",
+                          boxShadow: c.panelShadow,
                           overflow: "hidden",
                           zIndex: 100,
                         }}>
-                          <div style={{ padding: "14px 16px 8px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-                            <p style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.35)", textTransform: "uppercase", letterSpacing: "0.14em", margin: 0 }}>
+                          <div style={{ padding: "14px 16px 8px", borderBottom: `1px solid ${c.border}` }}>
+                            <p style={{ fontSize: 10, fontWeight: 700, color: c.textFaint, textTransform: "uppercase", letterSpacing: "0.14em", margin: 0 }}>
                               Quick destinations
                             </p>
                           </div>
@@ -181,23 +211,23 @@ export function Navbar() {
                                   textDecoration: "none",
                                   transition: "background 0.15s",
                                 }}
-                                onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.06)")}
+                                onMouseEnter={(e) => (e.currentTarget.style.background = c.pill)}
                                 onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                               >
                                 <span style={{ fontSize: 16 }}>{d.icon}</span>
-                                <span style={{ fontSize: 12, fontWeight: 600, color: "#fff", fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif' }}>
+                                <span style={{ fontSize: 12, fontWeight: 600, color: c.textStrong, fontFamily: FONT }}>
                                   {d.label}
                                 </span>
                               </Link>
                             ))}
                           </div>
-                          <div style={{ padding: "8px 16px 14px", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+                          <div style={{ padding: "8px 16px 14px", borderTop: `1px solid ${c.border}` }}>
                             <Link
                               href="/destinations"
                               style={{
                                 display: "flex", alignItems: "center", justifyContent: "space-between",
                                 fontSize: 12, fontWeight: 600,
-                                color: "rgba(255,255,255,0.50)",
+                                color: c.textMuted,
                                 textDecoration: "none",
                               }}
                             >
@@ -219,10 +249,10 @@ export function Navbar() {
                     style={{
                       padding: "7px 13px", borderRadius: 8,
                       fontSize: 13, fontWeight: 500, textDecoration: "none",
-                      color: active ? "#fff" : "rgba(255,255,255,0.60)",
-                      background: active ? "rgba(255,255,255,0.06)" : "transparent",
+                      color: active ? c.textStrong : c.text,
+                      background: active ? c.pill : "transparent",
                       transition: "color 0.15s, background 0.15s",
-                      fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
+                      fontFamily: FONT,
                     }}
                   >
                     {link.label}
@@ -233,8 +263,9 @@ export function Navbar() {
 
             {/* ── Desktop Right Actions ── */}
             <div className="hidden lg:flex items-center" style={{ gap: 8 }}>
+              <ThemeToggle />
               {status === "loading" ? (
-                <Loader2 style={{ width: 16, height: 16, color: "rgba(255,255,255,0.4)", animation: "spin 1s linear infinite" }} />
+                <Loader2 style={{ width: 16, height: 16, color: c.textMuted, animation: "spin 1s linear infinite" }} />
               ) : isAuthenticated ? (
                 <div ref={userRef} style={{ position: "relative" }}>
                   <button
@@ -242,36 +273,36 @@ export function Navbar() {
                     style={{
                       display: "flex", alignItems: "center", gap: 7,
                       padding: "6px 10px", borderRadius: 8, border: "none",
-                      background: userMenuOpen ? "rgba(255,255,255,0.08)" : "transparent",
+                      background: userMenuOpen ? c.pill : "transparent",
                       cursor: "pointer", transition: "background 0.15s",
-                      fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
+                      fontFamily: FONT,
                     }}
                   >
                     <div style={{
                       width: 28, height: 28, borderRadius: "50%",
-                      background: "rgba(255,255,255,0.15)",
+                      background: c.avatarBg,
                       display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: 11, fontWeight: 700, color: "#fff", flexShrink: 0,
+                      fontSize: 11, fontWeight: 700, color: c.textStrong, flexShrink: 0,
                     }}>
                       {user?.name?.slice(0, 2).toUpperCase()}
                     </div>
-                    <span style={{ fontSize: 13, fontWeight: 500, color: "#fff", maxWidth: 90, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    <span style={{ fontSize: 13, fontWeight: 500, color: c.textStrong, maxWidth: 90, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                       {user?.name?.split(" ")[0]}
                     </span>
-                    <ChevronDown style={{ width: 13, height: 13, color: "rgba(255,255,255,0.5)", transition: "transform 0.2s", transform: userMenuOpen ? "rotate(180deg)" : "none" }} />
+                    <ChevronDown style={{ width: 13, height: 13, color: c.textMuted, transition: "transform 0.2s", transform: userMenuOpen ? "rotate(180deg)" : "none" }} />
                   </button>
 
                   {userMenuOpen && (
                     <div style={{
                       position: "absolute", right: 0, top: "calc(100% + 8px)",
-                      width: 220, background: "#1a1a1a",
-                      border: "1px solid rgba(255,255,255,0.08)",
-                      borderRadius: 12, boxShadow: "0 12px 48px rgba(0,0,0,0.65)",
+                      width: 220, background: c.panel,
+                      border: `1px solid ${c.panelBorder}`,
+                      borderRadius: 12, boxShadow: c.menuShadow,
                       overflow: "hidden", zIndex: 100,
                     }}>
-                      <div style={{ padding: "14px 16px 12px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-                        <p style={{ fontSize: 13, fontWeight: 600, color: "#fff", margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{user?.name}</p>
-                        <p style={{ fontSize: 11, color: "rgba(255,255,255,0.40)", margin: "2px 0 0", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{user?.email}</p>
+                      <div style={{ padding: "14px 16px 12px", borderBottom: `1px solid ${c.border}` }}>
+                        <p style={{ fontSize: 13, fontWeight: 600, color: c.textStrong, margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{user?.name}</p>
+                        <p style={{ fontSize: 11, color: c.textMuted, margin: "2px 0 0", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{user?.email}</p>
                       </div>
                       <div style={{ padding: "6px" }}>
                         <Link
@@ -279,11 +310,11 @@ export function Navbar() {
                           style={{
                             display: "flex", alignItems: "center", gap: 8,
                             padding: "9px 12px", borderRadius: 8, textDecoration: "none",
-                            fontSize: 13, fontWeight: 500, color: "rgba(255,255,255,0.70)",
-                            fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
+                            fontSize: 13, fontWeight: 500, color: c.text,
+                            fontFamily: FONT,
                             transition: "background 0.15s",
                           }}
-                          onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.06)")}
+                          onMouseEnter={(e) => (e.currentTarget.style.background = c.pill)}
                           onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                         >
                           <User style={{ width: 14, height: 14 }} />
@@ -296,10 +327,10 @@ export function Navbar() {
                             padding: "9px 12px", borderRadius: 8, border: "none",
                             background: "transparent", cursor: "pointer",
                             fontSize: 13, fontWeight: 500, color: "#f87171",
-                            fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
+                            fontFamily: FONT,
                             transition: "background 0.15s",
                           }}
-                          onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(239,68,68,0.10)")}
+                          onMouseEnter={(e) => (e.currentTarget.style.background = c.dangerBg)}
                           onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                         >
                           <LogOut style={{ width: 14, height: 14 }} />
@@ -315,10 +346,10 @@ export function Navbar() {
                   style={{
                     padding: "7px 14px", borderRadius: 8, border: "none", background: "transparent",
                     fontSize: 13, fontWeight: 500,
-                    color: "rgba(255,255,255,0.60)",
+                    color: c.text,
                     cursor: "pointer",
                     transition: "color 0.15s",
-                    fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
+                    fontFamily: FONT,
                   }}
                 >
                   Log in
@@ -331,9 +362,9 @@ export function Navbar() {
                 style={{
                   display: "flex", alignItems: "center", gap: 6,
                   padding: "8px 18px", borderRadius: 9,
-                  background: "#fff", color: "#111",
+                  background: c.ctaBg, color: c.ctaFg,
                   fontSize: 13, fontWeight: 700, textDecoration: "none",
-                  fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
+                  fontFamily: FONT,
                   transition: "opacity 0.15s",
                   whiteSpace: "nowrap",
                 }}
@@ -346,20 +377,22 @@ export function Navbar() {
             </div>
 
             {/* ── Mobile hamburger — only shown below 1024px ── */}
-            <button
-              className="lg:hidden"
-              onClick={() => setMobileOpen((v) => !v)}
-              aria-label="Toggle menu"
-              style={{
-                width: 36, height: 36, borderRadius: 8, border: "none",
-                background: "rgba(255,255,255,0.05)", cursor: "pointer",
-                alignItems: "center", justifyContent: "center",
-                color: "#fff", transition: "background 0.15s",
-                flexShrink: 0,
-              }}
-            >
-              {mobileOpen ? <X style={{ width: 18, height: 18 }} /> : <Menu style={{ width: 18, height: 18 }} />}
-            </button>
+            <div className="lg:hidden flex items-center gap-2">
+              <ThemeToggle />
+              <button
+                onClick={() => setMobileOpen((v) => !v)}
+                aria-label="Toggle menu"
+                style={{
+                  width: 36, height: 36, borderRadius: 8, border: "none",
+                  background: c.ghost, cursor: "pointer",
+                  alignItems: "center", justifyContent: "center",
+                  color: c.textStrong, transition: "background 0.15s",
+                  flexShrink: 0,
+                }}
+              >
+                {mobileOpen ? <X style={{ width: 18, height: 18 }} /> : <Menu style={{ width: 18, height: 18 }} />}
+              </button>
+            </div>
           </div>
         </nav>
       </header>
@@ -369,7 +402,7 @@ export function Navbar() {
         <div
           style={{
             position: "fixed", inset: 0, zIndex: 40,
-            background: "#111",
+            background: c.menuBg,
             display: "flex", flexDirection: "column",
             paddingTop: 64,
             overflowY: "auto",
@@ -389,9 +422,9 @@ export function Navbar() {
                     padding: "14px 16px", borderRadius: 10, textDecoration: "none",
                     marginBottom: 2,
                     fontSize: 16, fontWeight: 600,
-                    color: active ? "#fff" : "rgba(255,255,255,0.65)",
-                    background: active ? "rgba(255,255,255,0.07)" : "transparent",
-                    fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
+                    color: active ? c.textStrong : c.text,
+                    background: active ? c.pill : "transparent",
+                    fontFamily: FONT,
                   }}
                 >
                   {link.label}
@@ -401,8 +434,8 @@ export function Navbar() {
             })}
 
             {/* Mobile destinations quick-links */}
-            <div style={{ marginTop: 16, padding: "12px 16px", borderRadius: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}>
-              <p style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.30)", textTransform: "uppercase", letterSpacing: "0.14em", marginBottom: 10 }}>
+            <div style={{ marginTop: 16, padding: "12px 16px", borderRadius: 10, background: c.ghostSoft, border: `1px solid ${c.border}` }}>
+              <p style={{ fontSize: 10, fontWeight: 700, color: c.textFaint, textTransform: "uppercase", letterSpacing: "0.14em", marginBottom: 10 }}>
                 Quick Destinations
               </p>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 4 }}>
@@ -414,9 +447,9 @@ export function Navbar() {
                     style={{
                       display: "flex", alignItems: "center", gap: 6,
                       padding: "8px 10px", borderRadius: 7, textDecoration: "none",
-                      background: "rgba(255,255,255,0.04)",
-                      fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.70)",
-                      fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
+                      background: c.ghostSoft,
+                      fontSize: 12, fontWeight: 600, color: c.text,
+                      fontFamily: FONT,
                     }}
                   >
                     <span style={{ fontSize: 14 }}>{d.icon}</span>
@@ -428,29 +461,29 @@ export function Navbar() {
           </nav>
 
           {/* Mobile bottom actions */}
-          <div style={{ padding: "20px", borderTop: "1px solid rgba(255,255,255,0.07)", display: "flex", flexDirection: "column", gap: 8 }}>
+          <div style={{ padding: "20px", borderTop: `1px solid ${c.border}`, display: "flex", flexDirection: "column", gap: 8 }}>
             {isAuthenticated ? (
               <>
-                <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 14px", borderRadius: 10, background: "rgba(255,255,255,0.05)", marginBottom: 4 }}>
-                  <div style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(255,255,255,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#fff", flexShrink: 0 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 14px", borderRadius: 10, background: c.ghost, marginBottom: 4 }}>
+                  <div style={{ width: 36, height: 36, borderRadius: "50%", background: c.avatarBg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: c.textStrong, flexShrink: 0 }}>
                     {user?.name?.slice(0, 2).toUpperCase()}
                   </div>
                   <div style={{ minWidth: 0 }}>
-                    <p style={{ fontSize: 13, fontWeight: 600, color: "#fff", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user?.name}</p>
-                    <p style={{ fontSize: 11, color: "rgba(255,255,255,0.40)", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user?.email}</p>
+                    <p style={{ fontSize: 13, fontWeight: 600, color: c.textStrong, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user?.name}</p>
+                    <p style={{ fontSize: 11, color: c.textMuted, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user?.email}</p>
                   </div>
                 </div>
                 <Link
                   href="/profile"
                   onClick={() => setMobileOpen(false)}
-                  style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7, padding: "12px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.10)", textDecoration: "none", fontSize: 14, fontWeight: 600, color: "rgba(255,255,255,0.70)", fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif' }}
+                  style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7, padding: "12px", borderRadius: 10, border: `1px solid ${c.panelBorder}`, textDecoration: "none", fontSize: 14, fontWeight: 600, color: c.text, fontFamily: FONT }}
                 >
                   <User style={{ width: 15, height: 15 }} />
                   Profile & Bookings
                 </Link>
                 <button
                   onClick={() => { setMobileOpen(false); handleLogout(); }}
-                  style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7, padding: "12px", borderRadius: 10, border: "1px solid rgba(239,68,68,0.20)", background: "transparent", cursor: "pointer", fontSize: 14, fontWeight: 600, color: "#f87171", fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif' }}
+                  style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7, padding: "12px", borderRadius: 10, border: "1px solid rgba(239,68,68,0.20)", background: "transparent", cursor: "pointer", fontSize: 14, fontWeight: 600, color: "#f87171", fontFamily: FONT }}
                 >
                   <LogOut style={{ width: 15, height: 15 }} />
                   Log out
@@ -458,10 +491,10 @@ export function Navbar() {
               </>
             ) : (
               <>
-                <button onClick={() => { setMobileOpen(false); window.dispatchEvent(new CustomEvent("open-login-modal")); }} style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "100%", padding: "12px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.10)", background: "transparent", cursor: "pointer", fontSize: 14, fontWeight: 600, color: "rgba(255,255,255,0.60)", fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif' }}>
+                <button onClick={() => { setMobileOpen(false); window.dispatchEvent(new CustomEvent("open-login-modal")); }} style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "100%", padding: "12px", borderRadius: 10, border: `1px solid ${c.panelBorder}`, background: "transparent", cursor: "pointer", fontSize: 14, fontWeight: 600, color: c.text, fontFamily: FONT }}>
                   Log in
                 </button>
-                <button onClick={() => { setMobileOpen(false); window.dispatchEvent(new CustomEvent("open-register-modal")); }} style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "100%", padding: "12px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.10)", textDecoration: "none", fontSize: 14, fontWeight: 600, color: "#fff", background: "rgba(255,255,255,0.06)", cursor: "pointer", fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif' }}>
+                <button onClick={() => { setMobileOpen(false); window.dispatchEvent(new CustomEvent("open-register-modal")); }} style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "100%", padding: "12px", borderRadius: 10, border: `1px solid ${c.panelBorder}`, textDecoration: "none", fontSize: 14, fontWeight: 600, color: c.textStrong, background: c.pill, cursor: "pointer", fontFamily: FONT }}>
                   Sign up free
                 </button>
               </>
@@ -472,9 +505,9 @@ export function Navbar() {
               style={{
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 7,
                 padding: "14px", borderRadius: 10,
-                background: "#fff", color: "#111",
+                background: c.ctaBg, color: c.ctaFg,
                 textDecoration: "none", fontSize: 14, fontWeight: 700,
-                fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
+                fontFamily: FONT,
               }}
             >
               Customize Your Trip

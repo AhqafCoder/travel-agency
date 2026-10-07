@@ -19,14 +19,14 @@ export function StatCard({ label, value, trend, icon: Icon, iconColor = "text-or
   const trendNeutral = trend === undefined || trend === 0;
 
   return (
-    <div className="bg-muted/60 border border-border rounded-xl p-5 hover:bg-muted transition-colors">
+    <div className="group bg-card border border-border rounded-xl p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
       <div className="flex items-center justify-between mb-4">
-        <p className="text-sm text-muted-foreground font-medium">{label}</p>
-        <div className={cn("w-9 h-9 rounded-lg bg-muted/60 flex items-center justify-center", iconColor.replace("text-", "bg-").replace("400", "500/15"))}>
-          <Icon className={cn("w-5 h-5", iconColor)} />
+        <p className="text-[13px] text-muted-foreground font-medium">{label}</p>
+        <div className="w-9 h-9 rounded-lg bg-orange-500/10 border border-orange-500/15 flex items-center justify-center">
+          <Icon className="w-5 h-5 text-[#FF6B35]" />
         </div>
       </div>
-      <p className="text-2xl font-bold text-foreground">
+      <p className="text-[1.7rem] leading-8 font-bold text-foreground tabular-nums tracking-tight">
         {prefix}
         {typeof value === "number" ? value.toLocaleString() : value}
         {suffix}

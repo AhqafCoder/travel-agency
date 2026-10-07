@@ -1,4 +1,4 @@
-import { formatPrice } from "@/lib/mock-data";
+import { formatPrice } from "@/lib/utils";
 
 interface PriceBreakdownProps {
   pricePerPerson: number;

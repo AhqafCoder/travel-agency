@@ -1,24 +1,28 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
-  Camera,
-  Video,
-  Globe,
-  AtSign,
   Mail,
   Phone,
+  MapPin,
   MessageCircle,
   ArrowUp,
 } from "lucide-react";
 import { SITE, FOOTER_LINKS } from "@/lib/constants";
 import { EnquiryForm } from "@/components/forms/EnquiryForm";
+import {
+  InstagramIcon,
+  FacebookIcon,
+  WhatsAppIcon,
+} from "@/components/common/BrandIcons";
 
 const SOCIALS = [
-  { icon: Camera, href: SITE.social.instagram, label: "Instagram" },
-  { icon: Video, href: SITE.social.youtube, label: "YouTube" },
-  { icon: Globe, href: SITE.social.facebook, label: "Facebook" },
-  { icon: AtSign, href: SITE.social.twitter, label: "Twitter" },
-  { icon: MessageCircle, href: SITE.social.whatsapp, label: "WhatsApp" },
+  { icon: InstagramIcon, href: SITE.social.instagram, label: "Instagram" },
+  {
+    icon: FacebookIcon,
+    href: SITE.social.facebook,
+    label: "Facebook",
+  },
+  { icon: WhatsAppIcon, href: SITE.social.whatsapp, label: "WhatsApp" },
 ];
 
 const LINK_COLUMNS = [
@@ -33,7 +37,7 @@ const linkClass =
 
 export function Footer() {
   return (
-    <footer className="relative overflow-hidden bg-[oklch(0.05_0.003_250)] border-t border-white/6">
+    <footer className="relative overflow-hidden bg-[oklch(0.05_0.003_250)] light:bg-muted/40 border-t border-border">
       {/* Soft glow behind the CTA */}
       <div
         aria-hidden
@@ -43,7 +47,7 @@ export function Footer() {
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* ── Enquiry panel ──────────────────────────── */}
         <div className="-translate-y-0 pt-14">
-          <div className="rounded-3xl border border-white/8 bg-gradient-to-br from-white/[0.06] to-white/[0.02] px-6 py-10 sm:px-10 sm:py-12">
+          <div className="rounded-3xl border border-border bg-gradient-to-br from-white/[0.06] to-white/[0.02] light:from-black/[0.04] light:to-black/[0.01] px-6 py-10 sm:px-10 sm:py-12">
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
               <div className="lg:col-span-2">
                 <h3 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
@@ -80,9 +84,9 @@ export function Footer() {
                   href={`https://wa.me/${SITE.whatsapp}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-7 inline-flex items-center gap-2 rounded-xl border border-white/15 px-5 py-2.5 text-sm font-semibold text-foreground hover:bg-white/8 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                  className="mt-7 inline-flex items-center gap-2 rounded-xl border border-border px-5 py-2.5 text-sm font-semibold text-foreground hover:bg-muted transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                 >
-                  <MessageCircle className="w-4 h-4" />
+                  <WhatsAppIcon className="w-4 h-4" />
                   Prefer WhatsApp? Chat with us
                 </a>
               </div>
@@ -108,7 +112,7 @@ export function Footer() {
                 alt=""
                 width={48}
                 height={48}
-                className="h-11 w-auto"
+                className="h-11 w-auto light:invert"
               />
               <span className="font-display font-bold text-2xl tracking-tight text-foreground">
                 EditMyTrips
@@ -116,7 +120,8 @@ export function Footer() {
             </Link>
 
             <p className="mt-5 text-muted-foreground text-sm leading-relaxed max-w-xs">
-              {SITE.description}
+              Crafting extraordinary Indian journeys since 2016. Your journey
+              is our passion.
             </p>
 
             <div className="mt-6 flex items-center gap-2.5">
@@ -127,7 +132,7 @@ export function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="flex items-center justify-center w-10 h-10 rounded-full bg-white/5 border border-white/8 text-muted-foreground hover:text-primary hover:border-primary/40 hover:bg-primary/10 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-muted/60 border border-border text-muted-foreground hover:text-primary hover:border-primary/40 hover:bg-primary/10 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                 >
                   <Icon className="w-4 h-4" />
                 </a>
@@ -159,7 +164,7 @@ export function Footer() {
         </div>
 
         {/* ── Contact + legal bar ─────────────────────── */}
-        <div className="border-t border-white/6 py-7 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+        <div className="border-t border-border py-7 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
           <div className="flex flex-wrap gap-x-6 gap-y-3">
             <a
               href={`mailto:${SITE.email}`}
@@ -175,6 +180,15 @@ export function Footer() {
               <Phone className="w-3.5 h-3.5" />
               {SITE.phone}
             </a>
+            <a
+              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(SITE.address)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <MapPin className="w-3.5 h-3.5 shrink-0" />
+              {SITE.address}
+            </a>
           </div>
 
           <div className="flex items-center justify-between lg:justify-end gap-6">
@@ -184,7 +198,7 @@ export function Footer() {
             <a
               href="#top"
               aria-label="Back to top"
-              className="flex items-center justify-center w-9 h-9 rounded-full border border-white/10 text-muted-foreground hover:text-foreground hover:border-white/30 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              className="flex items-center justify-center w-9 h-9 rounded-full border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             >
               <ArrowUp className="w-4 h-4" />
             </a>

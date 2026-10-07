@@ -1,13 +1,26 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "sonner";
 import { AuthProvider } from "@/components/auth/AuthContext";
 import { FloatingEnquiryWidget } from "@/components/common/FloatingEnquiryWidget";
 import { AuthModal } from "@/components/auth/LoginModal";
+import { ReviewPrompt } from "@/components/reviews/ReviewPrompt";
+import { useTheme } from "@/components/theme/ThemeProvider";
 
 export function Providers({ children }: { children: React.ReactNode }) {
+  const { theme } = useTheme();
+  const pathname = usePathname();
+  // Floating customer widgets (enquiry pop-up, post-trip review prompt)
+  // belong to the public website only — never the admin panel or checkout.
+  const isAppRoute =
+    pathname?.startsWith("/admin") ||
+    pathname?.startsWith("/booking") ||
+    pathname?.startsWith("/profile") ||
+    pathname?.startsWith("/login") ||
+    pathname?.startsWith("/register");
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -44,11 +57,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         {children}
-        <FloatingEnquiryWidget />
+        {!isAppRoute && <FloatingEnquiryWidget />}
+        {!isAppRoute && <ReviewPrompt />}
         <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} defaultMode={authMode} />
       </AuthProvider>
       <Toaster
         position="top-right"
+        theme={theme}
         richColors
         expand
         toastOptions={{

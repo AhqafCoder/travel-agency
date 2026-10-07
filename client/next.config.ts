@@ -2,6 +2,8 @@ import type { NextConfig } from "next";
 import path from "path";
 
 const nextConfig: NextConfig = {
+  // Native/server-only packages must not be bundled by Turbopack
+  serverExternalPackages: ["mongoose", "bcryptjs", "jsonwebtoken", "cloudinary"],
   // The monorepo root (client/ + server/) is one level above this app;
   // without this, Turbopack picks up stray lockfiles in home dir and warns.
   turbopack: {
@@ -50,21 +52,6 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: "5mb",
     },
-  },
-  // Environment validation - fail fast if required env vars are missing
-  env: {
-    // These are recommended environment variables
-    NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
-    NEXTAUTH_URL: process.env.NEXTAUTH_URL,
-    MONGODB_URI: process.env.MONGODB_URI,
-    RAZORPAY_KEY_ID: process.env.RAZORPAY_KEY_ID,
-    RAZORPAY_KEY_SECRET: process.env.RAZORPAY_KEY_SECRET,
-    RESEND_API_KEY: process.env.RESEND_API_KEY,
-    CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
-    CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
-    CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
-    WHATSAPP_ACCESS_TOKEN: process.env.WHATSAPP_ACCESS_TOKEN,
-    WHATSAPP_PHONE_NUMBER_ID: process.env.WHATSAPP_PHONE_NUMBER_ID,
   },
   // Headers for security
   async headers() {

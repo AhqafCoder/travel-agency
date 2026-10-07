@@ -2,6 +2,7 @@
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
+@custom-variant light (&:is(html.light *));
 
 @theme inline {
   --color-background: var(--background);
@@ -101,6 +102,72 @@
 }
 
 /* ═══════════════════════════════════════════════
+   LIGHT THEME  —  public site light mode
+   Toggled via html.light (see ThemeProvider).
+   :root above stays the dark default, so server
+   HTML renders correct dark with zero flash.
+   Admin overrides both via body.admin-light.
+═══════════════════════════════════════════════ */
+html.light {
+  color-scheme: light;
+
+  --brand:            #111111;
+  --brand-foreground: #ffffff;
+  --surface:          #f7f7f8;
+  --surface-2:        #ececee;
+
+  --background:        #ffffff;
+  --foreground:        #18181b;
+
+  --card:              #ffffff;
+  --card-foreground:   #18181b;
+
+  --popover:           #ffffff;
+  --popover-foreground:#18181b;
+
+  --primary:           #111111;
+  --primary-foreground:#ffffff;
+
+  --secondary:         #f4f4f5;
+  --secondary-foreground:#18181b;
+
+  --muted:             #f4f4f5;
+  --muted-foreground:  #6b7280;
+
+  --accent:            #f4f4f5;
+  --accent-foreground: #18181b;
+
+  --destructive:       #ef4444;
+
+  --border:            rgba(0,0,0,0.10);
+  --input:             rgba(0,0,0,0.12);
+  --ring:              rgba(0,0,0,0.30);
+
+  --sidebar:                #fafafa;
+  --sidebar-foreground:     #18181b;
+  --sidebar-primary:        #111111;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent:         #f0f0f1;
+  --sidebar-accent-foreground: #18181b;
+  --sidebar-border:         rgba(0,0,0,0.08);
+  --sidebar-ring:           rgba(0,0,0,0.30);
+}
+
+/* ── Smooth theme switch: applied only while toggling ── */
+html.theme-anim,
+html.theme-anim *,
+html.theme-anim *::before,
+html.theme-anim *::after {
+  transition: background-color 300ms ease,
+              border-color 300ms ease,
+              color 300ms ease,
+              fill 300ms ease,
+              stroke 300ms ease,
+              box-shadow 300ms ease,
+              outline-color 300ms ease !important;
+}
+
+/* ═══════════════════════════════════════════════
    LIGHT THEME SCOPE — admin dashboard
    Toggled via body.admin-light (see admin layout).
    Lives on <body> so portals (dialogs, popovers,
@@ -181,8 +248,8 @@ body.admin-light h6 {
   }
 
   body {
-    background: #111111;
-    color: #ffffff;
+    background: var(--background);
+    color: var(--foreground);
     /* Helvetica Neue → Arial → system sans */
     font-family: "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
     font-size: 15px;
@@ -195,15 +262,18 @@ body.admin-light h6 {
     font-weight: 700;
     letter-spacing: -0.015em;
     line-height: 1.15;
-    color: #ffffff;
+    color: var(--foreground);
   }
 
   ::-webkit-scrollbar        { width: 5px; height: 5px; }
   ::-webkit-scrollbar-track  { background: transparent; }
   ::-webkit-scrollbar-thumb  { background: #333; border-radius: 9999px; }
   ::-webkit-scrollbar-thumb:hover { background: #444; }
+  html.light ::-webkit-scrollbar-thumb { background: #c4c4c8; }
+  html.light ::-webkit-scrollbar-thumb:hover { background: #a8a8ad; }
 
   ::selection { background: rgba(255,255,255,0.2); color: #ffffff; }
+  html.light ::selection { background: rgba(17,17,17,0.12); color: #18181b; }
 }
 
 /* ═══════════════════════════════════════════════
@@ -227,7 +297,7 @@ body.admin-light h6 {
       rgba(0,0,0,0.08) 35%,
       rgba(0,0,0,0.15) 58%,
       rgba(0,0,0,0.72) 78%,
-      rgba(17,17,17,0.97) 100%
+      color-mix(in srgb, var(--background) 97%, transparent) 100%
     );
   }
 
@@ -244,14 +314,14 @@ body.admin-light h6 {
   /* ── Section divider ── */
   .section-divider {
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
   }
 
   /* ── Glass variants ── */
   .glass {
     backdrop-filter: blur(20px) saturate(160%);
-    background: rgba(17,17,17,0.82);
-    border: 1px solid rgba(255,255,255,0.08);
+    background: color-mix(in srgb, var(--background) 82%, transparent);
+    border: 1px solid var(--border);
   }
   .glass-white {
     backdrop-filter: blur(20px) saturate(160%);

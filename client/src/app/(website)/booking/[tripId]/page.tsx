@@ -1,7 +1,10 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { MOCK_TRIPS } from "@/lib/mock-data";
+import { getTripBySlugOrId } from "@/server/services/public.service";
 import { BookingFlow } from "@/components/booking/BookingFlow";
+
+// Live DB data (seats, prices, views) — always render fresh.
+export const dynamic = "force-dynamic";
 
 type BookingParams = {
   params: Promise<{ tripId: string }>;
@@ -10,7 +13,7 @@ type BookingParams = {
 
 export async function generateMetadata({ params }: BookingParams): Promise<Metadata> {
   const { tripId } = await params;
-  const trip = MOCK_TRIPS.find((t) => t._id === tripId);
+  const trip = await getTripBySlugOrId(tripId);
   if (!trip) return { title: "Booking Not Found" };
   return {
     title: `Book ${trip.title} | editmytrips`,
@@ -22,7 +25,7 @@ export default async function BookingPage({ params, searchParams }: BookingParam
   const { tripId } = await params;
   const { departure, count } = await searchParams;
 
-  const trip = MOCK_TRIPS.find((t) => t._id === tripId);
+  const trip = await getTripBySlugOrId(tripId);
   if (!trip) notFound();
 
   const presetCount = count ? Math.max(1, Math.min(12, Number(count) || 1)) : undefined;

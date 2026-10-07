@@ -27,7 +27,18 @@ export default function AdminLayout({
 
   return (
     <AdminGuard>
-      <SidebarProvider>
+      <SidebarProvider
+        style={{
+          // Light sidebar kept on-brand: soft gray surface, orange active states
+          "--sidebar": "#f7f7f8",
+          "--sidebar-foreground": "#3f3f46",
+          "--sidebar-accent": "rgba(255, 107, 53, 0.10)",
+          "--sidebar-accent-foreground": "#e85a25",
+          "--sidebar-border": "#ececee",
+          "--sidebar-primary": "#FF6B35",
+          "--sidebar-ring": "#FF6B35",
+        } as React.CSSProperties}
+      >
         <AppSidebar />
         <SidebarInset className="min-w-0">
           <AdminHeader />

@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, MapPin, Calendar } from "lucide-react";
-import { MOCK_DESTINATIONS } from "@/lib/mock-data";
+import { listDestinationsPublic } from "@/server/services/public.service";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
@@ -11,9 +11,12 @@ export const metadata: Metadata = {
     "Explore India's most spectacular regions — the Himalayas, the beaches, the deserts, and the hidden valleys.",
 };
 
-export default function DestinationsPage() {
-  const featured = MOCK_DESTINATIONS.filter((d) => d.featured);
-  const rest = MOCK_DESTINATIONS.filter((d) => !d.featured);
+export const dynamic = "force-dynamic";
+
+export default async function DestinationsPage() {
+  const destinations = await listDestinationsPublic();
+  const featured = destinations.filter((d) => d.featured);
+  const rest = destinations.filter((d) => !d.featured);
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -60,7 +63,7 @@ export default function DestinationsPage() {
                 href={`/destinations/${featured[0].slug}`}
                 className={cn(
                   "group relative overflow-hidden rounded-2xl lg:col-span-2 lg:row-span-2",
-                  "border border-white/6 hover:border-white/14 transition-all duration-300",
+                  "border border-border hover:border-foreground/25 transition-all duration-300",
                   "aspect-[3/2] lg:aspect-auto lg:min-h-[480px]",
                   "shadow-[0_2px_20px_oklch(0_0_0/50%)] hover:shadow-[0_8px_40px_oklch(0_0_0/60%)]"
                 )}
@@ -115,7 +118,7 @@ export default function DestinationsPage() {
                   href={`/destinations/${dest.slug}`}
                   className={cn(
                     "group relative overflow-hidden rounded-2xl",
-                    "border border-white/6 hover:border-white/14 transition-all duration-300",
+                    "border border-border hover:border-foreground/25 transition-all duration-300",
                     "aspect-[4/3]",
                     "shadow-[0_2px_16px_oklch(0_0_0/40%)] hover:shadow-[0_6px_32px_oklch(0_0_0/55%)]"
                   )}
@@ -151,7 +154,7 @@ export default function DestinationsPage() {
 
       {/* ── All Destinations ─────────────────────────────────── */}
       {rest.length > 0 && (
-        <section className="py-14 sm:py-20 bg-[oklch(0.09_0.005_250)]">
+        <section className="py-14 sm:py-20 bg-[oklch(0.09_0.005_250)] light:bg-muted/40">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <p className="text-xs text-primary uppercase tracking-[0.2em] font-medium mb-6">
               More destinations
@@ -163,7 +166,7 @@ export default function DestinationsPage() {
                   href={`/destinations/${dest.slug}`}
                   className={cn(
                     "group relative overflow-hidden rounded-2xl",
-                    "border border-white/6 hover:border-white/14 transition-all duration-300",
+                    "border border-border hover:border-foreground/25 transition-all duration-300",
                     "aspect-[4/3]",
                     "shadow-[0_2px_16px_oklch(0_0_0/40%)]"
                   )}
@@ -210,13 +213,13 @@ export default function DestinationsPage() {
         <section className="py-14 sm:py-20 bg-background">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {MOCK_DESTINATIONS.map((dest) => (
+              {destinations.map((dest) => (
                 <Link
                   key={dest._id}
                   href={`/destinations/${dest.slug}`}
                   className={cn(
                     "group relative overflow-hidden rounded-2xl aspect-[4/3]",
-                    "border border-white/6 hover:border-white/14 transition-all duration-300"
+                    "border border-border hover:border-foreground/25 transition-all duration-300"
                   )}
                 >
                   <Image

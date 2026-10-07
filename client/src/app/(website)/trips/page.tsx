@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, SlidersHorizontal } from "lucide-react";
 import { TripCard } from "@/components/travel/TripCard";
-import { MOCK_TRIPS, getFeaturedTrips } from "@/lib/mock-data";
+import { listTripsPublic } from "@/server/services/public.service";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
@@ -11,9 +11,11 @@ export const metadata: Metadata = {
     "Browse all handcrafted trips and adventures across India. Filter by type, difficulty, and destination.",
 };
 
-export default function TripsPage() {
-  const allTrips = MOCK_TRIPS.filter((t) => t.status === "PUBLISHED");
-  const featured = getFeaturedTrips();
+export const dynamic = "force-dynamic";
+
+export default async function TripsPage() {
+  const { data: allTrips } = await listTripsPublic({ pageSize: "50" });
+  const featured = allTrips.filter((t) => t.featured);
   const trending = allTrips.filter((t) => t.trending && !t.featured);
 
   return (
@@ -77,7 +79,7 @@ export default function TripsPage() {
 
       {/* ── Featured Trips ───────────────────────────────────── */}
       {featured.length > 0 && (
-        <section className="py-14 sm:py-20 bg-[oklch(0.09_0.005_250)]">
+        <section className="py-14 sm:py-20 bg-[oklch(0.09_0.005_250)] light:bg-muted/40">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-end justify-between mb-10">
               <div>
@@ -123,7 +125,7 @@ export default function TripsPage() {
           </div>
 
           {allTrips.length === 0 ? (
-            <div className="text-center py-20 rounded-2xl border border-white/6 bg-card">
+            <div className="text-center py-20 rounded-2xl border border-border bg-card">
               <p className="text-muted-foreground">
                 No trips available at the moment. Check back soon!
               </p>
@@ -139,7 +141,7 @@ export default function TripsPage() {
       </section>
 
       {/* ── CTA strip ─────────────────────────────────────────── */}
-      <section className="py-14 bg-[oklch(0.09_0.005_250)] border-t border-white/5">
+      <section className="py-14 bg-[oklch(0.09_0.005_250)] light:bg-muted/40 border-t border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="font-display text-2xl sm:text-3xl font-bold text-foreground mb-3">
             Can&apos;t find what you&apos;re looking for?

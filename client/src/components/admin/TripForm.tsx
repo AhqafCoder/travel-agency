@@ -32,13 +32,15 @@ import { DeparturesManager } from "@/components/admin/DeparturesManager";
   basePrice: z.number().min(0),
   maxGroupSize: z.number().min(1),
   status: z.enum(["DRAFT", "PUBLISHED", "ARCHIVED"]),
+  featured: z.boolean(),
+  trending: z.boolean(),
   inclusions: z.array(z.string()),
   exclusions: z.array(z.string()),
   itinerary: z.array(
     z.object({
       dayNumber: z.number(),
-      title: z.string().min(1),
-      description: z.string().min(1),
+      title: z.string(),
+      description: z.string(),
       activities: z.array(z.string()),
       meals: z.array(z.enum(["Breakfast", "Lunch", "Dinner"])),
       stay: z.string().optional(),
@@ -46,7 +48,7 @@ import { DeparturesManager } from "@/components/admin/DeparturesManager";
       distance: z.string().optional(),
       highlights: z.array(z.string()),
     })
-  ).min(1, "At least one itinerary day is required"),
+  ),
 });
 
 type TripFormValues = z.infer<typeof tripSchema>;
@@ -76,13 +78,18 @@ export function TripForm({ initialData, isEdit }: TripFormProps) {
       slug: initialData.slug || "",
       shortDescription: initialData.shortDescription || "",
       description: initialData.description || "",
-      destinationId: typeof initialData.destinationId === "string" ? initialData.destinationId : initialData.destinationId || "",
+      destinationId:
+        typeof initialData.destinationId === "string"
+          ? initialData.destinationId
+          : ((initialData.destinationId as unknown as { _id?: string })?._id ?? ""),
       tripType: initialData.tripType || "Adventure",
       difficulty: initialData.difficulty || "Moderate",
       durationDays: initialData.durationDays || 1,
       basePrice: initialData.basePrice || 0,
       maxGroupSize: initialData.maxGroupSize || 10,
       status: initialData.status || "DRAFT",
+      featured: initialData.featured ?? false,
+      trending: initialData.trending ?? false,
       inclusions: initialData.inclusions || [],
       exclusions: initialData.exclusions || [],
       itinerary: initialData.itinerary?.length ? initialData.itinerary : [{ dayNumber: 1, title: "", description: "", activities: [], meals: [], highlights: [] }],
@@ -98,6 +105,8 @@ export function TripForm({ initialData, isEdit }: TripFormProps) {
       basePrice: 0,
       maxGroupSize: 10,
       status: "DRAFT",
+      featured: false,
+      trending: false,
       inclusions: [],
       exclusions: [],
       itinerary: [{ dayNumber: 1, title: "", description: "", activities: [], meals: [], highlights: [] }],
@@ -122,8 +131,14 @@ export function TripForm({ initialData, isEdit }: TripFormProps) {
   const onSubmit = async (values: TripFormValues) => {
     try {
       setIsSubmitting(true);
+      // Drop itinerary rows the user left blank; auto-slug from title.
+      const itinerary = values.itinerary
+        .map((day, i) => ({ ...day, dayNumber: i + 1 }))
+        .filter((day) => day.title.trim() || day.description.trim());
       const payload = {
         ...values,
+        slug: values.slug.trim() || String(values.title).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
+        itinerary,
         coverImage: coverImage[0] ?? "",
         gallery,
       };
@@ -143,7 +158,13 @@ export function TripForm({ initialData, isEdit }: TripFormProps) {
   };
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+    <form
+      onSubmit={form.handleSubmit(onSubmit, (errors) => {
+        const first = Object.keys(errors)[0];
+        toast.error(`Please fix the highlighted fields${first ? ` (${first})` : ""}`);
+      })}
+      className="space-y-8"
+    >
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">{isEdit ? "Edit Trip" : "Create New Trip"}</h2>
@@ -159,12 +180,12 @@ export function TripForm({ initialData, isEdit }: TripFormProps) {
 
       <Tabs defaultValue="basic" className="w-full">
         <TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent mb-6">
-          <TabsTrigger value="basic" className="data-[state=active]:border-b-2 data-[state=active]:border-[#FF6B35] rounded-none px-4 py-2">Basic Info</TabsTrigger>
-          <TabsTrigger value="content" className="data-[state=active]:border-b-2 data-[state=active]:border-[#FF6B35] rounded-none px-4 py-2">Content</TabsTrigger>
-          <TabsTrigger value="itinerary" className="data-[state=active]:border-b-2 data-[state=active]:border-[#FF6B35] rounded-none px-4 py-2">Itinerary</TabsTrigger>
-          <TabsTrigger value="pricing" className="data-[state=active]:border-b-2 data-[state=active]:border-[#FF6B35] rounded-none px-4 py-2">Pricing & Settings</TabsTrigger>
+          <TabsTrigger value="basic" className="data-[active]:border-b-2 data-[active]:border-[#FF6B35] data-[active]:text-[#FF6B35] rounded-none px-4 py-2">Basic Info</TabsTrigger>
+          <TabsTrigger value="content" className="data-[active]:border-b-2 data-[active]:border-[#FF6B35] data-[active]:text-[#FF6B35] rounded-none px-4 py-2">Content</TabsTrigger>
+          <TabsTrigger value="itinerary" className="data-[active]:border-b-2 data-[active]:border-[#FF6B35] data-[active]:text-[#FF6B35] rounded-none px-4 py-2">Itinerary</TabsTrigger>
+          <TabsTrigger value="pricing" className="data-[active]:border-b-2 data-[active]:border-[#FF6B35] data-[active]:text-[#FF6B35] rounded-none px-4 py-2">Pricing & Settings</TabsTrigger>
           {isEdit && (
-            <TabsTrigger value="departures" className="data-[state=active]:border-b-2 data-[state=active]:border-[#FF6B35] rounded-none px-4 py-2">Departures</TabsTrigger>
+            <TabsTrigger value="departures" className="data-[active]:border-b-2 data-[active]:border-[#FF6B35] data-[active]:text-[#FF6B35] rounded-none px-4 py-2">Departures</TabsTrigger>
           )}
         </TabsList>
 
@@ -189,7 +210,9 @@ export function TripForm({ initialData, isEdit }: TripFormProps) {
               render={({ field }) => (
                 <Select onValueChange={field.onChange} value={field.value}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select destination" />
+                    <SelectValue placeholder="Select destination">
+                      {destData?.data?.find((d) => d._id === field.value)?.name ?? "Select destination"}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {destData?.data?.map((d) => (
@@ -307,7 +330,7 @@ export function TripForm({ initialData, isEdit }: TripFormProps) {
         <TabsContent value="pricing" className="space-y-6 max-w-3xl">
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-2">
-              <Label>Base Price ($)</Label>
+              <Label>Base Price (₹)</Label>
               <Input type="number" {...form.register("basePrice", { valueAsNumber: true })} />
             </div>
             <div className="space-y-2">
@@ -334,6 +357,32 @@ export function TripForm({ initialData, isEdit }: TripFormProps) {
                       <SelectItem value="ARCHIVED">Archived</SelectItem>
                     </SelectContent>
                   </Select>
+                )}
+              />
+            </div>
+            <div className="flex items-center justify-between rounded-lg border p-3">
+              <div>
+                <Label htmlFor="trip-featured">Featured</Label>
+                <p className="text-xs text-muted-foreground">Shows in the homepage Featured Trips section</p>
+              </div>
+              <Controller
+                control={form.control}
+                name="featured"
+                render={({ field }) => (
+                  <Switch id="trip-featured" checked={field.value} onCheckedChange={field.onChange} />
+                )}
+              />
+            </div>
+            <div className="flex items-center justify-between rounded-lg border p-3">
+              <div>
+                <Label htmlFor="trip-trending">Trending</Label>
+                <p className="text-xs text-muted-foreground">Shows in the homepage Trending This Season section</p>
+              </div>
+              <Controller
+                control={form.control}
+                name="trending"
+                render={({ field }) => (
+                  <Switch id="trip-trending" checked={field.value} onCheckedChange={field.onChange} />
                 )}
               />
             </div>

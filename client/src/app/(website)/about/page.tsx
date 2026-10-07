@@ -7,7 +7,6 @@ import {
   Mountain,
   ShieldCheck,
   Sparkles,
-  Users,
 } from "lucide-react";
 import { SITE } from "@/lib/constants";
 
@@ -48,33 +47,6 @@ const VALUES = [
     title: "Obsessive detail",
     description:
       "From the morning chai stop to the sunset viewpoint, we sweat the small stuff so you don't have to.",
-  },
-];
-
-const TEAM = [
-  {
-    name: "Aarav Mehta",
-    role: "Founder & Chief Trip Editor",
-    image:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80",
-  },
-  {
-    name: "Zoya Khan",
-    role: "Head of Experiences",
-    image:
-      "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&q=80",
-  },
-  {
-    name: "Rohan Iyer",
-    role: "Lead Captain, Himalayas",
-    image:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&q=80",
-  },
-  {
-    name: "Meera Nair",
-    role: "Community & Support",
-    image:
-      "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&q=80",
   },
 ];
 
@@ -178,38 +150,6 @@ export default function AboutPage() {
                 <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
                   {description}
                 </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Team */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-2">
-            <Users className="w-5 h-5 text-primary" />
-            <h2 className="text-3xl font-bold text-foreground">Meet the crew</h2>
-          </div>
-          <p className="mt-3 text-muted-foreground max-w-xl">
-            The people who plan, lead and obsess over your trips.
-          </p>
-          <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {TEAM.map((member) => (
-              <div key={member.name} className="group">
-                <div className="relative aspect-[4/5] overflow-hidden rounded-2xl">
-                  <Image
-                    src={member.image}
-                    alt={member.name}
-                    fill
-                    sizes="(max-width: 640px) 100vw, 25vw"
-                    className="object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
-                </div>
-                <h3 className="mt-4 font-semibold text-foreground">
-                  {member.name}
-                </h3>
-                <p className="text-sm text-muted-foreground">{member.role}</p>
               </div>
             ))}
           </div>

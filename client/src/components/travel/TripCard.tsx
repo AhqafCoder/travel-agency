@@ -20,8 +20,8 @@ export function TripCard({ trip }: TripCardProps) {
       className="group flex flex-col overflow-hidden transition-all duration-300 card-shadow card-shadow-hover"
       style={{
         borderRadius: 14,
-        border: "1px solid rgba(255,255,255,0.07)",
-        background: "#1a1a1a",
+        border: "1px solid var(--border)",
+        background: "var(--card)",
         textDecoration: "none",
       }}
     >
@@ -71,56 +71,58 @@ export function TripCard({ trip }: TripCardProps) {
       <div className="flex flex-col flex-1" style={{ padding: "14px 16px 16px" }}>
         {/* Location */}
         <div className="flex items-center gap-1 mb-1.5">
-          <MapPin style={{ width: 11, height: 11, color: "#777", flexShrink: 0 }} />
-          <span className="truncate" style={{ fontSize: 11, color: "#777" }}>
-            {trip.destination?.name ?? "India"}{trip.destination?.state ? `, ${trip.destination.state}` : ""}
+          <MapPin style={{ width: 11, height: 11, color: "var(--muted-foreground)", flexShrink: 0 }} />
+          <span className="truncate" style={{ fontSize: 11, color: "var(--muted-foreground)" }}>
+            {(trip.destination?.name ?? "India") !== trip.destination?.state
+              ? `${trip.destination?.name ?? "India"}${trip.destination?.state ? `, ${trip.destination.state}` : ""}`
+              : trip.destination?.name ?? "India"}
           </span>
         </div>
 
         {/* Title */}
         <h3
           className="line-clamp-2"
-          style={{ fontSize: 15, fontWeight: 700, color: "#fff", margin: "0 0 6px", lineHeight: 1.3 }}
+          style={{ fontSize: 15, fontWeight: 700, color: "var(--foreground)", margin: "0 0 6px", lineHeight: 1.3 }}
         >
           {trip.title}
         </h3>
 
         {/* Description */}
-        <p className="line-clamp-2 flex-1" style={{ fontSize: 12, color: "#777", lineHeight: 1.55, margin: 0 }}>
+        <p className="line-clamp-2 flex-1" style={{ fontSize: 12, color: "var(--muted-foreground)", lineHeight: 1.55, margin: 0 }}>
           {trip.shortDescription}
         </p>
 
         {/* Tags row */}
         <div className="flex flex-wrap items-center gap-1.5 mt-3">
-          <span style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.50)", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 9999, padding: "2px 8px" }}>
+          <span style={{ fontSize: 11, fontWeight: 600, color: "var(--muted-foreground)", background: "var(--muted)", border: "1px solid var(--border)", borderRadius: 9999, padding: "2px 8px" }}>
             {trip.difficulty}
           </span>
-          <span style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.50)", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 9999, padding: "2px 8px" }}>
+          <span style={{ fontSize: 11, fontWeight: 600, color: "var(--muted-foreground)", background: "var(--muted)", border: "1px solid var(--border)", borderRadius: 9999, padding: "2px 8px" }}>
             {trip.tripType}
           </span>
-          <span className="flex items-center gap-1" style={{ fontSize: 11, color: "#666" }}>
+          <span className="flex items-center gap-1" style={{ fontSize: 11, color: "var(--muted-foreground)" }}>
             <Clock style={{ width: 11, height: 11 }} />
             {trip.durationDays}D/{trip.durationNights}N
           </span>
         </div>
 
         {/* Price + CTA */}
-        <div className="flex items-center justify-between mt-3 pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+        <div className="flex items-center justify-between mt-3 pt-3" style={{ borderTop: "1px solid var(--border)" }}>
           <div>
-            <p style={{ fontSize: 10, color: "#666", margin: 0, textTransform: "uppercase", letterSpacing: "0.08em" }}>From</p>
+            <p style={{ fontSize: 10, color: "var(--muted-foreground)", margin: 0, textTransform: "uppercase", letterSpacing: "0.08em" }}>From</p>
             <div className="flex items-baseline gap-1">
-              <span style={{ fontSize: 17, fontWeight: 700, color: "#fff" }}>
+              <span style={{ fontSize: 17, fontWeight: 700, color: "var(--foreground)" }}>
                 ₹{price.toLocaleString("en-IN")}
               </span>
               {hasDiscount && (
-                <span style={{ fontSize: 11, color: "#555", textDecoration: "line-through" }}>
+                <span style={{ fontSize: 11, color: "var(--muted-foreground)", textDecoration: "line-through" }}>
                   ₹{trip.basePrice.toLocaleString("en-IN")}
                 </span>
               )}
             </div>
-            <p style={{ fontSize: 10, color: "#666", margin: 0 }}>per person</p>
+            <p style={{ fontSize: 10, color: "var(--muted-foreground)", margin: 0 }}>per person</p>
           </div>
-          <span style={{ fontSize: 12, fontWeight: 700, color: "#fff", opacity: 0.6 }}>
+          <span style={{ fontSize: 12, fontWeight: 700, color: "var(--foreground)", opacity: 0.6 }}>
             View Trip →
           </span>
         </div>
