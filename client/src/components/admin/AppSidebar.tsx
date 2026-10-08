@@ -58,13 +58,13 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" render={<Link href="/admin" />}>
-              <div className="flex aspect-square size-8 items-center justify-center overflow-hidden rounded-lg border border-border bg-muted">
+              <div className="flex aspect-square size-8 items-center justify-center overflow-hidden rounded-lg">
                 <Image
-                  src="/image.png"
+                  src="/favicon.png"
                   alt="EditMyTrips"
-                  width={28}
-                  height={28}
-                  className="size-5 object-contain"
+                  width={32}
+                  height={32}
+                  className="size-8"
                 />
               </div>
               <span className="font-display truncate text-sm font-bold tracking-tight">

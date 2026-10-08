@@ -5,7 +5,10 @@ import { Metadata } from "next";
 import { MapPin, Calendar, ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { TripCard } from "@/components/travel/TripCard";
-import { getDestinationBySlug, MOCK_TRIPS } from "@/lib/mock-data";
+import { getDestinationBySlugPublic } from "@/server/services/public.service";
+
+// Live DB data (seats, prices, views) — always render fresh.
+export const dynamic = "force-dynamic";
 
 interface Params {
   params: Promise<{ slug: string }>;
@@ -13,7 +16,7 @@ interface Params {
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
-  const dest = getDestinationBySlug(slug);
+  const dest = await getDestinationBySlugPublic(slug);
   if (!dest) return { title: "Destination Not Found" };
   return {
     title: `${dest.name}, ${dest.state} | editmytrips`,
@@ -28,10 +31,10 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 
 export default async function DestinationDetailPage({ params }: Params) {
   const { slug } = await params;
-  const dest = getDestinationBySlug(slug);
+  const dest = await getDestinationBySlugPublic(slug);
   if (!dest) return notFound();
 
-  const trips = MOCK_TRIPS.filter((t) => t.destinationId === dest._id);
+  const trips = dest.trips;
 
   return (
     <div className="flex flex-col min-h-screen bg-background">

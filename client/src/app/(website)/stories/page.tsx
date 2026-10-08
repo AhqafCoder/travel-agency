@@ -5,7 +5,7 @@ import { Clock, Eye, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MOCK_STORIES } from "@/lib/mock-data";
+import { listStoriesPublic } from "@/server/services/public.service";
 import { format } from "date-fns";
 
 export const metadata: Metadata = {
@@ -14,9 +14,12 @@ export const metadata: Metadata = {
     "Real experiences, travel tips, and inspiration from the editmytrips community.",
 };
 
-export default function StoriesPage() {
-  const featured = MOCK_STORIES.filter((s) => s.featured).slice(0, 1);
-  const rest = MOCK_STORIES.filter((s) => !featured.includes(s));
+export const dynamic = "force-dynamic";
+
+export default async function StoriesPage() {
+  const stories = await listStoriesPublic();
+  const featured = stories.filter((s) => s.featured).slice(0, 1);
+  const rest = stories.filter((s) => !featured.includes(s));
 
   return (
     <div className="flex flex-col min-h-screen bg-background">

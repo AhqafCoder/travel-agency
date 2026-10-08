@@ -117,7 +117,7 @@ export function EnquiryForm({
             name="phone"
             type="tel"
             required
-            placeholder="+91 98765 43210"
+            placeholder="+91 87555 77146"
             autoComplete="tel"
             className={inputClass}
           />

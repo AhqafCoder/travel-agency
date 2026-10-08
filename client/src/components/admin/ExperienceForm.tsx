@@ -55,7 +55,10 @@ export function ExperienceForm({ initialData }: { initialData?: Experience }) {
       ? {
           title: initialData.title,
           slug: initialData.slug,
-          destinationId: initialData.destinationId,
+          destinationId:
+            typeof initialData.destinationId === "string"
+              ? initialData.destinationId
+              : ((initialData.destinationId as unknown as { _id?: string })?._id ?? ""),
           description: initialData.description,
           duration: initialData.duration,
           price: initialData.price,

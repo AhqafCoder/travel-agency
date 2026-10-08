@@ -1,11 +1,11 @@
-import type { User, Trip, Destination, Experience, Story, Booking, Review, Coupon, TripDeparture, Payment, Captain, PaginationMeta, DashboardStats, RevenueChartData } from "@/types";
+import type { User, Trip, Destination, Experience, Story, Booking, Review, Coupon, TripDeparture, Payment, Captain, PaginationMeta, DashboardStats, RevenueChartData, PriceCalculation } from "@/types";
 
 // ─────────────────────────────────────────────
-// Client API layer — talks to the Express server
-// at NEXT_PUBLIC_API_URL (default http://localhost:4000/api).
+// Client API layer — talks to the built-in Next.js
+// route handlers at /api (NEXT_PUBLIC_API_URL overrides).
 // ─────────────────────────────────────────────
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api";
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "/api";
 
 const TOKEN_KEY = "emt_token";
 const USER_KEY = "emt_user";
@@ -144,6 +144,9 @@ export const api = {
   me(): Promise<User> {
     return request<User>("/auth/me");
   },
+  updateMe(input: { name?: string; phone?: string; avatar?: string }): Promise<User> {
+    return request<User>("/auth/me", { method: "PATCH", body: input });
+  },
 
   // ── Public Trips ─────────────────────────────────────────────────────────
   trips: {
@@ -192,6 +195,70 @@ export const api = {
     },
   },
 
+  // ── Public Departures ──────────────────────────────────────────────────
+  departures: {
+    list(tripId?: string): Promise<TripDeparture[]> {
+      return request<TripDeparture[]>(`/departures${tripId ? `?tripId=${tripId}` : ""}`);
+    },
+  },
+
+  // ── Bookings (auth required) ────────────────────────────────────────────
+  bookings: {
+    list(): Promise<Booking[]> {
+      return request<Booking[]>("/bookings");
+    },
+    get(id: string): Promise<Booking> {
+      return request<Booking>(`/bookings/${id}`);
+    },
+    create(input: {
+      tripId: string;
+      departureId: string;
+      travellers: Array<Record<string, unknown>>;
+      couponCode?: string;
+      notes?: string;
+    }): Promise<Booking> {
+      return request<Booking>("/bookings", { method: "POST", body: input });
+    },
+    /** Preview price (coupon-aware) + upcoming departures for a trip. */
+    price(input: { tripId: string; travellersCount: number; couponCode?: string }): Promise<{
+      price: PriceCalculation;
+      departures: TripDeparture[];
+    }> {
+      return request("/bookings/price", { method: "POST", body: input });
+    },
+    cancel(id: string, reason: string): Promise<Booking> {
+      return request<Booking>(`/bookings/${id}/cancel`, { method: "PATCH", body: { reason } });
+    },
+  },
+
+  // ── Reviews ─────────────────────────────────────────────────────────────
+  reviews: {
+    listByTrip(tripIdOrSlug: string): Promise<Review[]> {
+      return request<Review[]>(`/trips/${tripIdOrSlug}/reviews`);
+    },
+    /** Create a verified review — requires a COMPLETED booking for the trip. */
+    create(
+      tripIdOrSlug: string,
+      input: { rating: number; title?: string; content: string; images?: string[]; bookingId?: string }
+    ): Promise<Review> {
+      return request<Review>(`/trips/${tripIdOrSlug}/reviews`, { method: "POST", body: input });
+    },
+    /** My completed bookings that have no review yet (post-trip popup). */
+    pending(): Promise<Booking[]> {
+      return request<Booking[]>("/reviews/pending");
+    },
+  },
+
+  // ── Public coupon suggestions (admin-promoted codes) ───────────────────
+  coupons: {
+    /** Codes the admin chose to suggest publicly; safe fields only. */
+    public(): Promise<
+      Pick<Coupon, "code" | "description" | "type" | "value" | "minimumAmount" | "maximumDiscount">[]
+    > {
+      return request(`/coupons/public`);
+    },
+  },
+
   // ── Public Enquiry Leads ──────────────────────────────────────────────
   leads: {
     submit(input: {
@@ -209,6 +276,17 @@ export const api = {
 
   // ── Media (Cloudinary) ────────────────────────────────────────────────
   media: {
+    /** Admin-only: page through assets stored under editmytrips/<folder>. */
+    list(
+      folder?: string,
+      cursor?: string
+    ): Promise<{ data: { publicId: string; url: string; width?: number; height?: number; format?: string; bytes?: number; createdAt?: string }[]; meta?: { nextCursor?: string | null } }> {
+      const sp = new URLSearchParams();
+      if (folder) sp.set("folder", folder);
+      if (cursor) sp.set("cursor", cursor);
+      const qs = sp.toString();
+      return request(`/media${qs ? `?${qs}` : ""}`);
+    },
     async upload(file: File, folder = "general"): Promise<{ url: string; publicId: string }> {
       const fd = new FormData();
       fd.append("file", file);

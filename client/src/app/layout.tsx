@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
+import { ThemeProvider, themeInitScript } from "@/components/theme/ThemeProvider";
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -18,8 +19,13 @@ export const metadata: Metadata = {
     "India's most experience-driven travel platform. Handcrafted trips, curated destinations, and memories you'll actually remember.",
   metadataBase: new URL("https://editmytrips.com"),
   icons: {
-    icon: "/favicon.png",
-    apple: "/favicon.png",
+    icon: [
+      { url: "/favicon.png", type: "image/png", sizes: "256x256" },
+      { url: "/icon-192.png", type: "image/png", sizes: "192x192" },
+      { url: "/icon-512.png", type: "image/png", sizes: "512x512" },
+      { url: "/favicon.ico", sizes: "16x16 32x32 48x48", type: "image/x-icon" },
+    ],
+    apple: "/apple-touch-icon.png",
   },
   openGraph: {
     type: "website",
@@ -40,12 +46,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${geistMono.variable} h-full`} data-scroll-behavior="smooth">
-      <head>
-        <link rel="icon" href="/favicon.png" type="image/png" />
-      </head>
-      <body className="min-h-full flex flex-col bg-[#111] text-white">
-        <Providers>{children}</Providers>
+    <html lang="en" className={`${geistMono.variable} h-full`} data-scroll-behavior="smooth" suppressHydrationWarning>
+      <head />
+      <body className="min-h-full flex flex-col bg-background text-foreground">
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+        <ThemeProvider>
+          <Providers>{children}</Providers>
+        </ThemeProvider>
       </body>
     </html>
   );

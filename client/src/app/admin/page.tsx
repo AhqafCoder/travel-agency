@@ -78,7 +78,7 @@ export default function AdminDashboardPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard
           label="Total Revenue"
-          value={`$${stats?.revenue.total.toLocaleString() || "0"}`}
+          value={`₹${(stats?.revenue.total ?? 0).toLocaleString("en-IN")}`}
           icon={DollarSign}
           trend={stats?.revenue.trend || 0}
         />
@@ -128,7 +128,7 @@ export default function AdminDashboardPage() {
                     axisLine={false}
                     tickLine={false}
                     tick={{ fill: '#64748b' }}
-                    tickFormatter={(value) => `$${value}`}
+                    tickFormatter={(value) => `₹${value.toLocaleString("en-IN")}`}
                   />
                   <Tooltip 
                     contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
@@ -164,7 +164,7 @@ export default function AdminDashboardPage() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-semibold">${booking.total}</p>
+                    <p className="text-sm font-semibold">₹{booking.total.toLocaleString("en-IN")}</p>
                     <p className="text-xs text-emerald-600 font-medium">{booking.bookingStatus}</p>
                   </div>
                 </div>

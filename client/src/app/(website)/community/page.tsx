@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MOCK_REVIEWS, MOCK_CUSTOMERS, MOCK_STORIES } from "@/lib/mock-data";
+import { listRecentApprovedReviews, listCommunityTravellers, listStoriesPublic } from "@/server/services/public.service";
 import { Review } from "@/types";
 
 export const metadata: Metadata = {
@@ -45,10 +45,12 @@ function Stars({ rating }: { rating: number }) {
   );
 }
 
-export default function CommunityPage() {
-  const reviews = MOCK_REVIEWS.filter((r) => r.status === "APPROVED").slice(0, 6);
-  const travellers = MOCK_CUSTOMERS.slice(0, 6);
-  const story = MOCK_STORIES[0];
+export const dynamic = "force-dynamic";
+
+export default async function CommunityPage() {
+  const reviews = (await listRecentApprovedReviews(6)).slice(0, 6);
+  const travellers = (await listCommunityTravellers(6)).slice(0, 6);
+  const story = (await listStoriesPublic())[0];
 
   return (
     <div className="flex flex-col min-h-screen bg-background">

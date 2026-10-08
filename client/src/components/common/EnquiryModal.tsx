@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { api } from "@/lib/api";
+import { lockScroll, unlockScroll } from "@/lib/scroll-lock";
 import {
   X,
   User,
@@ -26,14 +27,14 @@ interface EnquiryModalProps {
 }
 
 const inputBase =
-  "w-full rounded-lg bg-white/[0.04] border border-white/10 py-2.5 pl-10 pr-3 text-sm text-white " +
-  "placeholder:text-white/30 outline-none transition " +
-  "hover:border-white/20 focus:border-white/50 focus:bg-white/[0.06] focus:ring-4 focus:ring-white/10";
+  "w-full rounded-lg bg-muted/40 border border-border py-2.5 pl-10 pr-3 text-sm text-foreground " +
+  "placeholder:text-muted-foreground/60 outline-none transition " +
+  "hover:border-foreground/20 focus:border-foreground/50 focus:bg-muted/60 focus:ring-4 focus:ring-foreground/10";
 
 const iconBase =
-  "pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40";
+  "pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground";
 
-const labelBase = "mb-1 block text-xs font-medium text-white/70";
+const labelBase = "mb-1 block text-xs font-medium text-muted-foreground";
 
 export function EnquiryModal({
   isOpen,
@@ -84,11 +85,10 @@ export function EnquiryModal({
     if (!isOpen) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     document.addEventListener("keydown", onKey);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    lockScroll();
     return () => {
       document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prev;
+      unlockScroll();
     };
   }, [isOpen, onClose]);
 
@@ -130,52 +130,52 @@ export function EnquiryModal({
       aria-labelledby="enquiry-title"
     >
       <div
-        className={`relative grid w-full max-w-3xl max-h-[92vh] overflow-y-auto rounded-2xl bg-[#111] text-white
-          border border-white/10 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.9)] md:grid-cols-[15rem_1fr]
+        className={`relative grid w-full max-w-3xl max-h-[92vh] overflow-y-auto rounded-2xl bg-card text-foreground
+          border border-border shadow-[0_30px_80px_-20px_rgba(0,0,0,0.9)] md:grid-cols-[15rem_1fr]
           transition-all duration-300 ease-out motion-reduce:transition-none
           ${show ? "translate-y-0 scale-100 opacity-100" : "translate-y-4 scale-[0.97] opacity-0"}`}
       >
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-foreground/30 to-transparent" />
 
         {/* Close */}
         <button
           type="button"
           onClick={onClose}
           aria-label="Close enquiry form"
-          className="absolute right-3 top-3 z-10 grid h-8 w-8 place-items-center rounded-full text-white/50 transition
-            hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+          className="absolute right-3 top-3 z-10 grid h-8 w-8 place-items-center rounded-full text-muted-foreground transition
+            hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <X className="h-4 w-4" />
         </button>
 
         {/* ---------- Left info panel ---------- */}
-        <aside className="flex flex-col justify-between gap-6 border-b border-white/10 bg-white/[0.03] p-6 md:border-b-0 md:border-r">
+        <aside className="flex flex-col justify-between gap-6 border-b border-border bg-muted/30 p-6 md:border-b-0 md:border-r">
           <div>
             <h2 id="enquiry-title" className="text-xl font-semibold leading-tight tracking-tight">
               Plan your trip with us
             </h2>
-            <p className="mt-2 text-sm leading-relaxed text-white/55">
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
               Tell us where and when. We'll send back a plan built around you.
             </p>
           </div>
 
           <div className="hidden md:block">
-            <p className="mb-3 text-xs font-medium text-white/45">Why choose us</p>
-            <ul className="space-y-3 text-sm text-white/80">
+            <p className="mb-3 text-xs font-medium text-muted-foreground">Why choose us</p>
+            <ul className="space-y-3 text-sm text-foreground/90">
               <li className="flex items-center gap-3">
-                <Route className="h-4 w-4 shrink-0 text-white/50" />
+                <Route className="h-4 w-4 shrink-0 text-muted-foreground" />
                 Custom itinerary
               </li>
               <li className="flex items-center gap-3">
-                <BadgeCheck className="h-4 w-4 shrink-0 text-white/50" />
+                <BadgeCheck className="h-4 w-4 shrink-0 text-muted-foreground" />
                 Government approved
               </li>
               <li className="flex items-center gap-3">
-                <Headset className="h-4 w-4 shrink-0 text-white/50" />
+                <Headset className="h-4 w-4 shrink-0 text-muted-foreground" />
                 24/7 concierge
               </li>
               <li className="flex items-center gap-3">
-                <Award className="h-4 w-4 shrink-0 text-white/50" />
+                <Award className="h-4 w-4 shrink-0 text-muted-foreground" />
                 Trusted since 2016
               </li>
             </ul>
@@ -185,17 +185,17 @@ export function EnquiryModal({
         {/* ---------- Right side ---------- */}
         {submitted ? (
           <div className="flex min-h-[20rem] flex-col items-center justify-center px-8 py-10 text-center">
-            <div className="mb-4 grid h-14 w-14 place-items-center rounded-full bg-white/[0.06] ring-1 ring-white/15">
-              <CheckCircle2 className="h-7 w-7 text-white" />
+            <div className="mb-4 grid h-14 w-14 place-items-center rounded-full bg-muted ring-1 ring-border">
+              <CheckCircle2 className="h-7 w-7 text-foreground" />
             </div>
             <h3 className="text-xl font-semibold tracking-tight">Enquiry sent</h3>
-            <p className="mt-2 max-w-xs text-sm leading-relaxed text-white/60">
+            <p className="mt-2 max-w-xs text-sm leading-relaxed text-muted-foreground">
               Thanks, {name.split(" ")[0]}. Our team will contact you about {destination} shortly.
             </p>
             <button
               onClick={onClose}
-              className="mt-6 rounded-lg bg-white px-7 py-2.5 text-sm font-semibold text-black transition
-                hover:bg-white/90 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/30"
+              className="mt-6 rounded-lg bg-primary px-7 py-2.5 text-sm font-semibold text-primary-foreground transition
+                hover:bg-primary/90 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring"
             >
               Done
             </button>
@@ -240,7 +240,7 @@ export function EnquiryModal({
                     inputMode="tel"
                     required
                     autoComplete="tel"
-                    placeholder="+91 98765 43210"
+                    placeholder="+91 87555 77146"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     className={inputBase}
@@ -299,13 +299,13 @@ export function EnquiryModal({
 
               <div>
                 <span className={labelBase}>Travellers</span>
-                <div className="flex h-[42px] items-center justify-between rounded-lg border border-white/10 bg-white/[0.04] px-1">
+                <div className="flex h-[42px] items-center justify-between rounded-lg border border-border bg-muted/40 px-1">
                   <button
                     type="button"
                     aria-label="Decrease travellers"
                     onClick={() => setPeople((p) => Math.max(1, p - 1))}
                     disabled={people <= 1}
-                    className="grid h-8 w-8 place-items-center rounded-md text-white/70 transition hover:bg-white/10 hover:text-white
+                    className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground transition hover:bg-muted hover:text-foreground
                       disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent"
                   >
                     <Minus className="h-4 w-4" />
@@ -317,7 +317,7 @@ export function EnquiryModal({
                     type="button"
                     aria-label="Increase travellers"
                     onClick={() => setPeople((p) => Math.min(50, p + 1))}
-                    className="grid h-8 w-8 place-items-center rounded-md text-white/70 transition hover:bg-white/10 hover:text-white"
+                    className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground transition hover:bg-muted hover:text-foreground"
                   >
                     <Plus className="h-4 w-4" />
                   </button>
@@ -326,7 +326,7 @@ export function EnquiryModal({
 
               <div className="sm:col-span-2">
                 <label htmlFor="enq-notes" className={labelBase}>
-                  Special requests <span className="font-normal text-white/40">(optional)</span>
+                  Special requests <span className="font-normal text-muted-foreground">(optional)</span>
                 </label>
                 <textarea
                   id="enq-notes"
@@ -334,9 +334,9 @@ export function EnquiryModal({
                   placeholder="Budget, hotel preferences, activities..."
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  className="w-full resize-none rounded-lg border border-white/10 bg-white/[0.04] px-3.5 py-2.5 text-sm text-white
-                    placeholder:text-white/30 outline-none transition hover:border-white/20
-                    focus:border-white/50 focus:bg-white/[0.06] focus:ring-4 focus:ring-white/10"
+                  className="w-full resize-none rounded-lg border border-border bg-muted/40 px-3.5 py-2.5 text-sm text-foreground
+                    placeholder:text-muted-foreground/60 outline-none transition hover:border-foreground/20
+                    focus:border-foreground/50 focus:bg-muted/60 focus:ring-4 focus:ring-foreground/10"
                 />
               </div>
             </div>
@@ -344,9 +344,9 @@ export function EnquiryModal({
             <button
               type="submit"
               disabled={loading}
-              className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg bg-white py-2.5 text-sm font-semibold text-black
-                transition hover:bg-white/90 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70
-                focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/30"
+              className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-2.5 text-sm font-semibold text-primary-foreground
+                transition hover:bg-primary/90 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70
+                focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring"
             >
               {loading ? (
                 <>

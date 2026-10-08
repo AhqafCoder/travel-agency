@@ -18,9 +18,13 @@ import {
 } from "lucide-react";
 import { BookingWidget } from "@/components/booking/BookingWidget";
 import { CaptainCard } from "@/components/travel/CaptainCard";
-import { getTripBySlug, getTripReviews, formatPrice } from "@/lib/mock-data";
+import { getTripBySlugOrId, listApprovedReviews, getUpcomingDepartures } from "@/server/services/public.service";
+import { formatPrice } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { DIFFICULTY_COLORS, SITE } from "@/lib/constants";
+
+// Live DB data (seats, prices, views) — always render fresh.
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
@@ -28,7 +32,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const trip = getTripBySlug(slug);
+  const trip = await getTripBySlugOrId(slug);
   if (!trip) return { title: "Trip Not Found" };
   return {
     title: `${trip.title} | EditMyTrips`,
@@ -47,10 +51,11 @@ export default async function TripDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const trip = getTripBySlug(slug);
+  const trip = await getTripBySlugOrId(slug);
   if (!trip) return notFound();
 
-  const reviews = getTripReviews(trip._id);
+  const reviews = await listApprovedReviews(trip._id);
+  const departures = await getUpcomingDepartures(trip._id);
   const price = trip.discountedPrice || trip.basePrice;
   const hasDiscount =
     trip.discountedPrice && trip.discountedPrice < trip.basePrice;
@@ -218,7 +223,7 @@ export default async function TripDetailPage({
                 <div className="space-y-3">
                   {trip.itinerary.map((day) => (
                     <details
-                      key={day._id}
+                      key={day.dayNumber}
                       className="group border border-white/6 rounded-xl bg-card overflow-hidden"
                       open={day.dayNumber === 1}
                     >
@@ -515,7 +520,7 @@ export default async function TripDetailPage({
 
           {/* ── RIGHT: Sticky Booking Sidebar ──────────────────── */}
           <aside className="lg:col-span-1">
-            <BookingWidget trip={trip} />
+            <BookingWidget trip={trip} departures={departures} />
           </aside>
         </div>
       </div>

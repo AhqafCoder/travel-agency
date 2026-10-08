@@ -1,6 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { api, ApiError } from "@/lib/api";
+import { useAuth } from "@/components/auth/AuthContext";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -25,16 +29,13 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { DateSelector } from "@/components/booking/DateSelector";
 import { PriceBreakdown } from "@/components/booking/PriceBreakdown";
-import {
-  formatPrice,
-  getTripDepartures,
-  MOCK_COUPONS,
-} from "@/lib/mock-data";
+import { formatPrice } from "@/lib/utils";
 import type {
   Trip,
   TripDeparture,
   BookingTraveller,
-  Coupon,
+  Booking,
+  PriceCalculation,
 } from "@/types";
 
 /* ------------------------------------------------------------------ */
@@ -161,7 +162,7 @@ function TravellerForm({
         <div className="space-y-1.5">
           <Label className="text-xs">Phone *</Label>
           <Input
-            placeholder="+91 98765 43210"
+            placeholder="+91 87555 77146"
             value={traveller.phone}
             onChange={(e) => update("phone", e.target.value)}
           />
@@ -205,56 +206,101 @@ export function BookingFlow({
   presetDepartureId,
   presetCount,
 }: BookingFlowProps) {
-  const departures = getTripDepartures(trip._id).filter(
-    (d) => d.status === "ACTIVE" && d.availableSeats > 0
+  const { data: departuresData = [] } = useQuery({
+    queryKey: ["departures", trip._id],
+    queryFn: () => api.departures.list(trip._id),
+  });
+  const departures = useMemo(
+    () => departuresData.filter((d) => d.status === "ACTIVE" && d.availableSeats > 0),
+    [departuresData]
   );
 
   const [step, setStep] = useState(1);
   const [selectedDeparture, setSelectedDeparture] =
-    useState<TripDeparture | null>(
-      departures.find((d) => d._id === presetDepartureId) || departures[0] || null
+    useState<TripDeparture | null>(null);
+
+  // Pick the preset (or first) departure once the list arrives.
+  useEffect(() => {
+    if (selectedDeparture || departures.length === 0) return;
+    setSelectedDeparture(
+      departures.find((d) => d._id === presetDepartureId) || departures[0]
     );
+  }, [departures, presetDepartureId, selectedDeparture]);
   const [travellersCount, setTravellersCount] = useState(presetCount || 1);
   const [travellers, setTravellers] = useState<
     Omit<BookingTraveller, "_id" | "bookingId">[]
   >(Array.from({ length: presetCount || 1 }, emptyTraveller));
   const [couponCode, setCouponCode] = useState("");
-  const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
+  const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
+  const [pricePreview, setPricePreview] = useState<PriceCalculation | null>(null);
+  const [applyingCoupon, setApplyingCoupon] = useState(false);
   const [couponError, setCouponError] = useState("");
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [bookingConfirmed, setBookingConfirmed] = useState(false);
   const [confirming, setConfirming] = useState(false);
 
-  /* Derived price values */
-  const pricePerPerson =
-    selectedDeparture?.price || trip.discountedPrice || trip.basePrice;
+  /* Admin-curated coupon suggestions (safe fields only, from /api/coupons/public) */
+  const { data: suggestedCoupons = [] } = useQuery({
+    queryKey: ["suggested-coupons"],
+    queryFn: api.coupons.public,
+  });
+
+  /* Derived price values — server truth when a coupon is applied */
+  const preview =
+    appliedCoupon && pricePreview ? pricePreview : null;
+  const pricePerPerson = preview
+    ? preview.pricePerPerson
+    : selectedDeparture?.price || trip.discountedPrice || trip.basePrice;
   const subtotal = pricePerPerson * travellersCount;
+  const discount = preview ? preview.couponDiscount : 0;
+  const tax = preview ? preview.tax : Math.round(subtotal * 0.05);
+  const total = preview ? preview.total : subtotal - discount + tax;
 
-  const discount = useMemo(() => {
-    if (!appliedCoupon) return 0;
-    if (appliedCoupon.type === "FIXED") return Math.min(appliedCoupon.value, subtotal);
-    const pct = (appliedCoupon.value / 100) * subtotal;
-    return Math.min(pct, appliedCoupon.maximumDiscount ?? pct);
-  }, [appliedCoupon, subtotal]);
-
-  const tax = Math.round((subtotal - discount) * 0.05);
-  const total = subtotal - discount + tax;
-
-  /* Coupon application */
-  const applyCoupon = () => {
+  /* Coupon application — validated server-side with exact pricing */
+  const applyCoupon = async () => {
     const code = couponCode.trim().toUpperCase();
-    if (!code) return;
-    const coupon = MOCK_COUPONS.find(
-      (c) => c.code === code && c.active && subtotal >= c.minimumAmount
-    );
-    if (!coupon) {
-      setCouponError("Invalid coupon or minimum amount not met.");
-      setAppliedCoupon(null);
-      return;
-    }
+    if (!code || applyingCoupon) return;
+    setApplyingCoupon(true);
     setCouponError("");
-    setAppliedCoupon(coupon);
+    try {
+      const { price } = await api.bookings.price({
+        tripId: trip._id,
+        travellersCount,
+        couponCode: code,
+      });
+      setAppliedCoupon(code);
+      setPricePreview(price);
+      toast.success(`Coupon ${code} applied`);
+    } catch (err) {
+      setAppliedCoupon(null);
+      setPricePreview(null);
+      setCouponError(
+        err instanceof ApiError ? err.message : "Could not apply coupon. Try again."
+      );
+    } finally {
+      setApplyingCoupon(false);
+    }
   };
+
+  // Keep the preview exact when the traveller count changes.
+  useEffect(() => {
+    if (!appliedCoupon) return;
+    let stale = false;
+    api.bookings
+      .price({ tripId: trip._id, travellersCount, couponCode: appliedCoupon })
+      .then(({ price }) => {
+        if (!stale) setPricePreview(price);
+      })
+      .catch(() => {
+        if (stale) return;
+        setAppliedCoupon(null);
+        setPricePreview(null);
+        setCouponError("Coupon is no longer valid for this order.");
+      });
+    return () => {
+      stale = true;
+    };
+  }, [appliedCoupon, travellersCount, trip._id]);
 
   /* Traveller list sync with count */
   const updateTravellersCount = (newCount: number) => {
@@ -291,19 +337,40 @@ export function BookingFlow({
         t.emergencyPhone.trim().length >= 6
     );
 
-  /* Confirmation */
-  const confirmBooking = () => {
+  /* Confirmation — creates a real booking (seat-reserving, coupon-aware) */
+  const { status: authStatus } = useAuth();
+  const [confirmedBooking, setConfirmedBooking] = useState<Booking | null>(null);
+
+  const confirmBooking = async () => {
+    if (!selectedDeparture || confirming) return;
+    if (authStatus !== "authenticated") {
+      window.dispatchEvent(new CustomEvent("open-login-modal"));
+      toast.error("Please log in to complete your booking");
+      return;
+    }
     setConfirming(true);
-    setTimeout(() => {
-      setConfirming(false);
+    try {
+      const booking = await api.bookings.create({
+        tripId: trip._id,
+        departureId: selectedDeparture._id,
+        travellers,
+        couponCode: appliedCoupon ?? undefined,
+      });
+      setConfirmedBooking(booking);
       setBookingConfirmed(true);
-    }, 2000);
+      window.scrollTo({ top: 0, behavior: "instant" });
+    } catch (err) {
+      toast.error(
+        err instanceof ApiError ? err.message : "Booking failed. Please try again."
+      );
+    } finally {
+      setConfirming(false);
+    }
   };
 
   /* ── Confirmation screen ──────────────────────────── */
 
-  if (bookingConfirmed) {
-    const bookingNumber = `EMT${10000 + Math.floor(Math.random() * 1000)}`;
+  if (bookingConfirmed && confirmedBooking) {
     return (
       <div className="flex flex-col min-h-screen bg-background">
         <div className="flex-1 flex items-center justify-center py-16 px-4">
@@ -322,7 +389,7 @@ export function BookingFlow({
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Booking ID</span>
                 <span className="font-mono font-semibold text-foreground">
-                  {bookingNumber}
+                  {confirmedBooking.bookingNumber}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
@@ -333,12 +400,12 @@ export function BookingFlow({
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Travellers</span>
-                <span className="text-foreground">{travellersCount}</span>
+                <span className="text-foreground">{confirmedBooking.travellersCount}</span>
               </div>
               <Separator />
               <div className="flex justify-between font-semibold">
                 <span>Total Paid</span>
-                <span className="text-teal">{formatPrice(total)}</span>
+                <span className="text-teal">{formatPrice(confirmedBooking.total)}</span>
               </div>
             </div>
             <div className="flex flex-col gap-3">
@@ -539,6 +606,7 @@ export function BookingFlow({
                         variant="outline"
                         onClick={() => {
                           setAppliedCoupon(null);
+                          setPricePreview(null);
                           setCouponCode("");
                         }}
                         size="sm"
@@ -546,25 +614,43 @@ export function BookingFlow({
                         Remove
                       </Button>
                     ) : (
-                      <Button onClick={applyCoupon} size="sm">
-                        Apply
+                      <Button onClick={applyCoupon} disabled={applyingCoupon} size="sm">
+                        {applyingCoupon ? "Checking…" : "Apply"}
                       </Button>
                     )}
                   </div>
                   {couponError && (
                     <p className="text-xs text-red-600 mt-2">{couponError}</p>
                   )}
-                  {appliedCoupon && (
+                  {appliedCoupon && discount > 0 && (
                     <p className="text-xs text-teal mt-2 font-medium">
-                      ✓ {appliedCoupon.code} applied —
-                      {appliedCoupon.type === "FIXED"
-                        ? ` ₹${appliedCoupon.value} off`
-                        : ` ${appliedCoupon.value}% off (max ₹${appliedCoupon.maximumDiscount})`}
+                      ✓ {appliedCoupon} applied — {formatPrice(discount)} off
                     </p>
                   )}
-                  <p className="text-[11px] text-muted-foreground mt-2">
-                    Try: WELCOME500 · ADVENTURE10 · MONSOON2026
-                  </p>
+                  {suggestedCoupons.length > 0 ? (
+                    <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+                      <span className="text-[11px] text-muted-foreground">Offers:</span>
+                      {suggestedCoupons.map((c) => (
+                        <button
+                          key={c.code}
+                          type="button"
+                          disabled={!!appliedCoupon}
+                          onClick={() => {
+                            setCouponCode(c.code);
+                            setCouponError("");
+                          }}
+                          title={c.description || undefined}
+                          className="rounded-full border border-border/50 bg-muted/50 px-2 py-0.5 text-[11px] font-mono font-semibold text-foreground/80 transition hover:border-brand/50 hover:text-brand disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          {c.code}
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-[11px] text-muted-foreground mt-2">
+                      Have a code? Enter it above — valid codes are shared by our team.
+                    </p>
+                  )}
                 </div>
 
                 {/* Terms */}
@@ -594,8 +680,9 @@ export function BookingFlow({
                 <div className="rounded-xl border border-dashed border-border/50 bg-muted/30 p-8 text-center">
                   <CreditCard className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
                   <p className="text-sm text-muted-foreground mb-4">
-                    Razorpay payment integration will be enabled once the backend
-                    is live.
+                    Online payment (Razorpay) is coming soon. Confirming now
+                    reserves your seats — our team will reach out to collect
+                    payment.
                   </p>
                   <Button
                     size="lg"
@@ -607,7 +694,7 @@ export function BookingFlow({
                   >
                     {confirming
                       ? "Confirming booking…"
-                      : `Pay ${formatPrice(total)}`}
+                      : `Confirm booking · ${formatPrice(total)}`}
                   </Button>
                 </div>
               </section>
@@ -707,7 +794,7 @@ export function BookingFlow({
                     pricePerPerson={pricePerPerson}
                     travellersCount={travellersCount}
                     discount={discount}
-                    couponCode={appliedCoupon?.code}
+                    couponCode={appliedCoupon ?? undefined}
                     tax={tax}
                     total={total}
                   />

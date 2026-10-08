@@ -16,6 +16,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useAuth } from "@/components/auth/AuthContext";
+import { isAdminRole } from "@/lib/utils";
 import { ApiError } from "@/lib/api";
 
 interface AuthFormProps {
@@ -50,12 +51,16 @@ export function AuthForm({
     const phone = String(form.get("phone") ?? "").trim();
 
     try {
+      let loggedIn;
       if (mode === "register") {
-        await register({ name, email, password, phone: phone || undefined });
+        loggedIn = await register({ name, email, password, phone: phone || undefined });
       } else {
-        await login(email, password);
+        loggedIn = await login(email, password);
       }
-      router.push("/profile");
+      // Staff land on the admin dashboard, customers on the homepage.
+      // ?redirect= (used by the admin guard) wins when present.
+      const redirect = new URLSearchParams(window.location.search).get("redirect");
+      router.push(redirect || (isAdminRole(loggedIn.role) ? "/admin" : "/"));
     } catch (err) {
       setError(
         err instanceof ApiError
@@ -109,7 +114,7 @@ export function AuthForm({
                 id="phone"
                 name="phone"
                 type="tel"
-                placeholder="+91 98765 43210"
+                placeholder="+91 87555 77146"
                 autoComplete="tel"
               />
             </div>

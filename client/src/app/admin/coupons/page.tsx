@@ -71,15 +71,25 @@ export default function AdminCouponsPage() {
       header: "Status",
       sortable: true,
       accessor: (coupon) => (
-        <span
-          className={`rounded-full px-2.5 py-1 text-xs font-medium ${
-            coupon.active
-              ? "bg-emerald-500/15 text-emerald-400"
-              : "bg-muted text-muted-foreground"
-          }`}
-        >
-          {coupon.active ? "Active" : "Inactive"}
-        </span>
+        <div className="flex items-center gap-1.5">
+          <span
+            className={`rounded-full px-2.5 py-1 text-xs font-medium ${
+              coupon.active
+                ? "bg-emerald-500/15 text-emerald-400"
+                : "bg-muted text-muted-foreground"
+            }`}
+          >
+            {coupon.active ? "Active" : "Inactive"}
+          </span>
+          {coupon.promoted && (
+            <span
+              title="Suggested publicly on the booking page"
+              className="rounded-full bg-orange-500/15 px-2 py-1 text-xs font-medium text-orange-400"
+            >
+              Suggested
+            </span>
+          )}
+        </div>
       ),
     },
   ];

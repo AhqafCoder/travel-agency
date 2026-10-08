@@ -1,12 +1,16 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { ExperienceCard } from "@/components/travel/ExperienceCard";
-import { MOCK_EXPERIENCES } from "@/lib/mock-data";
+import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
 export default function ExperiencesPage() {
-  const allExperiences = MOCK_EXPERIENCES.filter((e) => e.status === "ACTIVE");
+  const { data: allExperiences = [] } = useQuery({
+    queryKey: ["experiences"],
+    queryFn: () => api.experiences.list(),
+  });
 
   const categories = useMemo(() => {
     const cats = Array.from(new Set(allExperiences.map((e) => e.category)));

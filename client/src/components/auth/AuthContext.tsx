@@ -22,13 +22,13 @@ import {
 interface AuthContextValue {
   user: User | null;
   status: "loading" | "authenticated" | "unauthenticated";
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<User>;
   register: (input: {
     name: string;
     email: string;
     password: string;
     phone?: string;
-  }) => Promise<void>;
+  }) => Promise<User>;
   logout: () => void;
 }
 
@@ -85,6 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setStoredUser(loggedIn);
     setUser(loggedIn);
     setStatus("authenticated");
+    return loggedIn;
   }, []);
 
   const register = useCallback(
@@ -99,6 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setStoredUser(created);
       setUser(created);
       setStatus("authenticated");
+      return created;
     },
     []
   );

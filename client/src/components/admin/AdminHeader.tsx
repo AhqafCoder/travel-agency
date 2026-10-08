@@ -2,7 +2,8 @@
 
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Bell } from "lucide-react";
+import { Bell, Globe } from "lucide-react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { getAdminPageTitle } from "./admin-nav";
 
@@ -31,6 +32,13 @@ export function AdminHeader({ title, description, actions }: AdminHeaderProps) {
 
       <div className="ml-auto flex items-center gap-2">
         {actions}
+        <Link
+          href="/"
+          className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        >
+          <Globe className="h-3.5 w-3.5" />
+          View Website
+        </Link>
         <button
           aria-label="Notifications"
           className="relative flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
