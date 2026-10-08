@@ -3,7 +3,7 @@ import path from "path";
 
 const nextConfig: NextConfig = {
   // Native/server-only packages must not be bundled by Turbopack
-  serverExternalPackages: ["mongoose", "bcryptjs", "jsonwebtoken", "cloudinary", "sanitize-html"],
+  serverExternalPackages: ["mongoose", "bcryptjs", "jsonwebtoken", "cloudinary"],
   // The monorepo root (client/ + server/) is one level above this app;
   // without this, Turbopack picks up stray lockfiles in home dir and warns.
   turbopack: {
