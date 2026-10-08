@@ -16,7 +16,7 @@ import type {
   User as UserDTO,
 } from "@/types";
 import { connectDB } from "@/server/db/mongoose";
-import DOMPurify from "isomorphic-dompurify";
+import sanitizeHtml from "sanitize-html";
 
 /** Server components bypass route handlers — make sure Mongo is connected. */
 async function ensureDB() {
@@ -270,7 +270,7 @@ export async function getStoryBySlugPublic(
   if (countView) Story.updateOne({ _id: story._id }, { $inc: { views: 1 } }).exec();
   const author = story.authorId ? await User.findById(story.authorId).select("name avatar").lean() : null;
   // Story content is rich HTML rendered with dangerouslySetInnerHTML — sanitize on the way out.
-  return plain<StoryDTO>({ ...story, author, content: DOMPurify.sanitize(story.content ?? "") });
+  return plain<StoryDTO>({ ...story, author, content: sanitizeHtml(story.content ?? "") });
 }
 
 /** Approved reviews for a trip (newest first) with reviewer name/avatar. */
