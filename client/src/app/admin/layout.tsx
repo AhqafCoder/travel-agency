@@ -40,9 +40,9 @@ export default function AdminLayout({
         } as React.CSSProperties}
       >
         <AppSidebar />
-        <SidebarInset className="min-w-0">
+        <SidebarInset className="min-w-0 bg-[#f6f7f9]">
           <AdminHeader />
-          <main className="flex-1 overflow-x-hidden p-4 md:p-6">
+          <main className="flex-1 overflow-x-hidden p-4 md:p-7">
             <div className="mx-auto max-w-7xl">{children}</div>
           </main>
         </SidebarInset>

@@ -42,7 +42,7 @@ export async function reserveSeats(
     {
       _id: departureId,
       availableSeats: { $gte: seats },
-      status: { $in: [DepartureStatus.ACTIVE, DepartureStatus.DRAFT] },
+      status: DepartureStatus.ACTIVE,
     },
     { $inc: { availableSeats: -seats, bookedSeats: seats } },
     { new: true }

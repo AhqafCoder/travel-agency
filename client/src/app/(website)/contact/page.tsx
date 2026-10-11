@@ -40,7 +40,12 @@ const CONTACT_CARDS = [
   },
 ];
 
-export default function ContactPage() {
+export default async function ContactPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ destination?: string }>;
+}) {
+  const { destination } = await searchParams;
   return (
     <div className="flex flex-col min-h-screen bg-background">
       {/* Header */}
@@ -116,7 +121,7 @@ export default function ContactPage() {
           </div>
 
           <div className="lg:col-span-3 rounded-3xl border border-border/60 bg-card p-6 sm:p-8">
-            <EnquiryForm variant="light" />
+            <EnquiryForm variant="light" defaultDestination={destination ?? ""} />
           </div>
         </div>
       </section>

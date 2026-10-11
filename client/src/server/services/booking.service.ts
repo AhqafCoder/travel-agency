@@ -52,11 +52,23 @@ export async function createBooking(input: CreateBookingInput) {
   }
 
   const travellersCount = travellers.length;
-  const pricePerPerson = trip.discountedPrice ?? trip.basePrice;
 
-  // Atomic seat reservation — fails if not enough seats left.
-  const departure = await reserveSeats(departureId, travellersCount);
-  if (!departure) {
+  // Departure-specific price wins when the admin set one; otherwise trip price.
+  const departureDoc = await Departure.findById(departureId).select("price");
+  if (!departureDoc) {
+    const err = new Error("Departure not found") as Error & { status: number };
+    err.status = 404;
+    throw err;
+  }
+  const pricePerPerson = departureDoc.price > 0 ? departureDoc.price : trip.discountedPrice ?? trip.basePrice;
+
+  // Validate the coupon and compute the full price BEFORE reserving seats —
+  // otherwise a failed coupon leaves reserved seats stranded with no booking.
+  const price = await calculatePrice({ pricePerPerson, travellersCount, couponCode, tripId: String(trip._id) });
+
+  // Atomic seat reservation — ACTIVE departures only, fails if not enough seats.
+  const reserved = await reserveSeats(departureId, travellersCount);
+  if (!reserved) {
     const err = new Error(
       "Not enough seats available on this departure"
     ) as Error & { status: number };
@@ -64,9 +76,9 @@ export async function createBooking(input: CreateBookingInput) {
     throw err;
   }
 
-  const price = await calculatePrice({ pricePerPerson, travellersCount, couponCode, tripId: String(trip._id) });
-
-  const booking = await Booking.create({
+  let booking;
+  try {
+    booking = await Booking.create({
     bookingNumber: generateBookingNumber(),
     userId,
     tripId,
@@ -80,12 +92,18 @@ export async function createBooking(input: CreateBookingInput) {
     total: price.total,
     paymentStatus: PaymentStatus.PENDING,
     bookingStatus: BookingStatus.PENDING,
-    notes,
-  });
-
-  // Count coupon usage so usageLimit is honoured over time.
-  if (couponCode && price.couponDiscount > 0) {
-    await Coupon.updateOne({ code: couponCode.toUpperCase() }, { $inc: { usedCount: 1 } });
+      notes,
+    });
+    // Count coupon usage so usageLimit is honoured over time.
+    if (couponCode && price.couponDiscount > 0) {
+      await Coupon.updateOne({ code: couponCode.toUpperCase() }, { $inc: { usedCount: 1 } });
+    }
+  } catch (err) {
+    // Persistence failed after seats were taken — give them back.
+    await Departure.findByIdAndUpdate(departureId, {
+      $inc: { availableSeats: travellersCount, bookedSeats: -travellersCount },
+    });
+    throw err;
   }
 
   return booking.populate("tripId departureId");
@@ -127,6 +145,11 @@ export async function cancelBooking(
       bookedSeats: -booking.travellersCount,
     },
   });
+
+  // Give the coupon budget back so it isn't permanently consumed.
+  if (booking.couponCode && booking.discount > 0) {
+    await Coupon.updateOne({ code: booking.couponCode.toUpperCase() }, { $inc: { usedCount: -1 } });
+  }
 
   booking.bookingStatus = BookingStatus.CANCELLED;
   booking.cancelReason = reason;
