@@ -2,9 +2,11 @@ import bcrypt from "bcryptjs";
 import { User } from "@/server/models/User";
 import { signToken } from "@/server/lib/jwt";
 import { ok, fail, body, handle } from "@/server/lib/http";
+import { rateLimit, clientIp } from "@/server/lib/rate-limit";
 
 /** POST /api/auth/login — verify credentials and return a JWT. */
 export const POST = handle(async (req) => {
+  rateLimit(`login:${clientIp(req)}`, 10, 60_000);
   const { email, password } = await body<{ email?: string; password?: string }>(req);
 
   if (!email?.trim() || !password) return fail("Email and password are required", 400);

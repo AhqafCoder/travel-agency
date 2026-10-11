@@ -267,6 +267,7 @@ export function BookingFlow({
         tripId: trip._id,
         travellersCount,
         couponCode: code,
+        departureId: selectedDeparture?._id,
       });
       setAppliedCoupon(code);
       setPricePreview(price);
@@ -274,9 +275,15 @@ export function BookingFlow({
     } catch (err) {
       setAppliedCoupon(null);
       setPricePreview(null);
-      setCouponError(
-        err instanceof ApiError ? err.message : "Could not apply coupon. Try again."
-      );
+      if (err instanceof ApiError && err.status === 401) {
+        // Price preview now requires auth — walk the user to login.
+        window.dispatchEvent(new CustomEvent("open-login-modal"));
+        setCouponError("Please log in to apply coupon codes.");
+      } else {
+        setCouponError(
+          err instanceof ApiError ? err.message : "Could not apply coupon. Try again."
+        );
+      }
     } finally {
       setApplyingCoupon(false);
     }
@@ -287,7 +294,7 @@ export function BookingFlow({
     if (!appliedCoupon) return;
     let stale = false;
     api.bookings
-      .price({ tripId: trip._id, travellersCount, couponCode: appliedCoupon })
+      .price({ tripId: trip._id, travellersCount, couponCode: appliedCoupon, departureId: selectedDeparture?._id })
       .then(({ price }) => {
         if (!stale) setPricePreview(price);
       })
@@ -300,7 +307,7 @@ export function BookingFlow({
     return () => {
       stale = true;
     };
-  }, [appliedCoupon, travellersCount, trip._id]);
+  }, [appliedCoupon, travellersCount, trip._id, selectedDeparture]);
 
   /* Traveller list sync with count */
   const updateTravellersCount = (newCount: number) => {
@@ -664,13 +671,13 @@ export function BookingFlow({
                   />
                   <label htmlFor="terms" className="text-sm text-muted-foreground">
                     I agree to the{" "}
-                    <span className="font-medium text-foreground cursor-pointer">
+                    <Link href="/terms" target="_blank" className="font-medium text-foreground underline-offset-2 hover:underline">
                       Terms &amp; Conditions
-                    </span>{" "}
+                    </Link>{" "}
                     and{" "}
-                    <span className="font-medium text-foreground cursor-pointer">
+                    <Link href="/cancellation-policy" target="_blank" className="font-medium text-foreground underline-offset-2 hover:underline">
                       Cancellation Policy
-                    </span>
+                    </Link>
                     . I understand that free cancellation is available up to 7
                     days before departure.
                   </label>

@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import { User } from "@/server/models/User";
 import { signToken } from "@/server/lib/jwt";
 import { ok, created, fail, body, handle } from "@/server/lib/http";
+import { rateLimit, clientIp } from "@/server/lib/rate-limit";
 
 function publicUser(user: {
   _id: unknown;
@@ -27,6 +28,7 @@ function publicUser(user: {
 
 /** POST /api/auth/register — create an account and return a JWT. */
 export const POST = handle(async (req) => {
+  rateLimit(`register:${clientIp(req)}`, 5, 60_000);
   const { name, email, password, phone } = await body<{
     name?: string;
     email?: string;

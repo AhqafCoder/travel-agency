@@ -131,7 +131,7 @@ export function DataTable<T extends Record<string, any>>({
                   setSearchTerm(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="pl-9 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800"
+                className="h-10 rounded-xl border-black/[0.08] bg-white pl-9 shadow-[0_1px_2px_rgba(16,24,40,0.05)] focus-visible:ring-orange-500/25"
               />
             </div>
           )}
@@ -145,7 +145,7 @@ export function DataTable<T extends Record<string, any>>({
                 setCurrentPage(1);
               }}
             >
-              <SelectTrigger className="w-[150px] bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+              <SelectTrigger className="h-10 w-[150px] rounded-xl border-black/[0.08] bg-white shadow-[0_1px_2px_rgba(16,24,40,0.05)]">
                 <Filter className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
                 <SelectValue placeholder={filter.label} />
               </SelectTrigger>
@@ -165,10 +165,10 @@ export function DataTable<T extends Record<string, any>>({
       </div>
 
       {/* Table Box */}
-      <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden shadow-sm">
+      <div className="overflow-hidden rounded-2xl border border-black/[0.06] bg-white shadow-[0_1px_2px_rgba(16,24,40,0.05)]">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 text-xs font-semibold uppercase tracking-wider text-muted-foreground dark:text-muted-foreground">
+            <thead className="border-b border-black/[0.06] bg-zinc-50/80 text-[11px] font-semibold uppercase tracking-[0.08em] text-zinc-500">
               <tr>
                 {columns.map((col) => (
                   <th
@@ -179,7 +179,7 @@ export function DataTable<T extends Record<string, any>>({
                       <button
                         type="button"
                         onClick={() => handleSort(col.key)}
-                        className="flex items-center gap-1 hover:text-slate-900 dark:hover:text-foreground transition-colors"
+                        className="flex items-center gap-1 transition-colors hover:text-foreground"
                       >
                         {col.header}
                         <ArrowUpDown className="h-3 w-3 opacity-60" />
@@ -212,19 +212,23 @@ export function DataTable<T extends Record<string, any>>({
                 <tr>
                   <td
                     colSpan={columns.length + (actions ? 1 : 0)}
-                    className="px-4 py-12 text-center text-muted-foreground dark:text-muted-foreground"
+                    className="px-4 py-16 text-center"
                   >
-                    No records found.
+                    <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-muted text-muted-foreground">
+                      <Search className="h-5 w-5" />
+                    </div>
+                    <p className="mt-3 text-sm font-medium text-foreground">No records found</p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">Try adjusting your search or filters.</p>
                   </td>
                 </tr>
               ) : (
                 paginatedData.map((item, rowIdx) => (
                   <tr
                     key={item.id || item._id || rowIdx}
-                    className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors"
+                    className="transition-colors hover:bg-orange-50/50"
                   >
                     {columns.map((col) => (
-                      <td key={col.key} className={`px-4 py-3 ${col.className || ""}`}>
+                      <td key={col.key} className={`px-4 py-3.5 align-middle ${col.className || ""}`}>
                         {col.accessor ? col.accessor(item) : item[col.key]}
                       </td>
                     ))}
@@ -243,18 +247,18 @@ export function DataTable<T extends Record<string, any>>({
         </div>
 
         {/* Footer Pagination */}
-        <div className="flex items-center justify-between border-t border-slate-200 dark:border-slate-800 px-4 py-3 bg-slate-50/50 dark:bg-slate-800/30 text-xs text-muted-foreground dark:text-muted-foreground">
+        <div className="flex flex-col gap-3 border-t border-black/[0.06] bg-white px-4 py-3 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <div>
             Showing{" "}
-            <span className="font-semibold text-slate-900 dark:text-slate-100">
+            <span className="font-semibold text-foreground">
               {filteredData.length === 0 ? 0 : (currentPage - 1) * pageSize + 1}
             </span>{" "}
             to{" "}
-            <span className="font-semibold text-slate-900 dark:text-slate-100">
+            <span className="font-semibold text-foreground">
               {Math.min(currentPage * pageSize, filteredData.length)}
             </span>{" "}
             of{" "}
-            <span className="font-semibold text-slate-900 dark:text-slate-100">
+            <span className="font-semibold text-foreground">
               {filteredData.length}
             </span>{" "}
             entries
@@ -270,7 +274,7 @@ export function DataTable<T extends Record<string, any>>({
                   setCurrentPage(1);
                 }}
               >
-                <SelectTrigger className="h-7 w-[65px] bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-xs">
+                <SelectTrigger className="h-7 w-[65px] rounded-lg border-black/[0.08] bg-white text-xs">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

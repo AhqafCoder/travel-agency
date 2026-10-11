@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Experience } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Star } from "lucide-react";
@@ -9,8 +10,12 @@ interface ExperienceCardProps {
 }
 
 export function ExperienceCard({ experience }: ExperienceCardProps) {
+  const destinationName = experience.destination?.name ?? experience.title;
   return (
-    <div className="group relative overflow-hidden rounded-lg border border-border/20 bg-background/50 shadow-sm hover:shadow-md transition-shadow">
+    <Link
+      href={`/contact?destination=${encodeURIComponent(destinationName)}`}
+      className="group relative block overflow-hidden rounded-lg border border-border/20 bg-background/50 shadow-sm hover:shadow-md transition-shadow"
+    >
       {/* Image */}
       <div className="relative w-full h-48">
         <Image
@@ -45,6 +50,6 @@ export function ExperienceCard({ experience }: ExperienceCardProps) {
           <Button size="sm" variant="outline" className="h-8">Book Now</Button>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

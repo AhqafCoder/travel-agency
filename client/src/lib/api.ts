@@ -220,7 +220,7 @@ export const api = {
       return request<Booking>("/bookings", { method: "POST", body: input });
     },
     /** Preview price (coupon-aware) + upcoming departures for a trip. */
-    price(input: { tripId: string; travellersCount: number; couponCode?: string }): Promise<{
+    price(input: { tripId: string; travellersCount: number; couponCode?: string; departureId?: string }): Promise<{
       price: PriceCalculation;
       departures: TripDeparture[];
     }> {

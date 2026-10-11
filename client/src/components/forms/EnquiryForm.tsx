@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 interface EnquiryFormProps {
   /** "dark" renders for the dark footer panel, "light" for light pages. */
   variant?: "dark" | "light";
+  defaultDestination?: string;
   /** Hide the notes field for ultra-compact placements. */
   showNotes?: boolean;
   className?: string;
@@ -18,6 +19,7 @@ const inputBase =
 
 export function EnquiryForm({
   variant = "light",
+  defaultDestination = "",
   showNotes = true,
   className,
 }: EnquiryFormProps) {
@@ -143,6 +145,7 @@ export function EnquiryForm({
           <input
             id="enq-destination"
             name="destination"
+            defaultValue={defaultDestination}
             required
             placeholder="e.g. Ladakh, Kerala, Goa"
             className={inputClass}
