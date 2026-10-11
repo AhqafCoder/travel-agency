@@ -259,18 +259,18 @@ export async function listStoriesPublic(params: { search?: string; category?: st
   return plain<StoryDTO[]>(stories.map((s) => ({ ...s, author: authorMap.get(String(s.authorId)) })));
 }
 
-export async function getStoryBySlugPublic(
-  slug: string,
-  { countView = false }: { countView?: boolean } = {}
-): Promise<StoryDTO | null> {
+export async function getStoryBySlugPublic(slug: string): Promise<StoryDTO | null> {
   await ensureDB();
   const story = await Story.findOne({ slug, status: "PUBLISHED" }).lean();
   if (!story) return null;
-  // Fire-and-forget view counter — only for real page renders, not metadata fetches.
-  if (countView) Story.updateOne({ _id: story._id }, { $inc: { views: 1 } }).exec();
   const author = story.authorId ? await User.findById(story.authorId).select("name avatar").lean() : null;
   // Story content is rich HTML rendered with dangerouslySetInnerHTML — sanitize on the way out.
   return plain<StoryDTO>({ ...story, author, content: DOMPurify.sanitize(story.content ?? "") });
+}
+
+/** Fire-and-forget view counter for a story page render. */
+export function bumpStoryViews(id: string): void {
+  void Story.updateOne({ _id: id }, { $inc: { views: 1 } }).exec().catch(() => {});
 }
 
 /** Approved reviews for a trip (newest first) with reviewer name/avatar. */

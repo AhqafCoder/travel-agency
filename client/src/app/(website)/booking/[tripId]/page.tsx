@@ -1,6 +1,9 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { cache } from "react";
 import { getTripBySlugOrId } from "@/server/services/public.service";
+
+const getTrip = cache(getTripBySlugOrId);
 import { BookingFlow } from "@/components/booking/BookingFlow";
 
 // Live DB data (seats, prices, views) — always render fresh.
@@ -13,7 +16,7 @@ type BookingParams = {
 
 export async function generateMetadata({ params }: BookingParams): Promise<Metadata> {
   const { tripId } = await params;
-  const trip = await getTripBySlugOrId(tripId);
+  const trip = await getTrip(tripId);
   if (!trip) return { title: "Booking Not Found" };
   return {
     title: `Book ${trip.title} | editmytrips`,
@@ -25,7 +28,7 @@ export default async function BookingPage({ params, searchParams }: BookingParam
   const { tripId } = await params;
   const { departure, count } = await searchParams;
 
-  const trip = await getTripBySlugOrId(tripId);
+  const trip = await getTrip(tripId);
   if (!trip) notFound();
 
   const presetCount = count ? Math.max(1, Math.min(12, Number(count) || 1)) : undefined;

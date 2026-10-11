@@ -53,7 +53,7 @@ async function seed() {
 
   // ── users ───────────────────────────────────────────────────────────
   const staff = await User.insertMany([
-    { name: "Ahqaf Ali", email: "ahqaf@editmytrips.com", phone: "+91 90000 00001", role: "SUPER_ADMIN", passwordHash, createdAt: d(-300) },
+    { name: "Arjun", email: "arjun@editmytrips.com", phone: "+91 90000 00001", role: "SUPER_ADMIN", passwordHash, createdAt: d(-300) },
     { name: "Meera Kapoor", email: "meera@editmytrips.com", phone: "+91 90000 00002", role: "EDITOR", passwordHash, createdAt: d(-280) },
     { name: "Priya Ops", email: "priya.ops@editmytrips.com", phone: "+91 90000 00003", role: "OPERATIONS", passwordHash, createdAt: d(-270) },
   ]);
@@ -480,7 +480,7 @@ async function seed() {
     leads: await Lead.countDocuments({}),
   };
   console.log("✅ Seed complete:", counts);
-  console.log(`\n👤 Staff login:    ahqaf@editmytrips.com / ${DEFAULT_PASSWORD}`);
+  console.log(`\n👤 Super Admin:    arjun@editmytrips.com / ${DEFAULT_PASSWORD}`);
   console.log(`👤 Customer logins: rahul.sharma@example.com, vikram.singh@example.com, … / ${DEFAULT_PASSWORD}`);
   console.log(`💡 vikram.singh has a COMPLETED, un-reviewed trip → log in as him to see the post-trip review popup.\n`);
 }

@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     "Browse all handcrafted trips and adventures across India. Filter by type, difficulty, and destination.",
 };
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export default async function TripsPage() {
   const { data: allTrips } = await listTripsPublic({ pageSize: "50" });

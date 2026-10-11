@@ -33,13 +33,17 @@ const HERO_CATEGORIES = [
   { icon: "🏖️", label: "Beach" },
 ];
 
-export const dynamic = "force-dynamic";
+// Cached at the edge and revalidated every 60s (also refreshed on admin edits).
+// Homepage shows marketing sections only — no per-user or seat data.
+export const revalidate = 60;
 
 export default async function HomePage() {
-  const featuredTrips = (await getFeaturedTripsPublic(3)).slice(0, 3);
-  const trendingTrips = (await getTrendingTripsPublic(6)).slice(0, 6);
-  const reviews       = (await listRecentApprovedReviews(4)).slice(0, 4);
-  const stories       = (await listStoriesPublic({ featured: "true" })).slice(0, 3);
+  const [featuredTrips, trendingTrips, reviews, stories] = await Promise.all([
+    getFeaturedTripsPublic(3),
+    getTrendingTripsPublic(6),
+    listRecentApprovedReviews(4),
+    listStoriesPublic({ featured: "true" }),
+  ]);
 
   return (
     <div className="flex flex-col" style={{ background: "var(--background)", paddingTop: "64px" }}>

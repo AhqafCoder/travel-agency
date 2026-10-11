@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     "Explore India's most spectacular regions — the Himalayas, the beaches, the deserts, and the hidden valleys.",
 };
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export default async function DestinationsPage() {
   const destinations = await listDestinationsPublic();

@@ -14,7 +14,10 @@ export async function connectDB(): Promise<typeof mongoose> {
   if (cached.conn) return cached.conn;
 
   if (!cached.promise) {
-    cached.promise = mongoose.connect(process.env.MONGODB_URI ?? "mongodb://127.0.0.1:27017/editmytrips").then((mongooseInstance) => {
+    cached.promise = mongoose.connect(process.env.MONGODB_URI ?? "mongodb://127.0.0.1:27017/editmytrips", {
+        maxPoolSize: 10,
+        serverSelectionTimeoutMS: 8000,
+      }).then((mongooseInstance) => {
       console.log(`✅ MongoDB connected: ${mongooseInstance.connection.host}/${mongooseInstance.connection.name}`);
       return mongooseInstance;
     });

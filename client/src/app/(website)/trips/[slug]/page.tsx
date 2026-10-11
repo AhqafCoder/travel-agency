@@ -18,7 +18,11 @@ import {
 } from "lucide-react";
 import { BookingWidget } from "@/components/booking/BookingWidget";
 import { CaptainCard } from "@/components/travel/CaptainCard";
+import { cache } from "react";
 import { getTripBySlugOrId, listApprovedReviews, getUpcomingDepartures } from "@/server/services/public.service";
+
+// generateMetadata and the page share one DB query per request.
+const getTrip = cache(getTripBySlugOrId);
 import { formatPrice } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { DIFFICULTY_COLORS, SITE } from "@/lib/constants";
@@ -32,7 +36,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const trip = await getTripBySlugOrId(slug);
+  const trip = await getTrip(slug);
   if (!trip) return { title: "Trip Not Found" };
   return {
     title: `${trip.title} | EditMyTrips`,
@@ -51,11 +55,13 @@ export default async function TripDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const trip = await getTripBySlugOrId(slug);
+  const trip = await getTrip(slug);
   if (!trip) return notFound();
 
-  const reviews = await listApprovedReviews(trip._id);
-  const departures = await getUpcomingDepartures(trip._id);
+  const [reviews, departures] = await Promise.all([
+    listApprovedReviews(trip._id),
+    getUpcomingDepartures(trip._id),
+  ]);
   const price = trip.discountedPrice || trip.basePrice;
   const hasDiscount =
     trip.discountedPrice && trip.discountedPrice < trip.basePrice;
