@@ -6,7 +6,10 @@ import { Calendar, Clock, Eye, ArrowLeft, ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { getStoryBySlugPublic, listStoriesPublic } from "@/server/services/public.service";
+import { cache } from "react";
+import { getStoryBySlugPublic, listStoriesPublic, bumpStoryViews } from "@/server/services/public.service";
+
+const getStory = cache(getStoryBySlugPublic);
 import { format } from "date-fns";
 
 // Live DB data (seats, prices, views) — always render fresh.
@@ -28,8 +31,9 @@ export async function generateMetadata({
 
 export default async function StoryDetailPage({ params }: StoryParams) {
   const { slug } = await params;
-  const story = await getStoryBySlugPublic(slug, { countView: true });
+  const story = await getStory(slug);
   if (!story) notFound();
+  bumpStoryViews(story._id);
 
   const views = story.views;
 

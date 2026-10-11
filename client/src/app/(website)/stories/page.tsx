@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     "Real experiences, travel tips, and inspiration from the editmytrips community.",
 };
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export default async function StoriesPage() {
   const stories = await listStoriesPublic();

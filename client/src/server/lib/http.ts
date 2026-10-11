@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { verifyToken, type JwtPayload } from "@/server/lib/jwt";
 import type { UserRole } from "@/server/models/enums";
 import { connectDB } from "@/server/db/mongoose";
+import { revalidatePath } from "next/cache";
 
 export interface AuthUser {
   id: string;
@@ -84,7 +85,13 @@ export function handle<P = Record<string, never>>(
   return async (req: Request, ctx: Ctx<P>): Promise<Response> => {
     try {
       await connectDB();
-      return await fn(req, ctx);
+      const res = await fn(req, ctx);
+      // Admin writes affect homepage/list sections — refresh the ISR-cached
+      // public pages in the same request so changes appear instantly.
+      if (req.method !== "GET" && new URL(req.url).pathname.startsWith("/api/admin/")) {
+        for (const path of ["/", "/trips", "/destinations", "/stories"]) revalidatePath(path);
+      }
+      return res;
     } catch (err) {
       if ((err as { name?: string })?.name === "CastError") {
         return fail("Invalid identifier", 400);
